@@ -11,6 +11,8 @@
 	<properties>
 		<!-- Build encoding -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jooq-version>3.10.5</jooq-version>
+		<hikaricp.version>2.7.8</hikaricp.version>
 	</properties>
 
 	<developers>
@@ -26,6 +28,43 @@
 	</developers>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.1.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<version>${hikaricp.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq</artifactId>
+			<version>${jooq-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq-meta</artifactId>
+			<version>${jooq-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq-codegen</artifactId>
+			<version>${jooq-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.21</version>
+		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -60,19 +99,6 @@
 
 		</plugins>
 	</build>
-
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>io.rudin.arch</groupId>
-				<artifactId>arch-bom</artifactId>
-				<version>11.0.7</version>
-				<scope>import</scope>
-				<type>pom</type>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<distributionManagement>
 		<repository>
