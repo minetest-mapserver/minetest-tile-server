@@ -4,11 +4,14 @@ import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
 import org.jooq.DSLContext;
 import org.jooq.Record6;
+import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
+import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 
 public class FetchMap {
 
@@ -43,11 +46,46 @@ public class FetchMap {
 
 		int x_extent = maxx - minx;
 		int z_extent = maxz - minz;
-		
+
 		int flat_blocks = x_extent * z_extent;
-		
+
 		System.out.println("Flat blocks: " + flat_blocks);
-		
+
+		for (int blockx = minx; blockx < maxx; blockx++) {
+			
+			minz = ctx
+					.select(DSL.min(BLOCKS.POSZ))
+					.from(BLOCKS)
+					.where(BLOCKS.POSX.eq(blockx))
+					.fetchOne(DSL.min(BLOCKS.POSZ));
+			
+			maxz = ctx
+					.select(DSL.max(BLOCKS.POSZ))
+					.from(BLOCKS)
+					.where(BLOCKS.POSX.eq(blockx))
+					.fetchOne(DSL.max(BLOCKS.POSZ));
+			
+			
+			for (int blockz = minz; blockz < maxz; blockz++) {
+
+				System.out.println("x=" + blockx + " z=" + blockz);
+				
+				Result<BlocksRecord> blocks = ctx
+					.selectFrom(BLOCKS)
+					.where(BLOCKS.POSX.eq(blockx)
+							.and(BLOCKS.POSZ.eq(blockz)))
+					.fetch();
+
+				for (BlocksRecord block: blocks) {
+					MapBlock mapBlock = MapBlockParser.parse(block.getData());
+					
+					if (mapBlock.isEmpty())
+						continue;
+				}
+				
+			}
+		}
+
 		dataSource.close();
 	}
 
