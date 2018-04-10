@@ -2,6 +2,7 @@ package io.rudin.minetest.tileserver;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record6;
 import org.jooq.Result;
@@ -27,9 +28,17 @@ public class FetchMap {
 
 		DSLContext ctx = DSL.using(dataSource, SQLDialect.POSTGRES);
 
+		int restrict_min_y = 0;
+		int restrict_max_y = 4;
+				
+		Condition y_restriction = BLOCKS.POSY.ge(restrict_min_y).and(BLOCKS.POSY.le(restrict_max_y));
+
 		Record6<Integer, Integer, Integer, Integer, Integer, Integer> result = ctx
-				.select(DSL.min(BLOCKS.POSX), DSL.max(BLOCKS.POSX),DSL.min(BLOCKS.POSY), DSL.max(BLOCKS.POSY),DSL.min(BLOCKS.POSZ), DSL.max(BLOCKS.POSZ))
+				.select(DSL.min(BLOCKS.POSX), DSL.max(BLOCKS.POSX),
+						DSL.min(BLOCKS.POSY), DSL.max(BLOCKS.POSY),
+						DSL.min(BLOCKS.POSZ), DSL.max(BLOCKS.POSZ))
 				.from(BLOCKS)
+				.where(y_restriction)
 				.fetchOne();
 
 		Integer minx = result.get(DSL.min(BLOCKS.POSX));
@@ -48,21 +57,24 @@ public class FetchMap {
 		int z_extent = maxz - minz;
 
 		int flat_blocks = x_extent * z_extent;
+		int block_count = 0;
 
 		System.out.println("Flat blocks: " + flat_blocks);
+		
+		long start = System.currentTimeMillis();
 
 		for (int blockx = minx; blockx < maxx; blockx++) {
 			
 			minz = ctx
 					.select(DSL.min(BLOCKS.POSZ))
 					.from(BLOCKS)
-					.where(BLOCKS.POSX.eq(blockx))
+					.where(BLOCKS.POSX.eq(blockx).and(y_restriction))
 					.fetchOne(DSL.min(BLOCKS.POSZ));
 			
 			maxz = ctx
 					.select(DSL.max(BLOCKS.POSZ))
 					.from(BLOCKS)
-					.where(BLOCKS.POSX.eq(blockx))
+					.where(BLOCKS.POSX.eq(blockx).and(y_restriction))
 					.fetchOne(DSL.max(BLOCKS.POSZ));
 			
 			
@@ -72,12 +84,16 @@ public class FetchMap {
 				
 				Result<BlocksRecord> blocks = ctx
 					.selectFrom(BLOCKS)
-					.where(BLOCKS.POSX.eq(blockx)
-							.and(BLOCKS.POSZ.eq(blockz)))
+					.where(
+							BLOCKS.POSX.eq(blockx)
+							.and(BLOCKS.POSZ.eq(blockz))
+							.and(y_restriction)
+							)
 					.fetch();
 
 				for (BlocksRecord block: blocks) {
 					MapBlock mapBlock = MapBlockParser.parse(block.getData());
+					block_count++;
 					
 					if (mapBlock.isEmpty())
 						continue;
@@ -85,6 +101,10 @@ public class FetchMap {
 				
 			}
 		}
+		
+		long diff = System.currentTimeMillis() - start;
+		
+		System.out.println("Fetching of " + block_count + " blocks took " + diff + " ms");
 
 		dataSource.close();
 	}
