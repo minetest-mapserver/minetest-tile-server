@@ -42,17 +42,17 @@ public class MapBlockRenderer {
 
 			for (int x=0; x<16; x++) {
 				for (int z=0; z<16; z++) {
-
-					if (xz_coords[x][z]) {
-						continue;
-					}
-
 					for (int y=15; y>=0; y--) {
+
+						if (xz_coords[x][z]) {
+							break;
+						}
+
 
 						Optional<String> node = mapBlock.getNode(x, y, z);
 
 						if (!node.isPresent()) {
-							break;
+							continue;
 						}
 
 						String name = node.get();
@@ -67,16 +67,16 @@ public class MapBlockRenderer {
 
 							xz_coords[x][z] = true;
 							foundBlocks++;
+							
+							if (foundBlocks == expectedBlocks)
+								//All done
+								return;
+							
 						} else {
 							logger.debug("Color for name '{}' @ {}/{}/{} not found!", name, x, y, z);
 							//TODO: color not found
 						}
 
-					}
-
-					if (foundBlocks == expectedBlocks) {
-						logger.debug("All top blocks found ({}) exiting @ block-y: {}", foundBlocks, block.getPosy());
-						return;
 					}
 				}
 
