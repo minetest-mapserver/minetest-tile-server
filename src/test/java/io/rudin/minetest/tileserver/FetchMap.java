@@ -122,7 +122,7 @@ public class FetchMap {
 					continue;
 				
 				int graphics_offset_x = (blockx - minx) * 16;
-				int graphics_offset_z = (blockz - minz) * 16;
+				int graphics_offset_z = (z_extent * 16) - ((blockz - minz) * 16);
 				
 				Graphics blockGraphics = graphics.create(graphics_offset_x, graphics_offset_z, 16, 16);
 				

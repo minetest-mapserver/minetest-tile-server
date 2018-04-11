@@ -63,7 +63,10 @@ public class MapBlockRenderer {
 							logger.debug("Found node '{}' @ {}/{}/{} in blocky: {}", name, x, y, z, block.getPosy());
 
 							graphics.setColor(new java.awt.Color(color.r, color.g, color.b));
-							graphics.drawLine(x, z, x, z);
+							int graphicX = x;
+							int graphicY = 15 - z;
+							
+							graphics.drawLine(graphicX, graphicY, graphicX, graphicY);
 
 							xz_coords[x][z] = true;
 							foundBlocks++;
