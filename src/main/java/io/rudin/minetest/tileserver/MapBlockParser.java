@@ -6,12 +6,14 @@ import java.util.zip.Inflater;
 
 public class MapBlockParser {
 
-	private static int readU16(byte[] data, int offset) {
+	public static int readU16(byte[] data, int offset) {
 		return ((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff);
 	}
 
 	/**
 	 * Ref: https://github.com/minetest/minetest/blob/master/doc/world_format.txt
+	 * Impl: https://github.com/minetest/minetestmapper/blob/master/BlockDecoder.cpp
+	 * 
 	 * @param data
 	 * @return
 	 * @throws IllegalArgumentException
@@ -49,6 +51,10 @@ public class MapBlockParser {
 		byte[] mapData = new byte[1024 * 1024];
 
 		int mapDataLength = inflater.inflate(mapData);
+		
+		if (mapDataLength != 16384) {
+			throw new IllegalArgumentException("map data size does not line up: " + mapDataLength);
+		}
 		
 		block.mapData = mapData;
 		

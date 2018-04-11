@@ -14,9 +14,9 @@ public class MapBlock {
 	public final Map<Integer, String> mapping = new HashMap<>();
 	
 	public Optional<String> getNode(int x, int y, int z) {
-		int position = x + (y << 4) + (z << 8);
+		int position = x + (y * 16) + (z * 256);
 		
-		int id = mapData[position];
+		int id = MapBlockParser.readU16(mapData, position * 2);
 		
 		if (mapping.containsKey(id))
 			return Optional.of(mapping.get(id));

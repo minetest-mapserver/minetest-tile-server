@@ -2,6 +2,14 @@ package io.rudin.minetest.tileserver;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+
+import javax.imageio.ImageIO;
+
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record6;
@@ -28,8 +36,8 @@ public class FetchMap {
 
 		DSLContext ctx = DSL.using(dataSource, SQLDialect.POSTGRES);
 
-		int restrict_min_y = 0;
-		int restrict_max_y = 4;
+		int restrict_min_y = -500;
+		int restrict_max_y = 1500;
 				
 		Condition y_restriction = BLOCKS.POSY.ge(restrict_min_y).and(BLOCKS.POSY.le(restrict_max_y));
 
@@ -55,11 +63,23 @@ public class FetchMap {
 
 		int x_extent = maxx - minx;
 		int z_extent = maxz - minz;
-
-		int flat_blocks = x_extent * z_extent;
+		
+		int x_blocks = x_extent * 16;
+		int z_blocks = z_extent * 16;
+		
+		int flat_block_count = x_blocks * z_blocks;
 		int block_count = 0;
 
-		System.out.println("Flat blocks: " + flat_blocks);
+		System.out.println("Flat blocks: " + flat_block_count);
+		
+		BufferedImage image = new BufferedImage(x_blocks, z_blocks, BufferedImage.TYPE_INT_RGB);
+		Graphics2D graphics = image.createGraphics();
+		
+		graphics.setColor(Color.WHITE);
+		graphics.fillRect(0, 0, x_blocks, z_blocks);
+		
+		ColorTable colorTable = new ColorTable();
+		colorTable.load(FetchMap.class.getResourceAsStream("/colors.txt"));
 		
 		long start = System.currentTimeMillis();
 
@@ -79,7 +99,7 @@ public class FetchMap {
 			
 			
 			for (int blockz = minz; blockz < maxz; blockz++) {
-
+				
 				System.out.println("x=" + blockx + " z=" + blockz);
 				
 				Result<BlocksRecord> blocks = ctx
@@ -89,24 +109,34 @@ public class FetchMap {
 							.and(BLOCKS.POSZ.eq(blockz))
 							.and(y_restriction)
 							)
+					.orderBy(BLOCKS.POSY.desc())
 					.fetch();
-
-				for (BlocksRecord block: blocks) {
-					MapBlock mapBlock = MapBlockParser.parse(block.getData());
-					block_count++;
-					
-					if (mapBlock.isEmpty())
-						continue;
-				}
+				
+				if (blocks.isEmpty())
+					continue;
+				
+				int graphics_offset_x = (blockx - minx) * 16;
+				int graphics_offset_z = (blockz - minz) * 16;
+				
+				Graphics blockGraphics = graphics.create(graphics_offset_x, graphics_offset_z, 16, 16);
+				
+				MapBlockRenderer renderer = new MapBlockRenderer(blockGraphics, colorTable);
+				renderer.render(blocks);
+				
 				
 			}
 		}
 		
+		graphics.dispose();
+		
+		ImageIO.write(image, "jpg", new File("target/output.jpg"));
+
+
 		long diff = System.currentTimeMillis() - start;
 		
-		System.out.println("Fetching of " + block_count + " blocks took " + diff + " ms");
+		System.out.println("Fetching of " + block_count + " mapblocks took " + diff + " ms");
 
 		dataSource.close();
 	}
-
+	
 }
