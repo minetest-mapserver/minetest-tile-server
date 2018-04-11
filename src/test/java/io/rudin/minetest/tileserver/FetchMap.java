@@ -16,6 +16,8 @@ import org.jooq.Record6;
 import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -23,9 +25,13 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 
 public class FetchMap {
+	
+	private static final Logger logger = LoggerFactory.getLogger(FetchMap.class);
 
 	public static void main(String[] args) throws Exception {
 
+		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "DEBUG");
+		
 		HikariConfig cfg = new HikariConfig();
 		cfg.setUsername("postgres");
 		cfg.setPassword("enter");
@@ -129,7 +135,7 @@ public class FetchMap {
 		
 		graphics.dispose();
 		
-		ImageIO.write(image, "jpg", new File("target/output.jpg"));
+		ImageIO.write(image, "png", new File("target/output.png"));
 
 
 		long diff = System.currentTimeMillis() - start;
