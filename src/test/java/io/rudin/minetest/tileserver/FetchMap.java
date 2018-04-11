@@ -91,20 +91,20 @@ public class FetchMap {
 
 		for (int blockx = minx; blockx < maxx; blockx++) {
 			
-			minz = ctx
+			int iter_minz = ctx
 					.select(DSL.min(BLOCKS.POSZ))
 					.from(BLOCKS)
 					.where(BLOCKS.POSX.eq(blockx).and(y_restriction))
 					.fetchOne(DSL.min(BLOCKS.POSZ));
 			
-			maxz = ctx
+			int iter_maxz = ctx
 					.select(DSL.max(BLOCKS.POSZ))
 					.from(BLOCKS)
 					.where(BLOCKS.POSX.eq(blockx).and(y_restriction))
 					.fetchOne(DSL.max(BLOCKS.POSZ));
 			
 			
-			for (int blockz = minz; blockz < maxz; blockz++) {
+			for (int blockz = iter_minz; blockz < iter_maxz; blockz++) {
 				
 				System.out.println("x=" + blockx + " z=" + blockz);
 				
