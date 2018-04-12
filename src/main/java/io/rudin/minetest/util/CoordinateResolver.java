@@ -17,6 +17,25 @@ public class CoordinateResolver {
 	
 	public static class MapBlockCoordinateInfo {
 		public int x, z;
+		
+		//how many blocks on either axis (zoom:9 == 16)
+		public int blocksOnAxis;
+		
+		public int scale; //zoom:9 = 1 / zoom:10 = 2 / zoom:11 = 4 pixel/pixel
+	}
+	
+	/*
+	 * ...
+	 * 7 == 0.25
+	 * 8 == 0.5
+	 * 9 == 1
+	 * 10 == 2
+	 * 11 == 4
+	 * 12 == 8
+	 * ...
+	 */
+	public static double getZoomFactor(int zoom) {
+		return Math.pow(2, zoom - 9);
 	}
 	
 	public static MapBlockCoordinateInfo fromTile(int x, int y, int zoom) {
@@ -38,14 +57,28 @@ public class CoordinateResolver {
 		// tile with 1:1 map resolution
 		info.x = x * 16;
 		info.z = y * 16 * -1;
-		
+		info.blocksOnAxis = TILE_PIXEL_SIZE / MAPBLOCK_PIXEL_SIZE;
+		info.scale = 1;
+
 		if (zoom < 9) {
 			//zoomed out
 			//TODO
 			
 		} else if (zoom > 9) {
 			//zoomed in
-			//TODO
+			int factor = (int) Math.pow(2, zoom - 9);
+			// zoom:10 = 2
+			// zoom:11 = 4
+			// zoom:12 = 8
+			
+			info.x *= factor;
+			info.z *= factor;
+			info.blocksOnAxis /= factor;
+			info.scale = factor;
+			
+		} else {
+			//zoom == 9
+			//Nothing to do...
 		}
 		
 		return info;
