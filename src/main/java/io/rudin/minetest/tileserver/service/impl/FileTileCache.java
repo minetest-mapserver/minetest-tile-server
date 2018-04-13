@@ -1,4 +1,4 @@
-package io.rudin.minetest.tileserver.cache;
+package io.rudin.minetest.tileserver.service.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -7,12 +7,19 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import io.rudin.minetest.util.StreamUtil;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import io.rudin.minetest.tileserver.config.TileServerConfig;
+import io.rudin.minetest.tileserver.service.TileCache;
+import io.rudin.minetest.tileserver.util.StreamUtil;
+
+@Singleton
 public class FileTileCache implements TileCache {
 
-	public FileTileCache(File baseDirectory) {
-		this.baseDirectory = baseDirectory;
+	@Inject
+	public FileTileCache(TileServerConfig cfg) {
+		this.baseDirectory = new File(cfg.tileDirectory());
 	}
 	
 	private final File baseDirectory;

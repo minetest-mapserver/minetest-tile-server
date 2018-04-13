@@ -1,4 +1,4 @@
-package io.rudin.minetest.tileserver.cache;
+package io.rudin.minetest.tileserver.service;
 
 import java.io.IOException;
 

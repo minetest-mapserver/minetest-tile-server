@@ -1,4 +1,4 @@
-package io.rudin.minetest.util;
+package io.rudin.minetest.tileserver.util;
 
 import java.io.IOException;
 import java.io.InputStream;

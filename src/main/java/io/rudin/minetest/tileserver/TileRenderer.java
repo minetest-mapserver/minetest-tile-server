@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.zip.DataFormatException;
 
 import javax.imageio.ImageIO;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.jooq.DSLContext;
 import org.jooq.Result;
@@ -21,15 +23,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
-import io.rudin.minetest.tileserver.cache.TileCache;
-import io.rudin.minetest.util.CoordinateResolver;
-import io.rudin.minetest.util.CoordinateResolver.MapBlockCoordinateInfo;
-import io.rudin.minetest.util.WhiteTile;
+import io.rudin.minetest.tileserver.service.TileCache;
+import io.rudin.minetest.tileserver.util.CoordinateResolver;
+import io.rudin.minetest.tileserver.util.CoordinateResolver.MapBlockCoordinateInfo;
+import io.rudin.minetest.tileserver.util.WhiteTile;
 
+@Singleton
 public class TileRenderer {
 
 	private static final Logger logger = LoggerFactory.getLogger(TileRenderer.class);
 	
+	@Inject
 	public TileRenderer(DSLContext ctx, ColorTable colorTable, TileCache cache) {
 		this.ctx = ctx;
 		this.colorTable = colorTable;
