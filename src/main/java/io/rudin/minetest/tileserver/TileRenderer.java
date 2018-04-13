@@ -16,6 +16,7 @@ import javax.imageio.ImageIO;
 
 import org.jooq.DSLContext;
 import org.jooq.Result;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.cache.TileCache;
 import io.rudin.minetest.util.CoordinateResolver;
 import io.rudin.minetest.util.CoordinateResolver.MapBlockCoordinateInfo;
+import io.rudin.minetest.util.WhiteTile;
 
 public class TileRenderer {
 
@@ -49,6 +51,35 @@ public class TileRenderer {
 		//Check binary cache
 		if (cache.has(tileX, tileY, zoom)) {
 			return cache.get(tileX, tileY, zoom);
+		}
+		
+		
+		if (zoom < 9) {
+			//TODO: fail-fast for regions without map-blocks -> white
+
+			MapBlockCoordinateInfo mapblockInfo = CoordinateResolver.fromTile(tileX, tileY, zoom);
+		
+			int x1 = mapblockInfo.x;
+			int x2 = mapblockInfo.x + (int)mapblockInfo.width;
+			
+			int z1 = mapblockInfo.z;
+			int z2 = mapblockInfo.z + ((int)mapblockInfo.height * -1);
+			
+			Integer count = ctx
+				.select(DSL.count())
+				.from(BLOCKS)
+				.where(
+						BLOCKS.POSX.ge(Math.min(x1, x2))
+						.and(BLOCKS.POSX.le(Math.max(x1, x2)))
+						.and(BLOCKS.POSZ.ge(Math.min(z1, z2)))
+						.and(BLOCKS.POSZ.le(Math.max(z1, z2)))
+				)
+				.fetchOne(DSL.count());
+		
+			if (count == 0) {
+				return WhiteTile.getPNG();
+			}
+			
 		}
 
 
