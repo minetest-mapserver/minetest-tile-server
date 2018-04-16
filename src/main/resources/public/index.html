@@ -19,16 +19,31 @@
 
     <script src="leaflet.js"></script>
     <script>
+    var crs = L.Util.extend({}, L.CRS.Simple, {
+    	transformation: L.transformation(0.001, 0, 0.001, 0),
+    });
+    
     var map = L.map('image-map', {
       minZoom: 1,
       maxZoom: 13,
       center: [0, 0],
       zoom: 9,
-      crs: L.CRS.Simple
+      crs: crs
     });
     
     L.tileLayer('tiles/{z}/{x}/{y}').addTo(map);
-
+    //L.marker([0,0]).addTo(map);
+    //L.marker([1,1]).addTo(map);
+    //L.marker([410,114]).addTo(map);
+    
+    var playerMapper = player => {
+    	L.marker([player.posz/10, player.posx/10]).addTo(map);
+    	console.log(player);
+    };
+    
+    fetch("player")
+    .then(res => res.json())
+    .then(players => players.forEach(playerMapper));
     </script>
 
   </body>

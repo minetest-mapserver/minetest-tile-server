@@ -13,7 +13,9 @@ import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.module.ConfigModule;
 import io.rudin.minetest.tileserver.module.DBModule;
 import io.rudin.minetest.tileserver.module.ServiceModule;
+import io.rudin.minetest.tileserver.route.PlayerRoute;
 import io.rudin.minetest.tileserver.route.TileRoute;
+import io.rudin.minetest.tileserver.transformer.JsonTransformer;
 
 public class TileServer {
 
@@ -33,7 +35,10 @@ public class TileServer {
 		port(cfg.httPort());
 		init();
 		
-		get("/tiles/:z/:x/:y", injector.getInstance(TileRoute.class));
+		JsonTransformer json = injector.getInstance(JsonTransformer.class);
+		
+		get("/tiles/:z/:x/:y", "image/png", injector.getInstance(TileRoute.class));
+		get("/player", "application/json", injector.getInstance(PlayerRoute.class), json);
 		
 		
 		System.in.read();

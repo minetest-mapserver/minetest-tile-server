@@ -38,6 +38,9 @@ public class TileRenderer {
 		this.ctx = ctx;
 		this.colorTable = colorTable;
 		this.cache = cache;
+		
+		if (colorTable.getColorMap().isEmpty())
+			logger.warn("Color table empty!");
 	}
 
 	private final TileCache cache;
@@ -218,6 +221,8 @@ public class TileRenderer {
 
 				if (blocks.isEmpty())
 					continue;
+				
+				logger.debug("Got {} blocks", blocks.size());
 
 				MapBlockRenderer renderer = new MapBlockRenderer(mapblockGraphics, colorTable);
 
