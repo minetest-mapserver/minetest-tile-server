@@ -20,7 +20,10 @@
     <script src="leaflet.js"></script>
     <script>
     var crs = L.Util.extend({}, L.CRS.Simple, {
-    	transformation: L.transformation(0.001, 0, 0.001, 0),
+    	//transformation: L.transformation(0.001, 0, -0.001, 0),
+    	scale: function (zoom) {
+    		return Math.pow(2, zoom-9);
+    	}
     });
     
     var map = L.map('image-map', {
@@ -32,12 +35,13 @@
     });
     
     L.tileLayer('tiles/{z}/{x}/{y}').addTo(map);
-    //L.marker([0,0]).addTo(map);
-    //L.marker([1,1]).addTo(map);
+    L.marker([0,0]).bindPopup("0/0").addTo(map);
+    L.marker([1,1]).bindPopup("1/1").addTo(map);
+    L.marker([-207, 7]).bindPopup("Spawn").addTo(map);
     //L.marker([410,114]).addTo(map);
     
     var playerMapper = player => {
-    	L.marker([player.posz/10, player.posx/10]).addTo(map);
+    	L.marker([player.posz/10, player.posx/10]).bindPopup(player.name).addTo(map);
     	console.log(player);
     };
     

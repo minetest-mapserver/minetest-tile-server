@@ -20,6 +20,7 @@ public class TileRoute implements Route {
 
 	@Override
 	public Object handle(Request req, Response res) throws Exception {
+		res.header("Content-Type", "image/png");
 		int z = Integer.parseInt(req.params(":z"));
 		int y = Integer.parseInt(req.params(":y"));
 		int x = Integer.parseInt(req.params(":x"));

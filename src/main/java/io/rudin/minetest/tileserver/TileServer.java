@@ -37,8 +37,8 @@ public class TileServer {
 		
 		JsonTransformer json = injector.getInstance(JsonTransformer.class);
 		
-		get("/tiles/:z/:x/:y", "image/png", injector.getInstance(TileRoute.class));
-		get("/player", "application/json", injector.getInstance(PlayerRoute.class), json);
+		get("/tiles/:z/:x/:y", injector.getInstance(TileRoute.class));
+		get("/player", injector.getInstance(PlayerRoute.class), json);
 		
 		
 		System.in.read();

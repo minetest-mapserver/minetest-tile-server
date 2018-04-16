@@ -24,6 +24,7 @@ public class PlayerRoute implements Route {
 	
 	@Override
 	public Object handle(Request request, Response response) throws Exception {
+		response.header("Content-Type", "application/json");
 		return ctx.selectFrom(PLAYER).fetch().into(Player.class);
 	}
 
