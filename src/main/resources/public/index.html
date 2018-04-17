@@ -34,12 +34,13 @@
       crs: crs
     });
     
+    //works: map.on('mousemove', ev => console.log(ev.latlng));
+    
     L.tileLayer('tiles/{z}/{x}/{y}').addTo(map);
     //L.marker([-207, 7]).bindPopup("Spawn").addTo(map);
     
     var playerMapper = player => {
     	L.marker([player.posz/10, player.posx/10]).bindPopup(player.name).addTo(map);
-    	console.log(player);
     };
     
     fetch("player")
