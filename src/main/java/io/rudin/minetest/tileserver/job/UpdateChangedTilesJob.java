@@ -9,6 +9,9 @@ import org.jooq.Cursor;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
 
+import io.rudin.minetest.tileserver.util.CoordinateResolver;
+import io.rudin.minetest.tileserver.util.CoordinateResolver.TileInfo;
+
 @Singleton
 public class UpdateChangedTilesJob implements Runnable {
 
@@ -46,6 +49,9 @@ public class UpdateChangedTilesJob implements Runnable {
 					Integer z = change.get(TILESERVER_BLOCK_CHANGES.POSZ);
 					
 					System.out.println("Tile changed: " + x + "/" + z);
+					
+					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
+					
 					
 					//TODO: re-render tile
 					//TODO: event-bus for ui notification

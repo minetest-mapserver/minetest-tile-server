@@ -10,9 +10,21 @@ public class CoordinateResolver {
 	public static class TileInfo {
 		public int x, y;
 		public int zoom;
-		
-		public TileInfo zoom() {
-			return null;//TODO
+		public double width, height; //in tiles
+
+		public TileInfo toZoom(int zoom) {
+			TileInfo info = new TileInfo();
+			
+			double deltaFactor = Math.pow(2, zoom - this.zoom);
+			
+			info.zoom = zoom;
+			info.x = (int)(this.x * deltaFactor);
+			info.y = (int)(this.y * deltaFactor);
+			info.height = this.height / deltaFactor;
+			info.width = this.width / deltaFactor;
+			
+			
+			return info;
 		}
 	}
 	
@@ -20,6 +32,11 @@ public class CoordinateResolver {
 		TileInfo info = new TileInfo();
 		
 		info.zoom = DEFAULT_ZOOM;
+
+		info.x = x / 16;
+		info.y = z / 16 * -1;
+		info.height = 1;
+		info.width = 1;
 		
 		return info;
 	}
