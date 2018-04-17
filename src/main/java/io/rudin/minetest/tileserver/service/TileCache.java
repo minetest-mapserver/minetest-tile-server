@@ -10,4 +10,6 @@ public interface TileCache {
 
 	boolean has(int x, int y, int z);
 	
+	void remove(int x, int y, int z);
+	
 }

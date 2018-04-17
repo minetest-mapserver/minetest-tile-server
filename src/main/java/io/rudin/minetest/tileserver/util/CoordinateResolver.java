@@ -5,6 +5,8 @@ public class CoordinateResolver {
 	public static final int TILE_PIXEL_SIZE = 256;
 	public static final int MAPBLOCK_PIXEL_SIZE = 16;
 	
+	public static final int MAX_ZOOM = 13;
+	public static final int MIN_ZOOM = 1;
 	public static final int DEFAULT_ZOOM = 9;
 	
 	public static class TileInfo {

@@ -52,4 +52,9 @@ public class FileTileCache implements TileCache {
 		return getFile(x, y, z).isFile();
 	}
 
+	@Override
+	public void remove(int x, int y, int z) {
+		getFile(x, y, z).delete();
+	}
+
 }

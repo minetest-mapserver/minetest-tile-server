@@ -92,6 +92,25 @@ public class CoordinateResolverTest {
 		
 	}
 	
+	/*
+
+Zoom: 9
+ __ __ __ __
+|0 |1 |2 |3 |
+|_0|_0|_0|_0|
+|0 |1 |2 |3 |
+|_1|_1|_1|_1|
+
+
+Zoom: 8
+ _____ _____
+|0    |1    |
+|     |     |
+|     |     |
+|____0|____0|
+
+	 */
+	
 	@Test
 	public void testTileZoomIn2() {
 		TileInfo tileInfo = CoordinateResolver.fromCoordinates(16, -16);
@@ -107,6 +126,25 @@ public class CoordinateResolverTest {
 		Assert.assertEquals(0.5, tileInfo.height, 0.1);
 		Assert.assertEquals(2, tileInfo.x);
 		Assert.assertEquals(2, tileInfo.y);
+		
+		tileInfo = tileInfo.toZoom(10); //zoom in
+		Assert.assertEquals(10, tileInfo.zoom);
+		Assert.assertEquals(0.5, tileInfo.width, 0.1);
+		Assert.assertEquals(0.5, tileInfo.height, 0.1);
+		Assert.assertEquals(2, tileInfo.x);
+		Assert.assertEquals(2, tileInfo.y);
+		
+	}
+	
+	@Test
+	public void testTileZoomIterate() {
+		TileInfo tileInfo = CoordinateResolver.fromCoordinates(16, -16);
+		
+		for (int i=CoordinateResolver.MIN_ZOOM; i<=CoordinateResolver.MAX_ZOOM; i++) {
+			TileInfo zoomedTile = tileInfo.toZoom(i);
+			
+			System.out.println("Zoom: " + i + " x=" + zoomedTile.x + " y=" + zoomedTile.y + " width=" + zoomedTile.width);
+		}
 		
 	}
 

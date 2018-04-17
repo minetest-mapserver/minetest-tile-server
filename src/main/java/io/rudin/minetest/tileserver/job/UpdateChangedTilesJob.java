@@ -9,6 +9,7 @@ import org.jooq.Cursor;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
 
+import io.rudin.minetest.tileserver.service.TileCache;
 import io.rudin.minetest.tileserver.util.CoordinateResolver;
 import io.rudin.minetest.tileserver.util.CoordinateResolver.TileInfo;
 
@@ -16,11 +17,14 @@ import io.rudin.minetest.tileserver.util.CoordinateResolver.TileInfo;
 public class UpdateChangedTilesJob implements Runnable {
 
 	@Inject
-	public UpdateChangedTilesJob(DSLContext ctx) {
+	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache) {
 		this.ctx = ctx;
+		this.tileCache = tileCache;
 	}
 
 	private final DSLContext ctx;
+	
+	private final TileCache tileCache;
 
 	private boolean running = false;
 
@@ -52,8 +56,13 @@ public class UpdateChangedTilesJob implements Runnable {
 					
 					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
 					
+					//remove all tiles in every zoom
+					for (int i=CoordinateResolver.MIN_ZOOM; i<=CoordinateResolver.MAX_ZOOM; i++) {
+						TileInfo zoomedTile = tileInfo.toZoom(i);
+						
+						tileCache.remove(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
+					}
 					
-					//TODO: re-render tile
 					//TODO: event-bus for ui notification
 					
 					ctx
