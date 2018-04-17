@@ -47,6 +47,9 @@ public class UpdateChangedTilesJob implements Runnable {
 					
 					System.out.println("Tile changed: " + x + "/" + z);
 					
+					//TODO: re-render tile
+					//TODO: event-bus for ui notification
+					
 					ctx
 					.update(TILESERVER_BLOCK_CHANGES)
 					.set(TILESERVER_BLOCK_CHANGES.CHANGED, false)
@@ -59,9 +62,6 @@ public class UpdateChangedTilesJob implements Runnable {
 				cursor.close();
 
 			}
-
-
-			//TODO
 
 		} finally {
 			running = false;

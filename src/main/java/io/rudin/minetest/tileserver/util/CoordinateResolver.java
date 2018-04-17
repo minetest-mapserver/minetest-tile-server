@@ -5,12 +5,21 @@ public class CoordinateResolver {
 	public static final int TILE_PIXEL_SIZE = 256;
 	public static final int MAPBLOCK_PIXEL_SIZE = 16;
 	
+	public static final int DEFAULT_ZOOM = 9;
+	
 	public static class TileInfo {
 		public int x, y;
+		public int zoom;
+		
+		public TileInfo zoom() {
+			return null;//TODO
+		}
 	}
 	
 	public static TileInfo fromCoordinates(int x, int z) {
 		TileInfo info = new TileInfo();
+		
+		info.zoom = DEFAULT_ZOOM;
 		
 		return info;
 	}
@@ -31,7 +40,7 @@ public class CoordinateResolver {
 	 * ...
 	 */
 	public static double getZoomFactor(int zoom) {
-		return Math.pow(2, zoom - 9);
+		return Math.pow(2, zoom - DEFAULT_ZOOM);
 	}
 	
 	public static MapBlockCoordinateInfo fromTile(int x, int y, int zoom) {
@@ -57,10 +66,10 @@ public class CoordinateResolver {
 		info.width = 16;
 
 		
-		if (zoom < 9) {
+		if (zoom < DEFAULT_ZOOM) {
 			//zoomed out
 			
-			int factor = (int) Math.pow(2, 9 - zoom);
+			int factor = (int) Math.pow(2, DEFAULT_ZOOM - zoom);
 
 			info.x /= factor;
 			info.z /= factor;
@@ -68,10 +77,10 @@ public class CoordinateResolver {
 			info.height *= factor;
 			info.width *= factor;
 			
-		} else if (zoom > 9) {
+		} else if (zoom > DEFAULT_ZOOM) {
 			//zoomed in
 			
-			int factor = (int) Math.pow(2, zoom - 9);
+			int factor = (int) Math.pow(2, zoom - DEFAULT_ZOOM);
 			info.x *= factor;
 			info.z *= factor;
 
@@ -80,7 +89,7 @@ public class CoordinateResolver {
 			info.width /= factor;
 
 		} else {
-			//zoom == 9
+			//zoom == 9 (DEFAULT_ZOOM)
 			//Nothing to do...
 		}
 		
