@@ -31,6 +31,9 @@ public class TileServer {
 		
 		TileServerConfig cfg = injector.getInstance(TileServerConfig.class);
 		
+		DBMigration dbMigration = injector.getInstance(DBMigration.class);
+		dbMigration.migrate();
+		
 		staticFileLocation("/public");
 		port(cfg.httPort());
 		init();
