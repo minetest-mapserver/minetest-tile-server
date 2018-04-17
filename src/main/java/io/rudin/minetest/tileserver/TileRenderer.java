@@ -3,7 +3,6 @@ package io.rudin.minetest.tileserver;
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -34,20 +33,17 @@ public class TileRenderer {
 	private static final Logger logger = LoggerFactory.getLogger(TileRenderer.class);
 	
 	@Inject
-	public TileRenderer(DSLContext ctx, ColorTable colorTable, TileCache cache) {
+	public TileRenderer(DSLContext ctx, TileCache cache, MapBlockRenderer blockRenderer) {
 		this.ctx = ctx;
-		this.colorTable = colorTable;
 		this.cache = cache;
-		
-		if (colorTable.getColorMap().isEmpty())
-			logger.warn("Color table empty!");
+		this.blockRenderer = blockRenderer;
 	}
 
 	private final TileCache cache;
 
 	private final DSLContext ctx;
 
-	private final ColorTable colorTable;
+	private final MapBlockRenderer blockRenderer;
 
 	public BufferedImage createTile() {
 		return new BufferedImage(CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE, BufferedImage.TYPE_INT_RGB);
@@ -201,12 +197,6 @@ public class TileRenderer {
 		for (int mbx=0; mbx<16; mbx++) {
 			for (int mbz=0; mbz<16; mbz++) {
 
-				Graphics mapblockGraphics = graphics.create(
-						mbx * CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
-						mbz * CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
-						CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
-						CoordinateResolver.MAPBLOCK_PIXEL_SIZE);
-
 				int mapblockX = coordinateInfo.x + mbx;
 				int mapblockZ = coordinateInfo.z + (mbz *-1);
 
@@ -224,9 +214,17 @@ public class TileRenderer {
 				
 				logger.debug("Got {} blocks", blocks.size());
 
-				MapBlockRenderer renderer = new MapBlockRenderer(mapblockGraphics, colorTable);
-
-				renderer.render(blocks);
+				BufferedImage mapBlockImage = blockRenderer.render(blocks);
+				
+				graphics.drawImage(
+						mapBlockImage,
+						mbx * CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
+						mbz * CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
+						CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
+						CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
+						null
+				);
+				
 			}
 		}
 

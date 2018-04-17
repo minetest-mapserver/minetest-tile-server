@@ -35,10 +35,7 @@
     });
     
     L.tileLayer('tiles/{z}/{x}/{y}').addTo(map);
-    L.marker([0,0]).bindPopup("0/0").addTo(map);
-    L.marker([1,1]).bindPopup("1/1").addTo(map);
-    L.marker([-207, 7]).bindPopup("Spawn").addTo(map);
-    //L.marker([410,114]).addTo(map);
+    //L.marker([-207, 7]).bindPopup("Spawn").addTo(map);
     
     var playerMapper = player => {
     	L.marker([player.posz/10, player.posx/10]).bindPopup(player.name).addTo(map);

@@ -1,8 +1,12 @@
 package io.rudin.minetest.tileserver;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.Optional;
 import java.util.zip.DataFormatException;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.jooq.Result;
 import org.slf4j.Logger;
@@ -11,21 +15,27 @@ import org.slf4j.LoggerFactory;
 import io.rudin.minetest.tileserver.ColorTable.Color;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 
+@Singleton
 public class MapBlockRenderer {
 
 	private static final Logger logger = LoggerFactory.getLogger(MapBlockRenderer.class);
 
-	public MapBlockRenderer(Graphics graphics, ColorTable colorTable) {
-		this.graphics = graphics;
+	private static final int BLOCK_SIZE = 16;
+	
+	@Inject
+	public MapBlockRenderer(ColorTable colorTable) {
 		this.colorTable = colorTable;
 	}
 
-	private final Graphics graphics;
-
 	private final ColorTable colorTable;
 
-	public void render(Result<BlocksRecord> mapblocks) throws IllegalArgumentException, DataFormatException {
+	public BufferedImage render(Result<BlocksRecord> mapblocks) throws IllegalArgumentException, DataFormatException {
 
+		BufferedImage image = new BufferedImage(BLOCK_SIZE, BLOCK_SIZE, BufferedImage.TYPE_INT_RGB);
+		Graphics2D graphics = image.createGraphics();
+
+		graphics.setColor(java.awt.Color.WHITE);
+		graphics.fillRect(0, 0, BLOCK_SIZE, BLOCK_SIZE);
 
 		int foundBlocks = 0;
 		final int expectedBlocks = 16 * 16;
@@ -73,7 +83,7 @@ public class MapBlockRenderer {
 							
 							if (foundBlocks == expectedBlocks)
 								//All done
-								return;
+								return image;
 							
 						} else {
 							logger.debug("Color for name '{}' @ {}/{}/{} not found!", name, x, y, z);
@@ -91,6 +101,7 @@ public class MapBlockRenderer {
 			logger.debug("Only found {} blocks in {} layers!", foundBlocks, mapblocks.size());
 		}
 
+		return image;
 	}
 
 }
