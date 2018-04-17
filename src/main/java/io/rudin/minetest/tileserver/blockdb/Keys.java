@@ -6,8 +6,12 @@ package io.rudin.minetest.tileserver.blockdb;
 
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
+import io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockChanges;
+import io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockDepth;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerRecord;
+import io.rudin.minetest.tileserver.blockdb.tables.records.TileserverBlockChangesRecord;
+import io.rudin.minetest.tileserver.blockdb.tables.records.TileserverBlockDepthRecord;
 
 import javax.annotation.Generated;
 
@@ -40,6 +44,8 @@ public class Keys {
 
     public static final UniqueKey<BlocksRecord> BLOCKS_PKEY = UniqueKeys0.BLOCKS_PKEY;
     public static final UniqueKey<PlayerRecord> PLAYER_PKEY = UniqueKeys0.PLAYER_PKEY;
+    public static final UniqueKey<TileserverBlockChangesRecord> TILESERVER_BLOCK_CHANGES_PKEY = UniqueKeys0.TILESERVER_BLOCK_CHANGES_PKEY;
+    public static final UniqueKey<TileserverBlockDepthRecord> TILESERVER_BLOCK_DEPTH_PKEY = UniqueKeys0.TILESERVER_BLOCK_DEPTH_PKEY;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -53,5 +59,7 @@ public class Keys {
     private static class UniqueKeys0 {
         public static final UniqueKey<BlocksRecord> BLOCKS_PKEY = Internal.createUniqueKey(Blocks.BLOCKS, "blocks_pkey", Blocks.BLOCKS.POSX, Blocks.BLOCKS.POSY, Blocks.BLOCKS.POSZ);
         public static final UniqueKey<PlayerRecord> PLAYER_PKEY = Internal.createUniqueKey(Player.PLAYER, "player_pkey", Player.PLAYER.NAME);
+        public static final UniqueKey<TileserverBlockChangesRecord> TILESERVER_BLOCK_CHANGES_PKEY = Internal.createUniqueKey(TileserverBlockChanges.TILESERVER_BLOCK_CHANGES, "tileserver_block_changes_pkey", TileserverBlockChanges.TILESERVER_BLOCK_CHANGES.POSX, TileserverBlockChanges.TILESERVER_BLOCK_CHANGES.POSY, TileserverBlockChanges.TILESERVER_BLOCK_CHANGES.POSZ);
+        public static final UniqueKey<TileserverBlockDepthRecord> TILESERVER_BLOCK_DEPTH_PKEY = Internal.createUniqueKey(TileserverBlockDepth.TILESERVER_BLOCK_DEPTH, "tileserver_block_depth_pkey", TileserverBlockDepth.TILESERVER_BLOCK_DEPTH.POSX, TileserverBlockDepth.TILESERVER_BLOCK_DEPTH.POSZ);
     }
 }

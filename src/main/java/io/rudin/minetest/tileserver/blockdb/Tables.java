@@ -6,6 +6,8 @@ package io.rudin.minetest.tileserver.blockdb;
 
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
+import io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockChanges;
+import io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockDepth;
 
 import javax.annotation.Generated;
 
@@ -32,4 +34,14 @@ public class Tables {
      * The table <code>player</code>.
      */
     public static final Player PLAYER = io.rudin.minetest.tileserver.blockdb.tables.Player.PLAYER;
+
+    /**
+     * The table <code>tileserver_block_changes</code>.
+     */
+    public static final TileserverBlockChanges TILESERVER_BLOCK_CHANGES = io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockChanges.TILESERVER_BLOCK_CHANGES;
+
+    /**
+     * The table <code>tileserver_block_depth</code>.
+     */
+    public static final TileserverBlockDepth TILESERVER_BLOCK_DEPTH = io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockDepth.TILESERVER_BLOCK_DEPTH;
 }
