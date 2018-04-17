@@ -18,8 +18,8 @@ public class CoordinateResolver {
 			double deltaFactor = Math.pow(2, zoom - this.zoom);
 			
 			info.zoom = zoom;
-			info.x = (int)(this.x * deltaFactor);
-			info.y = (int)(this.y * deltaFactor);
+			info.x = (int)(this.x * deltaFactor) + (int)((this.x * deltaFactor) % 2);
+			info.y = (int)(this.y * deltaFactor) + (int)((this.y * deltaFactor) % 2);
 			info.height = this.height / deltaFactor;
 			info.width = this.width / deltaFactor;
 			
