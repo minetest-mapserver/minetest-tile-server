@@ -39,33 +39,35 @@ public class StaticTileGen {
 
 		System.out.println("Max-X " + maxX + " Min-X: " + minX);
 
-		for (int x=minX; x<=maxX; x++) {
+		for (int i=CoordinateResolver.DEFAULT_ZOOM; i>=CoordinateResolver.MIN_ZOOM; i--) {
 
-			Record2<Integer, Integer> zrange = ctx
-					.select(DSL.max(BLOCKS.POSZ), DSL.min(BLOCKS.POSZ))
-					.from(BLOCKS)
-					.where(BLOCKS.POSX.eq(x))
-					.fetchOne();
+			for (int x=minX; x<=maxX; x++) {
 
-			Integer maxZ = zrange.get(DSL.max(BLOCKS.POSZ));
-			Integer minZ = zrange.get(DSL.min(BLOCKS.POSZ));
+				Record2<Integer, Integer> zrange = ctx
+						.select(DSL.max(BLOCKS.POSZ), DSL.min(BLOCKS.POSZ))
+						.from(BLOCKS)
+						.where(BLOCKS.POSX.eq(x))
+						.fetchOne();
 
-			if (maxZ == null || minZ == null)
-				continue;
-			
-			for (int z=minZ; z<=maxZ; z++) {
-				
-				TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
-				TileInfo minZoom = tileInfo.toZoom(CoordinateResolver.MIN_ZOOM);
-				
-				System.out.println("Tile: " + minZoom.x + "/" + minZoom.y + " @ " + minZoom.zoom);
-				
-				tileRenderer.render(minZoom.x, minZoom.y, minZoom.zoom);
+				Integer maxZ = zrange.get(DSL.max(BLOCKS.POSZ));
+				Integer minZ = zrange.get(DSL.min(BLOCKS.POSZ));
+
+				if (maxZ == null || minZ == null)
+					continue;
+
+				for (int z=minZ; z<=maxZ; z++) {
+
+					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z).toZoom(i);
+					//TileInfo minZoom = tileInfo.toZoom(CoordinateResolver.MIN_ZOOM);
+
+					System.out.println("Tile: " + tileInfo.x + "/" + tileInfo.y + " @ " + tileInfo.zoom);
+
+					tileRenderer.render(tileInfo.x, tileInfo.y, tileInfo.zoom);
+				}
+
+
 			}
-			
-
 		}
-
 
 
 	}
