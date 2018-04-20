@@ -39,9 +39,12 @@ public class StaticTileGen {
 
 		System.out.println("Max-X " + maxX + " Min-X: " + minX);
 
-		for (int i=CoordinateResolver.DEFAULT_ZOOM; i>=CoordinateResolver.MIN_ZOOM; i--) {
+		for (int zoom=CoordinateResolver.DEFAULT_ZOOM; zoom>=CoordinateResolver.MIN_ZOOM; zoom--) {
 
-			for (int x=minX; x<=maxX; x++) {
+			int factor = (int)Math.pow(2, CoordinateResolver.DEFAULT_ZOOM - zoom);
+			int step = 16 * factor;
+			
+			for (int x=minX; x<=maxX; x+=step) {
 
 				Record2<Integer, Integer> zrange = ctx
 						.select(DSL.max(BLOCKS.POSZ), DSL.min(BLOCKS.POSZ))
@@ -55,17 +58,17 @@ public class StaticTileGen {
 				if (maxZ == null || minZ == null)
 					continue;
 
-				for (int z=minZ; z<=maxZ; z++) {
+				for (int z=minZ; z<=maxZ; z+=step) {
 
-					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z).toZoom(i);
+					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z).toZoom(zoom);
+
 					//TileInfo minZoom = tileInfo.toZoom(CoordinateResolver.MIN_ZOOM);
 
 					System.out.println("Tile: " + tileInfo.x + "/" + tileInfo.y + " @ " + tileInfo.zoom);
 
 					tileRenderer.render(tileInfo.x, tileInfo.y, tileInfo.zoom);
+
 				}
-
-
 			}
 		}
 
