@@ -134,16 +134,30 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5</version>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<localCheckout>true</localCheckout>
-					<releaseProfiles>optimize</releaseProfiles>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>io.rudin.minetest.tileserver.TileServer</mainClass>
+						</manifest>
+					</archive>
+					<appendAssemblyId>false</appendAssemblyId>
+					<finalName>tileserver</finalName>
 				</configuration>
 			</plugin>
-
 
 		</plugins>
 	</build>
