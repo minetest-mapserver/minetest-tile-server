@@ -8,6 +8,7 @@ import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
 import io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockChanges;
 import io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockDepth;
+import io.rudin.minetest.tileserver.blockdb.tables.TileserverTiles;
 
 import javax.annotation.Generated;
 
@@ -37,6 +38,7 @@ public class Indexes {
     public static final Index PLAYER_PKEY = Indexes0.PLAYER_PKEY;
     public static final Index TILESERVER_BLOCK_CHANGES_PKEY = Indexes0.TILESERVER_BLOCK_CHANGES_PKEY;
     public static final Index TILESERVER_BLOCK_DEPTH_PKEY = Indexes0.TILESERVER_BLOCK_DEPTH_PKEY;
+    public static final Index TILESERVER_TILES_PKEY = Indexes0.TILESERVER_TILES_PKEY;
 
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
@@ -47,5 +49,6 @@ public class Indexes {
         public static Index PLAYER_PKEY = Internal.createIndex("player_pkey", Player.PLAYER, new OrderField[] { Player.PLAYER.NAME }, true);
         public static Index TILESERVER_BLOCK_CHANGES_PKEY = Internal.createIndex("tileserver_block_changes_pkey", TileserverBlockChanges.TILESERVER_BLOCK_CHANGES, new OrderField[] { TileserverBlockChanges.TILESERVER_BLOCK_CHANGES.POSX, TileserverBlockChanges.TILESERVER_BLOCK_CHANGES.POSY, TileserverBlockChanges.TILESERVER_BLOCK_CHANGES.POSZ }, true);
         public static Index TILESERVER_BLOCK_DEPTH_PKEY = Internal.createIndex("tileserver_block_depth_pkey", TileserverBlockDepth.TILESERVER_BLOCK_DEPTH, new OrderField[] { TileserverBlockDepth.TILESERVER_BLOCK_DEPTH.POSX, TileserverBlockDepth.TILESERVER_BLOCK_DEPTH.POSZ }, true);
+        public static Index TILESERVER_TILES_PKEY = Internal.createIndex("tileserver_tiles_pkey", TileserverTiles.TILESERVER_TILES, new OrderField[] { TileserverTiles.TILESERVER_TILES.X, TileserverTiles.TILESERVER_TILES.Y, TileserverTiles.TILESERVER_TILES.Z }, true);
     }
 }

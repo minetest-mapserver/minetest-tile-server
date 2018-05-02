@@ -8,6 +8,7 @@ import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
 import io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockChanges;
 import io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockDepth;
+import io.rudin.minetest.tileserver.blockdb.tables.TileserverTiles;
 
 import javax.annotation.Generated;
 
@@ -44,4 +45,9 @@ public class Tables {
      * The table <code>tileserver_block_depth</code>.
      */
     public static final TileserverBlockDepth TILESERVER_BLOCK_DEPTH = io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockDepth.TILESERVER_BLOCK_DEPTH;
+
+    /**
+     * The table <code>tileserver_tiles</code>.
+     */
+    public static final TileserverTiles TILESERVER_TILES = io.rudin.minetest.tileserver.blockdb.tables.TileserverTiles.TILESERVER_TILES;
 }

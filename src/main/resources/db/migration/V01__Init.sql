@@ -20,6 +20,15 @@ create table tileserver_block_depth (
 	PRIMARY KEY (posX,posZ)
 );
 
+create table tileserver_tiles (
+    x int not null,
+    y int not null,
+    z int not null,
+    mtime bigint not null,
+    tile bytea,
+
+    PRIMARY KEY(x,y,z)
+);
 
 create or replace function on_blocks_change() returns trigger as
 $BODY$
