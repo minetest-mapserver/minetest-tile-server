@@ -8,3 +8,5 @@ target
 logs
 node_modules
 heimdallr-data
+.idea
+*.iml
