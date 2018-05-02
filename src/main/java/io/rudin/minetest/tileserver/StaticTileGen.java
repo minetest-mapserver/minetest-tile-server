@@ -2,6 +2,8 @@ package io.rudin.minetest.tileserver;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
+import io.rudin.minetest.tileserver.config.TileServerConfig;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
 import org.jooq.impl.DSL;
@@ -28,10 +30,14 @@ public class StaticTileGen {
 
 		DSLContext ctx = injector.getInstance(DSLContext.class);
 		TileRenderer tileRenderer = injector.getInstance(TileRenderer.class);
+		TileServerConfig cfg = injector.getInstance(TileServerConfig.class);
+
+		Condition yCondition = BLOCKS.POSY.between(cfg.tilesMinY(), cfg.tilesMaxY());
 
 		Record2<Integer, Integer> result = ctx
 				.select(DSL.max(BLOCKS.POSX), DSL.min(BLOCKS.POSX))
 				.from(BLOCKS)
+				.where(yCondition)
 				.fetchOne();
 
 		Integer maxX = result.get(DSL.max(BLOCKS.POSX));
@@ -50,6 +56,7 @@ public class StaticTileGen {
 						.select(DSL.max(BLOCKS.POSZ), DSL.min(BLOCKS.POSZ))
 						.from(BLOCKS)
 						.where(BLOCKS.POSX.eq(x))
+						.and(yCondition)
 						.fetchOne();
 
 				Integer maxZ = zrange.get(DSL.max(BLOCKS.POSZ));
@@ -64,9 +71,12 @@ public class StaticTileGen {
 
 					//TileInfo minZoom = tileInfo.toZoom(CoordinateResolver.MIN_ZOOM);
 
-					System.out.println("Tile: " + tileInfo.x + "/" + tileInfo.y + " @ " + tileInfo.zoom);
 
+					long start = System.currentTimeMillis();
 					tileRenderer.render(tileInfo.x, tileInfo.y, tileInfo.zoom);
+					long diff = System.currentTimeMillis() - start;
+
+					System.out.println("Tile: " + tileInfo.x + "/" + tileInfo.y + " @ " + tileInfo.zoom + " took " + diff + " ms");
 
 				}
 			}

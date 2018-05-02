@@ -11,13 +11,22 @@ public interface TileServerConfig extends Config {
 	@Key("http.port")
 	@DefaultValue("8080")
 	int httPort();
-	
+
+	//in map blocks
+	@Key("tiles.maxy")
+	@DefaultValue("10")
+	int tilesMaxY();
+
+	@Key("tiles.miny")
+	@DefaultValue("-1")
+	int tilesMinY();
+
 	@Key("tiles.directory")
 	@DefaultValue("target/tiles")
 	String tileDirectory();
 	
 	@Key("minetest.db.url")
-	@DefaultValue("jdbc:postgresql://10.0.0.144:5432/minetest")
+	@DefaultValue("jdbc:postgresql://10.0.0.147:5432/minetest")
 	String minetestDatabaseUrl();
 
 	@Key("minetest.db.username")

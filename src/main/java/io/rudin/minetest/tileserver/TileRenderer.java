@@ -15,6 +15,8 @@ import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.rudin.minetest.tileserver.config.TileServerConfig;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.impl.DSL;
@@ -33,11 +35,18 @@ public class TileRenderer {
 	private static final Logger logger = LoggerFactory.getLogger(TileRenderer.class);
 	
 	@Inject
-	public TileRenderer(DSLContext ctx, TileCache cache, MapBlockRenderer blockRenderer) {
+	public TileRenderer(DSLContext ctx, TileCache cache, MapBlockRenderer blockRenderer, TileServerConfig cfg) {
 		this.ctx = ctx;
 		this.cache = cache;
 		this.blockRenderer = blockRenderer;
+		this.cfg = cfg;
+
+		this.yCondition = BLOCKS.POSY.between(cfg.tilesMinY(), cfg.tilesMaxY());
 	}
+
+	private final Condition yCondition;
+
+	private final TileServerConfig cfg;
 
 	private final TileCache cache;
 
@@ -76,6 +85,7 @@ public class TileRenderer {
 						.and(BLOCKS.POSX.le(Math.max(x1, x2)))
 						.and(BLOCKS.POSZ.ge(Math.min(z1, z2)))
 						.and(BLOCKS.POSZ.le(Math.max(z1, z2)))
+						.and(yCondition)
 				)
 				.fetchOne(DSL.count());
 		
@@ -205,6 +215,7 @@ public class TileRenderer {
 						.where(
 								BLOCKS.POSX.eq(mapblockX)
 								.and(BLOCKS.POSZ.eq(mapblockZ))
+								.and(yCondition)
 								)
 						.orderBy(BLOCKS.POSY.desc())
 						.fetch();
