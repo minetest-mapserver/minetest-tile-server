@@ -48,7 +48,7 @@ public class MapBlockParser {
 		Inflater inflater = new Inflater();
 		inflater.setInput(data, dataOffset, data.length - dataOffset);
 		
-		byte[] mapData = new byte[1024 * 1024];
+		byte[] mapData = new byte[16384];
 
 		int mapDataLength = inflater.inflate(mapData);
 		
@@ -63,7 +63,7 @@ public class MapBlockParser {
 		inflater = new Inflater();
 		inflater.setInput(data, dataOffset, data.length - dataOffset);
 
-		byte[] md = new byte[1024 * 1024];
+		byte[] md = new byte[256000]; //TODO: limits?
 		int mapMdLength = inflater.inflate(md); //unused
 		
 		dataOffset += inflater.getTotalIn();

@@ -13,17 +13,6 @@ public class EventBusImpl implements EventBus {
 
     @Override
     public void post(Object obj) {
-
-        if (obj instanceof PlayerMovedEvent){
-            PlayerMovedEvent e = (PlayerMovedEvent)obj;
-            System.out.println("Player-move: " + e.player.getName() + " @" + e.player.getPosx() + "/" + e.player.getPosz());
-        }
-
-        if (obj instanceof TileChangedEvent){
-            //TileChangedEvent e = (TileChangedEvent)obj;
-            //System.out.println("Mapblock changed: " + e.mapblockX + "/" + e.mapblockZ + "  (Coordinates: " + e.mapblockX*16 + "/" + e.mapblockZ*16 + ") @ zoom " + e.zoom);
-        }
-
         eventBus.post(obj);
     }
 
