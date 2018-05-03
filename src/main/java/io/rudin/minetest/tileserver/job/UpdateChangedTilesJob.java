@@ -5,6 +5,7 @@ import static io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockChanges
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.Cursor;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
@@ -17,10 +18,13 @@ import io.rudin.minetest.tileserver.util.CoordinateResolver.TileInfo;
 public class UpdateChangedTilesJob implements Runnable {
 
 	@Inject
-	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache) {
+	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus) {
 		this.ctx = ctx;
 		this.tileCache = tileCache;
+		this.eventBus = eventBus;
 	}
+
+	private final EventBus eventBus;
 
 	private final DSLContext ctx;
 	
@@ -52,19 +56,25 @@ public class UpdateChangedTilesJob implements Runnable {
 					Integer x = change.get(TILESERVER_BLOCK_CHANGES.POSX);
 					Integer z = change.get(TILESERVER_BLOCK_CHANGES.POSZ);
 					
-					System.out.println("Mapblock changed: " + x + "/" + z + "  (Coordinates: " + x*16 + "/" + z*16 + ")");
 
 					TileInfo tileInfo = CoordinateResolver.fromCoordinatesMinZoom(x, z);
 					
 					//remove all tiles in every zoom
 					for (int i=CoordinateResolver.MAX_ZOOM; i>=CoordinateResolver.MIN_ZOOM; i--) {
 						TileInfo zoomedTile = tileInfo.toZoom(i);
-						
+
+						EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
+						event.x = zoomedTile.x;
+						event.y = zoomedTile.y;
+						event.zoom = zoomedTile.zoom;
+						event.mapblockX = x;
+						event.mapblockZ = z;
+						eventBus.post(event);
+
 						tileCache.remove(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
 					}
-					
-					//TODO: event-bus for ui notification
-					
+
+					//TODO: atomic change
 					ctx
 					.update(TILESERVER_BLOCK_CHANGES)
 					.set(TILESERVER_BLOCK_CHANGES.CHANGED, false)

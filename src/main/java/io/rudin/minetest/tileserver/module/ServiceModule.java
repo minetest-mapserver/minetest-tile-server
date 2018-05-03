@@ -8,8 +8,10 @@ import com.google.inject.AbstractModule;
 import io.rudin.minetest.tileserver.ColorTable;
 import io.rudin.minetest.tileserver.provider.ColorTableProvider;
 import io.rudin.minetest.tileserver.provider.ExecutorProvider;
+import io.rudin.minetest.tileserver.service.EventBus;
 import io.rudin.minetest.tileserver.service.TileCache;
 import io.rudin.minetest.tileserver.service.impl.DatabaseTileCache;
+import io.rudin.minetest.tileserver.service.impl.EventBusImpl;
 
 public class ServiceModule extends AbstractModule {
 
@@ -17,6 +19,7 @@ public class ServiceModule extends AbstractModule {
 	protected void configure() {
 		bind(TileCache.class).to(DatabaseTileCache.class);
 		//bind(TileCache.class).to(FileTileCache.class);
+		bind(EventBus.class).to(EventBusImpl.class);
 		bind(ColorTable.class).toProvider(ColorTableProvider.class);
 		bind(ExecutorService.class).toProvider(ExecutorProvider.class);
 		bind(ScheduledExecutorService.class).toProvider(ExecutorProvider.class);
