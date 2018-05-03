@@ -64,7 +64,7 @@
     }
 
     var RealtimeTileLayer = L.TileLayer.extend({
-      createTile(coords){
+      createTile: function(coords){
         var tile = document.createElement('img');
         tile.src = getTileSource(coords.x, coords.y, coords.z);
         tile.id = getImageId(coords.x, coords.y, coords.z);
