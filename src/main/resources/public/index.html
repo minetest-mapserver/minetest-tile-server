@@ -80,7 +80,7 @@
 
     var playerMarkers = {}; // name -> L.Marker
 
-    var playerMapper = player => {
+    function playerMapper(player) {
         var marker = playerMarkers[player.name];
         var latLng = [player.posz/10, player.posx/10];
         var popup = player.name + " @ " + player.posx/10 + "/" + player.posz/10;
@@ -98,12 +98,12 @@
 
         }
 
-    };
+    }
 
     function updatePlayers(){
       fetch("player")
-      .then(res => res.json())
-      .then(players => players.forEach(playerMapper));
+      .then(function(res) { return res.json(); })
+      .then(function(players) { players.forEach(playerMapper); });
     }
 
     updatePlayers();
