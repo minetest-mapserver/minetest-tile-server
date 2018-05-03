@@ -55,11 +55,19 @@
     map.on('moveend', updateHash)
     updateHash();
 
+    function getTileSource(x,y,zoom,cacheBust){
+        return "tiles/" + zoom + "/" + x + "/" + y + (cacheBust ? "?_=" + Date.now() : "");
+    }
+
+    function getImageId(x,y,zoom){
+        return "tile-" + x + "/" + y + "/" + zoom;
+    }
+
     var RealtimeTileLayer = L.TileLayer.extend({
       createTile(coords){
         var tile = document.createElement('img');
-        tile.src =  "tiles/" + coords.z + "/" + coords.x + "/" + coords.y;
-        //insert update logic here...
+        tile.src = getTileSource(coords.x, coords.y, coords.z);
+        tile.id = getImageId(coords.x, coords.y, coords.z);
         return tile;
       }
     });
@@ -106,6 +114,16 @@
         var event = JSON.parse(e.data);
         if (event.type === "player-move"){
             playerMapper(event.data.player);
+        }
+
+        if (event.type === "tile-update"){
+            var id = getImageId(event.data.x, event.data.y, event.data.zoom);
+            var el = document.getElementById(id);
+
+            if (el){
+                el.src = getTileSource(event.data.x, event.data.y, event.data.zoom, true);
+            }
+
         }
     }
 

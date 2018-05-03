@@ -2,9 +2,7 @@ package io.rudin.minetest.tileserver;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -117,7 +115,7 @@ public class TileRenderer {
 			byte[] data = cache.get(tileX, tileY, zoom);
 			return ImageIO.read(new ByteArrayInputStream(data));
 		}
-		
+
 		final int HALF_TILE_PIXEL_SIZE = CoordinateResolver.TILE_PIXEL_SIZE  / 2;
 
 
@@ -225,17 +223,15 @@ public class TileRenderer {
 				
 				logger.debug("Got {} blocks", blocks.size());
 
-				BufferedImage mapBlockImage = blockRenderer.render(blocks);
-				
-				graphics.drawImage(
-						mapBlockImage,
+				Graphics subGraphics = graphics.create(
 						mbx * CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
 						mbz * CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
 						CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
-						CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
-						null
+						CoordinateResolver.MAPBLOCK_PIXEL_SIZE
 				);
-				
+
+				blockRenderer.render(blocks, subGraphics);
+
 			}
 		}
 

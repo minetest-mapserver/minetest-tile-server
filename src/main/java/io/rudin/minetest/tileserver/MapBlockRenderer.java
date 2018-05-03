@@ -1,6 +1,6 @@
 package io.rudin.minetest.tileserver;
 
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Optional;
 import java.util.zip.DataFormatException;
@@ -29,13 +29,7 @@ public class MapBlockRenderer {
 
 	private final ColorTable colorTable;
 
-	public BufferedImage render(Result<BlocksRecord> mapblocks) throws IllegalArgumentException, DataFormatException {
-
-		BufferedImage image = new BufferedImage(BLOCK_SIZE, BLOCK_SIZE, BufferedImage.TYPE_INT_RGB);
-		Graphics2D graphics = image.createGraphics();
-
-		graphics.setColor(java.awt.Color.WHITE);
-		graphics.fillRect(0, 0, BLOCK_SIZE, BLOCK_SIZE);
+	public void render(Result<BlocksRecord> mapblocks, Graphics graphics) throws IllegalArgumentException, DataFormatException {
 
 		int foundBlocks = 0;
 		final int expectedBlocks = 16 * 16;
@@ -83,7 +77,7 @@ public class MapBlockRenderer {
 							
 							if (foundBlocks == expectedBlocks)
 								//All done
-								return image;
+								return;
 							
 						} else {
 							logger.debug("Color for name '{}' @ {}/{}/{} not found!", name, x, y, z);
@@ -100,8 +94,6 @@ public class MapBlockRenderer {
 		if (foundBlocks != expectedBlocks) {
 			logger.debug("Only found {} blocks in {} layers!", foundBlocks, mapblocks.size());
 		}
-
-		return image;
 	}
 
 }
