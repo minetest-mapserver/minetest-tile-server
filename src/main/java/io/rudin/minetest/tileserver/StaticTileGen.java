@@ -67,7 +67,7 @@ public class StaticTileGen {
 
 				for (int z=minZ; z<=maxZ; z+=step) {
 
-					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z).toZoom(zoom);
+					TileInfo tileInfo = CoordinateResolver.fromCoordinatesMinZoom(x, z).toZoom(zoom);
 
 					//TileInfo minZoom = tileInfo.toZoom(CoordinateResolver.MIN_ZOOM);
 

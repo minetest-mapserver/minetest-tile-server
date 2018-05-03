@@ -20,8 +20,11 @@ public class CoordinateResolver {
 			double deltaFactor = Math.pow(2, zoom - this.zoom);
 			
 			info.zoom = zoom;
-			info.x = (int)(this.x * deltaFactor) + (int)((this.x * deltaFactor) % 2);
-			info.y = (int)(this.y * deltaFactor) + (int)((this.y * deltaFactor) % 2);
+			//info.x = (int)(this.x * deltaFactor) + (int)((this.x * deltaFactor) % 2);
+			//info.y = (int)(this.y * deltaFactor) + (int)((this.y * deltaFactor) % 2);
+			info.x = (int)Math.floor((double)this.x * deltaFactor);
+			info.y = (int)Math.floor((double)this.y * deltaFactor);
+
 			info.height = this.height / deltaFactor;
 			info.width = this.width / deltaFactor;
 			
@@ -29,20 +32,33 @@ public class CoordinateResolver {
 			return info;
 		}
 	}
-	
+
 	public static TileInfo fromCoordinates(int x, int z) {
 		TileInfo info = new TileInfo();
-		
+
 		info.zoom = DEFAULT_ZOOM;
 
 		info.x = x / 16;
 		info.y = z / 16 * -1;
 		info.height = 1;
 		info.width = 1;
-		
+
 		return info;
 	}
-	
+
+	public static TileInfo fromCoordinatesMinZoom(int x, int z) {
+		TileInfo info = new TileInfo();
+
+		info.zoom = MAX_ZOOM;
+
+		info.x = x;
+		info.y = z * -1;
+		info.height = 1/16;
+		info.width = 1/16;
+
+		return info;
+	}
+
 	public static class MapBlockCoordinateInfo {
 		public int x, z;
 		public double width, height; //in map-blocks
@@ -52,10 +68,11 @@ public class CoordinateResolver {
 	 * ...
 	 * 7 == 0.25
 	 * 8 == 0.5
-	 * 9 == 1
-	 * 10 == 2
-	 * 11 == 4
-	 * 12 == 8
+	 * 9 == 1 (16x16 mapblocks)
+	 * 10 == 2 (8x8 mapblocks)
+	 * 11 == 4 (4x4 mapblocks)
+	 * 12 == 8 (2x2 mapblocks)
+	 * 13 == 16 (1 mapblock)
 	 * ...
 	 */
 	public static double getZoomFactor(int zoom) {

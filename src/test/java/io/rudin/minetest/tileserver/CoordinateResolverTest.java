@@ -62,15 +62,15 @@ public class CoordinateResolverTest {
 		Assert.assertEquals(8, tileInfo.zoom);
 		Assert.assertEquals(2, tileInfo.width, 0.1);
 		Assert.assertEquals(2, tileInfo.height, 0.1);
-		Assert.assertEquals(2, tileInfo.x); //XXX?
-		Assert.assertEquals(2, tileInfo.y);
+		Assert.assertEquals(1, tileInfo.x);
+		Assert.assertEquals(1, tileInfo.y);
 		
 		tileInfo = tileInfo.toZoom(7); //zoom out
 		Assert.assertEquals(7, tileInfo.zoom);
 		Assert.assertEquals(4, tileInfo.width, 0.1);
 		Assert.assertEquals(4, tileInfo.height, 0.1);
-		Assert.assertEquals(2, tileInfo.x);
-		Assert.assertEquals(2, tileInfo.y);
+		Assert.assertEquals(0, tileInfo.x);
+		Assert.assertEquals(0, tileInfo.y);
 		
 	}
 
@@ -135,10 +135,16 @@ Zoom: 8
 		Assert.assertEquals(2, tileInfo.y);
 		
 	}
-	
+
+	@Test
+	public void dumpTileInfo(){
+		TileInfo tileInfo = CoordinateResolver.fromCoordinatesMinZoom(6, -10);//96/-160
+		System.out.println("Tile x=" + tileInfo.x + " y=" + tileInfo.y + " zoom=" + tileInfo.zoom);
+	}
+
 	@Test
 	public void testTileZoomIterate() {
-		TileInfo tileInfo = CoordinateResolver.fromCoordinates(16, -16);
+		TileInfo tileInfo = CoordinateResolver.fromCoordinates(32, -32);
 		
 		for (int i=CoordinateResolver.MIN_ZOOM; i<=CoordinateResolver.MAX_ZOOM; i++) {
 			TileInfo zoomedTile = tileInfo.toZoom(i);

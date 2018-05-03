@@ -8,6 +8,7 @@ import static spark.Spark.stop;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -51,13 +52,18 @@ public class TileServer {
 		UpdateChangedTilesJob tilesJob = injector.getInstance(UpdateChangedTilesJob.class);
 		
 		executor.scheduleAtFixedRate(tilesJob, 0, 2, TimeUnit.SECONDS);
-		
-		System.in.read();
-		
-		stop();
-		
-		//TODO
-		executor.shutdown();
+
+		AtomicBoolean running = new AtomicBoolean(true);
+
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			stop();
+			executor.shutdownNow();
+			running.set(false);
+		}));
+
+		while (running.get()){
+			Thread.sleep(500);
+		}
 		
 	}
 	

@@ -52,12 +52,12 @@ public class UpdateChangedTilesJob implements Runnable {
 					Integer x = change.get(TILESERVER_BLOCK_CHANGES.POSX);
 					Integer z = change.get(TILESERVER_BLOCK_CHANGES.POSZ);
 					
-					System.out.println("Tile changed: " + x + "/" + z);
-					
-					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
+					System.out.println("Mapblock changed: " + x + "/" + z + "  (Coordinates: " + x*16 + "/" + z*16 + ")");
+
+					TileInfo tileInfo = CoordinateResolver.fromCoordinatesMinZoom(x, z);
 					
 					//remove all tiles in every zoom
-					for (int i=CoordinateResolver.MIN_ZOOM; i<=CoordinateResolver.MAX_ZOOM; i++) {
+					for (int i=CoordinateResolver.MAX_ZOOM; i>=CoordinateResolver.MIN_ZOOM; i--) {
 						TileInfo zoomedTile = tileInfo.toZoom(i);
 						
 						tileCache.remove(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);

@@ -101,6 +101,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Guava -->
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>25.0-jre</version>
+		</dependency>
+
 		<!-- xml bind -->
 
 		<dependency>

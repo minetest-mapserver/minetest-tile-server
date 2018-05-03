@@ -25,27 +25,82 @@
     		return Math.pow(2, zoom-9);
     	}
     });
+
+    var initialZoom = 11;
+    var initialCenter = [0, 0];
+
+    var hashParts = location.hash.substring(1).split("/");
+    if (hashParts.length == 3){
+      initialCenter[0] = +hashParts[1];
+      initialCenter[1] = +hashParts[0];
+      initialZoom = +hashParts[2]
+    }
     
     var map = L.map('image-map', {
       minZoom: 1,
       maxZoom: 13,
-      center: [0, 0],
-      zoom: 9,
+      center: initialCenter,
+      zoom: initialZoom,
       crs: crs
     });
     
     //works: map.on('mousemove', ev => console.log(ev.latlng));
-    
-    L.tileLayer('tiles/{z}/{x}/{y}').addTo(map);
+
+    function updateHash(){
+      var center = map.getCenter();
+      location.hash = center.lng + "/" + center.lat + "/" + map.getZoom();
+    }
+
+    map.on('zoomend', updateHash)
+    map.on('moveend', updateHash)
+    updateHash();
+
+    var RealtimeTileLayer = L.TileLayer.extend({
+      createTile(coords){
+        var tile = document.createElement('img');
+        tile.src =  "tiles/" + coords.z + "/" + coords.x + "/" + coords.y;
+        //insert update logic here...
+        return tile;
+      }
+    });
+
+    var tileLayer = new RealtimeTileLayer();
+    tileLayer.addTo(map);
+
+    //L.tileLayer('tiles/{z}/{x}/{y}').addTo(map);
     //L.marker([-207, 7]).bindPopup("Spawn").addTo(map);
-    
+
+    var playerMarkers = {}; // name -> L.Marker
+
     var playerMapper = player => {
-    	L.marker([player.posz/10, player.posx/10]).bindPopup(player.name).addTo(map);
+        var marker = playerMarkers[player.name];
+        var latLng = [player.posz/10, player.posx/10];
+        var popup = player.name + " @ " + player.posx/10 + "/" + player.posz/10;
+
+        if (!marker){
+          //Create marker
+          marker = L.marker(latLng);
+          marker.bindPopup(popup).addTo(map);
+          playerMarkers[player.name] = marker;
+
+        } else {
+          //Update marker
+          marker.setLatLng(latLng);
+          marker.bindPopup(popup);
+
+        }
+
     };
-    
-    fetch("player")
-    .then(res => res.json())
-    .then(players => players.forEach(playerMapper));
+
+    function updatePlayers(){
+      fetch("player")
+      .then(res => res.json())
+      .then(players => players.forEach(playerMapper))
+      .then(() => setTimeout(updatePlayers, 5000))
+    }
+
+    updatePlayers();
+
     </script>
 
   </body>
