@@ -45,9 +45,9 @@ public class StaticTileGen {
 
 		System.out.println("Max-X " + maxX + " Min-X: " + minX);
 
-		for (int zoom=CoordinateResolver.DEFAULT_ZOOM; zoom>=CoordinateResolver.MIN_ZOOM; zoom--) {
+		for (int zoom=CoordinateResolver.MAX_ZOOM; zoom>=CoordinateResolver.MIN_ZOOM; zoom--) {
 
-			int factor = (int)Math.pow(2, CoordinateResolver.DEFAULT_ZOOM - zoom);
+			int factor = (int)Math.pow(2, CoordinateResolver.ONE_TO_ONE_ZOOM - zoom);
 			int step = 16 * factor;
 			
 			for (int x=minX; x<=maxX; x+=step) {
@@ -67,7 +67,7 @@ public class StaticTileGen {
 
 				for (int z=minZ; z<=maxZ; z+=step) {
 
-					TileInfo tileInfo = CoordinateResolver.fromCoordinatesMinZoom(x, z).toZoom(zoom);
+					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z).toZoom(zoom);
 
 					//TileInfo minZoom = tileInfo.toZoom(CoordinateResolver.MIN_ZOOM);
 

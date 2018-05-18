@@ -30,6 +30,10 @@ public class MapBlockRenderer {
 	private final ColorTable colorTable;
 
 	public void render(Result<BlocksRecord> mapblocks, Graphics graphics) throws IllegalArgumentException, DataFormatException {
+		render(mapblocks, graphics, 1);
+	}
+
+	public void render(Result<BlocksRecord> mapblocks, Graphics graphics, int scale) throws IllegalArgumentException, DataFormatException {
 
 		int foundBlocks = 0;
 		final int expectedBlocks = 16 * 16;
@@ -70,7 +74,7 @@ public class MapBlockRenderer {
 							int graphicX = x;
 							int graphicY = 15 - z;
 							
-							graphics.drawLine(graphicX, graphicY, graphicX, graphicY);
+							graphics.fillRect(graphicX * scale, graphicY * scale, scale, scale);
 
 							xz_coords[x][z] = true;
 							foundBlocks++;

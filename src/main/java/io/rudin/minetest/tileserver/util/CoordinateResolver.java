@@ -7,7 +7,7 @@ public class CoordinateResolver {
 	
 	public static final int MAX_ZOOM = 13;
 	public static final int MIN_ZOOM = 1;
-	public static final int DEFAULT_ZOOM = 9;
+	public static final int ONE_TO_ONE_ZOOM = 13; // 1 tile == 1 mapblock
 	
 	public static class TileInfo {
 		public int x, y;
@@ -36,25 +36,12 @@ public class CoordinateResolver {
 	public static TileInfo fromCoordinates(int x, int z) {
 		TileInfo info = new TileInfo();
 
-		info.zoom = DEFAULT_ZOOM;
-
-		info.x = x / 16;
-		info.y = z / 16 * -1;
-		info.height = 1;
-		info.width = 1;
-
-		return info;
-	}
-
-	public static TileInfo fromCoordinatesMinZoom(int x, int z) {
-		TileInfo info = new TileInfo();
-
-		info.zoom = MAX_ZOOM;
+		info.zoom = ONE_TO_ONE_ZOOM;
 
 		info.x = x;
 		info.y = z * -1;
-		info.height = 1/16;
-		info.width = 1/16;
+		info.height = 1;
+		info.width = 1;
 
 		return info;
 	}
@@ -76,7 +63,7 @@ public class CoordinateResolver {
 	 * ...
 	 */
 	public static double getZoomFactor(int zoom) {
-		return Math.pow(2, zoom - DEFAULT_ZOOM);
+		return Math.pow(2, zoom - 9);
 	}
 	
 	public static MapBlockCoordinateInfo fromTile(int x, int y, int zoom) {
@@ -94,41 +81,16 @@ public class CoordinateResolver {
 		 *       ||
 		 * 
 		 */
+
+		double factor  = Math.pow(2, ONE_TO_ONE_ZOOM - zoom);
 		
 		// tile with 1:1 map resolution
-		info.x = x * 16;
-		info.z = y * 16 * -1;
-		info.height = 16;
-		info.width = 16;
+		info.x = (int)(x * factor);
+		info.z = (int)(y * factor * -1);
+		info.height = factor;
+		info.width = factor;
 
-		
-		if (zoom < DEFAULT_ZOOM) {
-			//zoomed out
-			
-			int factor = (int) Math.pow(2, DEFAULT_ZOOM - zoom);
 
-			info.x /= factor;
-			info.z /= factor;
-			
-			info.height *= factor;
-			info.width *= factor;
-			
-		} else if (zoom > DEFAULT_ZOOM) {
-			//zoomed in
-			
-			int factor = (int) Math.pow(2, zoom - DEFAULT_ZOOM);
-			info.x *= factor;
-			info.z *= factor;
-
-			
-			info.height /= factor;
-			info.width /= factor;
-
-		} else {
-			//zoom == 9 (DEFAULT_ZOOM)
-			//Nothing to do...
-		}
-		
 		return info;
 	}
 	

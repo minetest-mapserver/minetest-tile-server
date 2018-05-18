@@ -57,7 +57,7 @@ public class UpdateChangedTilesJob implements Runnable {
 					Integer z = change.get(TILESERVER_BLOCK_CHANGES.POSZ);
 					
 
-					TileInfo tileInfo = CoordinateResolver.fromCoordinatesMinZoom(x, z);
+					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
 					
 					//remove all tiles in every zoom
 					for (int i=CoordinateResolver.MAX_ZOOM; i>=CoordinateResolver.MIN_ZOOM; i--) {

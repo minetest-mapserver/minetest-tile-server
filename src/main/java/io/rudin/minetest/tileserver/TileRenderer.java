@@ -56,15 +56,18 @@ public class TileRenderer {
 		return new BufferedImage(CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE, BufferedImage.TYPE_INT_RGB);
 	}
 
+	private final int DEFAULT_BLOCK_ZOOM = 13;
+
 	public byte[] render(int tileX, int tileY, int zoom) throws IllegalArgumentException, DataFormatException, IOException {
 
 		//Check binary cache
 		if (cache.has(tileX, tileY, zoom)) {
 			return cache.get(tileX, tileY, zoom);
 		}
+
+
 		
-		
-		if (zoom < 9) {
+		if (zoom < DEFAULT_BLOCK_ZOOM) {
 			//TODO: fail-fast for regions without map-blocks -> white
 
 			MapBlockCoordinateInfo mapblockInfo = CoordinateResolver.fromTile(tileX, tileY, zoom);
@@ -119,7 +122,7 @@ public class TileRenderer {
 		final int HALF_TILE_PIXEL_SIZE = CoordinateResolver.TILE_PIXEL_SIZE  / 2;
 
 
-		if (zoom > 9) {
+		if (zoom > DEFAULT_BLOCK_ZOOM) {
 			//Zoom in
 
 			int nextZoom = zoom - 1;
@@ -153,7 +156,7 @@ public class TileRenderer {
 			return tile;
 
 
-		} else if (zoom < 9) {
+		} else if (zoom < DEFAULT_BLOCK_ZOOM) {
 			//Zoom out
 
 
@@ -191,7 +194,7 @@ public class TileRenderer {
 
 		}
 
-		//Default zoom (9)
+		//Default zoom (13 == 1 mapblock with 16px wide blocks)
 
 		MapBlockCoordinateInfo coordinateInfo = CoordinateResolver.fromTile(tileX, tileY, zoom);
 
@@ -202,37 +205,46 @@ public class TileRenderer {
 		graphics.setColor(Color.WHITE);
 		graphics.fillRect(0, 0, CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE);
 
-		for (int mbx=0; mbx<16; mbx++) {
-			for (int mbz=0; mbz<16; mbz++) {
 
-				int mapblockX = coordinateInfo.x + mbx;
-				int mapblockZ = coordinateInfo.z + (mbz *-1);
+		int mapblockX = coordinateInfo.x;
+		int mapblockZ = coordinateInfo.z;
 
-				Result<BlocksRecord> blocks = ctx
-						.selectFrom(BLOCKS)
-						.where(
-								BLOCKS.POSX.eq(mapblockX)
+		long now = System.currentTimeMillis();
+
+		Result<BlocksRecord> blocks = ctx
+				.selectFrom(BLOCKS)
+				.where(
+						BLOCKS.POSX.eq(mapblockX)
 								.and(BLOCKS.POSZ.eq(mapblockZ))
 								.and(yCondition)
-								)
-						.orderBy(BLOCKS.POSY.desc())
-						.fetch();
+				)
+				.orderBy(BLOCKS.POSY.desc())
+				.fetch();
 
-				if (blocks.isEmpty())
-					continue;
-				
-				logger.debug("Got {} blocks", blocks.size());
+		long fetchTime = System.currentTimeMillis() - now;
 
-				Graphics subGraphics = graphics.create(
-						mbx * CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
-						mbz * CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
-						CoordinateResolver.MAPBLOCK_PIXEL_SIZE,
-						CoordinateResolver.MAPBLOCK_PIXEL_SIZE
-				);
+		logger.debug("Got {} blocks for mapblockX={} mapblockZ={} tileX={} tileY={}",
+				blocks.size(),
+				mapblockX,
+				mapblockZ,
+				tileX,
+				tileY
+		);
 
-				blockRenderer.render(blocks, subGraphics);
+		if (!blocks.isEmpty()) {
 
-			}
+			now = System.currentTimeMillis();
+
+			blockRenderer.render(blocks, graphics, 16);
+
+			long renderTime = System.currentTimeMillis() - now;
+
+			String msg = "Timings of tile X={} Y={}: fetch={} ms render={} ms";
+
+			if (renderTime < 500 && fetchTime < 100)
+				logger.debug(msg, tileX, tileY, fetchTime, renderTime);
+			else
+				logger.warn(msg, tileX, tileY, fetchTime, renderTime);
 		}
 
 		return image;
