@@ -65,6 +65,7 @@ public class MapBlockParser {
 
 		byte[] md = new byte[256000]; //TODO: limits?
 		int mapMdLength = inflater.inflate(md); //unused
+		//TODO: parse meta: https://github.com/minetest/minetest/blob/master/doc/world_format.txt#L330
 		
 		dataOffset += inflater.getTotalIn();
 
