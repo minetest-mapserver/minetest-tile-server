@@ -82,7 +82,8 @@
 
     function playerMapper(player) {
         var marker = playerMarkers[player.name];
-        var latLng = [player.posz/10, player.posx/10];
+        var zOffset = 15;
+        var latLng = [(player.posz/10)-zOffset, player.posx/10];
         var popup = player.name + " @ " + player.posx/10 + "/" + player.posz/10;
 
         if (!marker){
