@@ -13,6 +13,7 @@ public class ColorTableProvider implements Provider<ColorTable> {
 	public ColorTable get() {
 		ColorTable colorTable = new ColorTable();
 		colorTable.load(ColorTableProvider.class.getResourceAsStream("/colors.txt"));
+		colorTable.load(ColorTableProvider.class.getResourceAsStream("/vanessa.txt"));
 		return colorTable;
 	}
 

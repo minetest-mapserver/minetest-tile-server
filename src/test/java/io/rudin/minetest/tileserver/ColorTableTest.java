@@ -14,10 +14,11 @@ public class ColorTableTest {
 		
 		ColorTable table = new ColorTable();
 		table.load(ColorTableTest.class.getResourceAsStream("/colors.txt"));
-		
+		table.load(ColorTableTest.class.getResourceAsStream("/vanessa.txt"));
+
 		Map<String, Color> map = table.getColorMap();
 		
-		Assert.assertTrue(map.size() > 20);
+		Assert.assertTrue(map.size() > 10000);
 		
 		Color color = map.get("vessels:shelf");
 		
