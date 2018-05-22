@@ -21,6 +21,10 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("-1")
 	int tilesMinY();
 
+	@Key("tilerenderer.processes")
+	@DefaultValue("4")
+	int tilerendererProcesses();
+
 	@Key("tiles.directory")
 	@DefaultValue("target/tiles")
 	String tileDirectory();
