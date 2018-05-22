@@ -84,7 +84,16 @@
         var marker = playerMarkers[player.name];
         var zOffset = 15;
         var latLng = [(player.posz/10)-zOffset, player.posx/10];
-        var popup = player.name + " @ " + player.posx/10 + "/" + player.posz/10;
+        var popup = "<h4>" + player.name + "</h4><hr>" +
+          "<b>X: </b> " + player.posx/10 + "<br>" +
+          "<b>Y: </b> " + player.posy/10 + "<br>" +
+          "<b>Z: </b> " + player.posz/10 + "<br>" +
+          "<b>Health: </b> " + player.hp + "<br>" +
+          "<b>Breath: </b> " + player.breath + "<br>" +
+          "<b>Created:</b> " + new Date(player.creationDate) + "<br>" +
+          "<b>Updated:</b> " + new Date(player.modificationDate)
+
+
 
         if (!marker){
           //Create marker
