@@ -17,6 +17,7 @@
   <body>
     <div id="image-map"></div>
 
+    <script src="js/moment.min.js"></script>
     <script src="leaflet.js"></script>
     <script>
     var crs = L.Util.extend({}, L.CRS.Simple, {
@@ -84,14 +85,16 @@
         var marker = playerMarkers[player.name];
         var zOffset = 15;
         var latLng = [(player.posz/10)-zOffset, player.posx/10];
+
+        var age = Date.now() - player.modificationDate;
+
         var popup = "<h4>" + player.name + "</h4><hr>" +
           "<b>X: </b> " + player.posx/10 + "<br>" +
           "<b>Y: </b> " + player.posy/10 + "<br>" +
           "<b>Z: </b> " + player.posz/10 + "<br>" +
           "<b>Health: </b> " + player.hp + "<br>" +
           "<b>Breath: </b> " + player.breath + "<br>" +
-          "<b>Created:</b> " + new Date(player.creationDate) + "<br>" +
-          "<b>Updated:</b> " + new Date(player.modificationDate)
+          "<b>Last login: </b> " + moment.duration(age).humanize();
 
 
 
