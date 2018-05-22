@@ -5,7 +5,9 @@ package io.rudin.minetest.tileserver.blockdb;
 
 
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
+import io.rudin.minetest.tileserver.blockdb.tables.Chat;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
+import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
 import io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockChanges;
 import io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockDepth;
 import io.rudin.minetest.tileserver.blockdb.tables.TileserverTiles;
@@ -32,9 +34,19 @@ public class Tables {
     public static final Blocks BLOCKS = io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
     /**
+     * The table <code>chat</code>.
+     */
+    public static final Chat CHAT = io.rudin.minetest.tileserver.blockdb.tables.Chat.CHAT;
+
+    /**
      * The table <code>player</code>.
      */
     public static final Player PLAYER = io.rudin.minetest.tileserver.blockdb.tables.Player.PLAYER;
+
+    /**
+     * The table <code>player_metadata</code>.
+     */
+    public static final PlayerMetadata PLAYER_METADATA = io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata.PLAYER_METADATA;
 
     /**
      * The table <code>tileserver_block_changes</code>.

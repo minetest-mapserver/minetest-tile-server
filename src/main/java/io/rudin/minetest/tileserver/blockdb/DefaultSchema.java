@@ -5,7 +5,9 @@ package io.rudin.minetest.tileserver.blockdb;
 
 
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
+import io.rudin.minetest.tileserver.blockdb.tables.Chat;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
+import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
 import io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockChanges;
 import io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockDepth;
 import io.rudin.minetest.tileserver.blockdb.tables.TileserverTiles;
@@ -34,7 +36,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = 1582418477;
+    private static final long serialVersionUID = -710793959;
 
     /**
      * The reference instance of <code></code>
@@ -47,9 +49,19 @@ public class DefaultSchema extends SchemaImpl {
     public final Blocks BLOCKS = io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
     /**
+     * The table <code>chat</code>.
+     */
+    public final Chat CHAT = io.rudin.minetest.tileserver.blockdb.tables.Chat.CHAT;
+
+    /**
      * The table <code>player</code>.
      */
     public final Player PLAYER = io.rudin.minetest.tileserver.blockdb.tables.Player.PLAYER;
+
+    /**
+     * The table <code>player_metadata</code>.
+     */
+    public final PlayerMetadata PLAYER_METADATA = io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata.PLAYER_METADATA;
 
     /**
      * The table <code>tileserver_block_changes</code>.
@@ -92,7 +104,9 @@ public class DefaultSchema extends SchemaImpl {
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
             Blocks.BLOCKS,
+            Chat.CHAT,
             Player.PLAYER,
+            PlayerMetadata.PLAYER_METADATA,
             TileserverBlockChanges.TILESERVER_BLOCK_CHANGES,
             TileserverBlockDepth.TILESERVER_BLOCK_DEPTH,
             TileserverTiles.TILESERVER_TILES);
