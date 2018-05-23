@@ -1,5 +1,7 @@
 package io.rudin.minetest.tileserver.service.impl;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.Striped;
 import io.rudin.minetest.tileserver.blockdb.tables.records.TileserverTilesRecord;
 import io.rudin.minetest.tileserver.service.TileCache;
@@ -20,14 +22,23 @@ public class DatabaseTileCache implements TileCache {
     public DatabaseTileCache(DSLContext ctx){
         this.ctx = ctx;
         this.lock = Striped.lazyWeakReadWriteLock(50);
+
+        Cache<String, byte[]> cache = CacheBuilder
+                .newBuilder()
+                .maximumSize(500)
+                .build();
     }
 
     private final Striped<ReadWriteLock> lock;
 
     private final DSLContext ctx;
 
+    private String getKey(int x, int y, int z){
+        return x + "/" + y + "/" + z;
+    }
+
     private ReadWriteLock getLock(int x, int y, int z){
-        return lock.get(x + "/" + y + "/" + z);
+        return lock.get(getKey(x,y,z));
     }
 
     @Override
