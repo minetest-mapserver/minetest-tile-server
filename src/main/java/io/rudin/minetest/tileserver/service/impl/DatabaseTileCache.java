@@ -25,6 +25,7 @@ public class DatabaseTileCache implements TileCache {
 
         Cache<String, byte[]> cache = CacheBuilder
                 .newBuilder()
+                .weakValues()
                 .maximumSize(500)
                 .build();
     }
