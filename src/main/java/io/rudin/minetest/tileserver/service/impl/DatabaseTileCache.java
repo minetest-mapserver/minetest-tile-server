@@ -23,12 +23,14 @@ public class DatabaseTileCache implements TileCache {
         this.ctx = ctx;
         this.lock = Striped.lazyWeakReadWriteLock(50);
 
-        Cache<String, byte[]> cache = CacheBuilder
+        cache = CacheBuilder
                 .newBuilder()
                 .weakValues()
                 .maximumSize(500)
                 .build();
     }
+
+    private final Cache<String, byte[]> cache;
 
     private final Striped<ReadWriteLock> lock;
 
@@ -44,6 +46,9 @@ public class DatabaseTileCache implements TileCache {
 
     @Override
     public void put(int x, int y, int z, byte[] data) {
+
+        cache.put(getKey(x,y,z), data);
+
         ReadWriteLock lock = getLock(x, y, z);
         Lock writeLock = lock.writeLock();
         writeLock.lock();
@@ -69,6 +74,13 @@ public class DatabaseTileCache implements TileCache {
 
     @Override
     public byte[] get(int x, int y, int z) {
+
+        byte[] cached = cache.getIfPresent(getKey(x, y, z));
+
+        if (cached != null) {
+            return cached;
+        }
+
         ReadWriteLock lock = getLock(x, y, z);
         Lock readLock = lock.readLock();
         readLock.lock();
@@ -90,6 +102,10 @@ public class DatabaseTileCache implements TileCache {
 
     @Override
     public boolean has(int x, int y, int z) {
+        if (cache.getIfPresent(getKey(x,y,z)) != null) {
+            return true;
+        }
+
         ReadWriteLock lock = getLock(x, y, z);
         Lock readLock = lock.readLock();
         readLock.lock();
@@ -113,6 +129,8 @@ public class DatabaseTileCache implements TileCache {
 
     @Override
     public void remove(int x, int y, int z) {
+        cache.invalidate(getKey(x,y,z));
+
         ReadWriteLock lock = getLock(x, y, z);
         Lock writeLock = lock.writeLock();
         writeLock.lock();
