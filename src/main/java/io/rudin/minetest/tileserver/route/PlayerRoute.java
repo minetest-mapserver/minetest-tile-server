@@ -12,6 +12,8 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+import java.sql.Timestamp;
+
 @Singleton
 public class PlayerRoute implements Route {
 
@@ -25,7 +27,14 @@ public class PlayerRoute implements Route {
 	@Override
 	public Object handle(Request request, Response response) throws Exception {
 		response.header("Content-Type", "application/json");
-		return ctx.selectFrom(PLAYER).fetch().into(Player.class);
+
+		Timestamp ts = new Timestamp(System.currentTimeMillis() - (3600L*1000L));
+
+		return ctx
+				.selectFrom(PLAYER)
+				.where(PLAYER.MODIFICATION_DATE.ge(ts))
+				.fetch()
+				.into(Player.class);
 	}
 
 }
