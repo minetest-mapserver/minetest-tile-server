@@ -1,6 +1,10 @@
 package io.rudin.minetest.tileserver.service;
 
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Player;
+import io.rudin.minetest.tileserver.entity.PlayerInfo;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public interface EventBus {
 
@@ -14,7 +18,7 @@ public interface EventBus {
     }
 
     class PlayerMovedEvent {
-        public Player player;
+        public PlayerInfo info;
     }
 
 }

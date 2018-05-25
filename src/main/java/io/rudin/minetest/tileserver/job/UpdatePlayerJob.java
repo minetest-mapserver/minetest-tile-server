@@ -1,6 +1,8 @@
 package io.rudin.minetest.tileserver.job;
 
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Player;
+import io.rudin.minetest.tileserver.blockdb.tables.pojos.PlayerMetadata;
+import io.rudin.minetest.tileserver.entity.PlayerInfo;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.DSLContext;
 
@@ -11,6 +13,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Player.PLAYER;
+import static io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata.PLAYER_METADATA;
 
 @Singleton
 public class UpdatePlayerJob implements Runnable {
@@ -52,8 +55,15 @@ public class UpdatePlayerJob implements Runnable {
                     this.timestamp = modificationDate;
                 }
 
+                List<PlayerMetadata> metadata = ctx
+                        .selectFrom(PLAYER_METADATA)
+                        .where(PLAYER_METADATA.PLAYER.eq(player.getName()))
+                        .fetchInto(PlayerMetadata.class);
+
+                PlayerInfo info = new PlayerInfo(player, metadata);
+
                 EventBus.PlayerMovedEvent event = new EventBus.PlayerMovedEvent();
-                event.player = player;
+                event.info = info;
                 eventBus.post(event);
             }
         } finally {

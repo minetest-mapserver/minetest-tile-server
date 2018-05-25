@@ -59,7 +59,8 @@ tileLayer.addTo(map);
 
 var playerMarkers = {}; // name -> L.Marker
 
-function playerMapper(player) {
+function playerMapper(info) {
+    var player = info.player;
     var marker = playerMarkers[player.name];
     var zOffset = 15;
     var latLng = [(player.posz/10)-zOffset, player.posx/10];
@@ -70,6 +71,12 @@ function playerMapper(player) {
       "<b>X: </b> " + player.posx/10 + "<br>" +
       "<b>Y: </b> " + player.posy/10 + "<br>" +
       "<b>Z: </b> " + player.posz/10 + "<br>" +
+      "<b>XP: </b> " + info.metadata.xp + "<br>" +
+      "<b>Deathcount: </b> " + info.metadata.died + "<br>" +
+      "<b>Playtime: </b> " + moment.duration((info.metadata.played_time || 1) * 1000).humanize() + "<br>" +
+      "<b>Digcount: </b> " + info.metadata.digged_nodes + "<br>" +
+      "<b>Craftcount: </b> " + info.metadata.crafted + "<br>" +
+      "<b>Placecount: </b> " + info.metadata.placed_nodes + "<br>" +
       "<b>Health: </b> " + player.hp + "<br>" +
       "<b>Breath: </b> " + player.breath + "<br>" +
       "<b>Last login: </b> " + moment.duration(age).humanize();
@@ -94,7 +101,7 @@ function playerMapper(player) {
 function updatePlayers(){
   fetch("player")
   .then(function(res) { return res.json(); })
-  .then(function(players) { players.forEach(playerMapper); });
+  .then(function(list) { list.forEach(playerMapper); });
 }
 
 updatePlayers();
@@ -104,7 +111,7 @@ var ws = new WebSocket(wsUrl);
 ws.onmessage = function(e){
     var event = JSON.parse(e.data);
     if (event.type === "player-move"){
-        playerMapper(event.data.player);
+        playerMapper(event.data.info);
     }
 
     if (event.type === "tile-update"){
