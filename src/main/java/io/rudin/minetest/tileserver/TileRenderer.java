@@ -241,7 +241,7 @@ public class TileRenderer {
 
 			String msg = "Timings of tile X={} Y={}: fetch={} ms render={} ms";
 
-			if (renderTime < 500 && fetchTime < 100)
+			if (renderTime < 500 && fetchTime < 500)
 				logger.debug(msg, tileX, tileY, fetchTime, renderTime);
 			else
 				logger.warn(msg, tileX, tileY, fetchTime, renderTime);
