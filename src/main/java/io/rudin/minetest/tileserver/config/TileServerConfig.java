@@ -30,7 +30,7 @@ public interface TileServerConfig extends Config {
 	String tileDirectory();
 	
 	@Key("minetest.db.url")
-	@DefaultValue("jdbc:postgresql://127.0.0.1:5432/postgres")
+	@DefaultValue("jdbc:postgresql://127.0.0.1:5432/minetest")
 	String minetestDatabaseUrl();
 
 	@Key("minetest.db.username")
