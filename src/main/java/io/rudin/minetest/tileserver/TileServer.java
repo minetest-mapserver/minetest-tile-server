@@ -53,8 +53,8 @@ public class TileServer {
 
 		ScheduledExecutorService executor = injector.getInstance(ScheduledExecutorService.class);
 
-		executor.scheduleAtFixedRate(injector.getInstance(UpdateChangedTilesJob.class), 0, 20, TimeUnit.SECONDS);
-		executor.scheduleAtFixedRate(injector.getInstance(UpdatePlayerJob.class), 0, 2, TimeUnit.SECONDS);
+		executor.scheduleAtFixedRate(injector.getInstance(UpdateChangedTilesJob.class), 0, cfg.tilerendererUpdateInterval(), TimeUnit.SECONDS);
+		executor.scheduleAtFixedRate(injector.getInstance(UpdatePlayerJob.class), 0, cfg.playerUpdateInterval(), TimeUnit.SECONDS);
 
 		AtomicBoolean running = new AtomicBoolean(true);
 

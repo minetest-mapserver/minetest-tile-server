@@ -25,6 +25,14 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("8")
 	int tilerendererProcesses();
 
+	@Key("tilerenderer.updateinterval")
+	@DefaultValue("20")
+	int tilerendererUpdateInterval();
+
+	@Key("player.updateinterval")
+	@DefaultValue("2")
+	int playerUpdateInterval();
+
 	@Key("tiles.directory")
 	@DefaultValue("target/tiles")
 	String tileDirectory();
