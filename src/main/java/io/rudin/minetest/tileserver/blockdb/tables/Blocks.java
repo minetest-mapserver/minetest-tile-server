@@ -9,6 +9,7 @@ import io.rudin.minetest.tileserver.blockdb.Indexes;
 import io.rudin.minetest.tileserver.blockdb.Keys;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Blocks extends TableImpl<BlocksRecord> {
 
-    private static final long serialVersionUID = -51195022;
+    private static final long serialVersionUID = 756115654;
 
     /**
      * The reference instance of <code>blocks</code>
@@ -72,6 +73,11 @@ public class Blocks extends TableImpl<BlocksRecord> {
      * The column <code>blocks.data</code>.
      */
     public final TableField<BlocksRecord, byte[]> DATA = createField("data", org.jooq.impl.SQLDataType.BLOB, this, "");
+
+    /**
+     * The column <code>blocks.mtime</code>.
+     */
+    public final TableField<BlocksRecord, Timestamp> MTIME = createField("mtime", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
     /**
      * Create a <code>blocks</code> table reference

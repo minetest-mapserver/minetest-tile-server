@@ -1,10 +1,11 @@
 package io.rudin.minetest.tileserver.job;
 
-import static io.rudin.minetest.tileserver.blockdb.tables.TileserverBlockChanges.TILESERVER_BLOCK_CHANGES;
+import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.Cursor;
 import org.jooq.DSLContext;
@@ -14,9 +15,15 @@ import io.rudin.minetest.tileserver.service.TileCache;
 import io.rudin.minetest.tileserver.util.CoordinateResolver;
 import io.rudin.minetest.tileserver.util.CoordinateResolver.TileInfo;
 import org.jooq.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Timestamp;
 
 @Singleton
 public class UpdateChangedTilesJob implements Runnable {
+
+	private static final Logger logger = LoggerFactory.getLogger(UpdateChangedTilesJob.class);
 
 	@Inject
 	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus) {
@@ -44,18 +51,21 @@ public class UpdateChangedTilesJob implements Runnable {
 		try {
 			running = true;
 
+			Timestamp now = new Timestamp(System.currentTimeMillis());
 
-			Result<Record2<Integer, Integer>> result = ctx
-					.select(TILESERVER_BLOCK_CHANGES.POSX, TILESERVER_BLOCK_CHANGES.POSZ)
-					.from(TILESERVER_BLOCK_CHANGES)
-					.where(TILESERVER_BLOCK_CHANGES.CHANGED.eq(true))
-					.groupBy(TILESERVER_BLOCK_CHANGES.POSZ, TILESERVER_BLOCK_CHANGES.POSX)
-					.limit(100)
+			Result<BlocksRecord> blocks = ctx
+					.selectFrom(BLOCKS)
+					.where(BLOCKS.MTIME.ge(now))
+					.limit(200)
 					.fetch();
 
-			for (Record2<Integer, Integer> change: result) {
-				Integer x = change.get(TILESERVER_BLOCK_CHANGES.POSX);
-				Integer z = change.get(TILESERVER_BLOCK_CHANGES.POSZ);
+			if (blocks.size() == 200){
+				logger.warn("Got max-blocks from update-queue");
+			}
+
+			for (BlocksRecord record: blocks) {
+				Integer x = record.getPosx();
+				Integer z = record.getPosz();
 
 
 				TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
@@ -75,13 +85,7 @@ public class UpdateChangedTilesJob implements Runnable {
 					tileCache.remove(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
 				}
 
-				//TODO: atomic change
-				ctx
-				.update(TILESERVER_BLOCK_CHANGES)
-				.set(TILESERVER_BLOCK_CHANGES.CHANGED, false)
-				.where(TILESERVER_BLOCK_CHANGES.POSX.eq(x))
-				.and(TILESERVER_BLOCK_CHANGES.POSZ.eq(z))
-				.execute();
+
 			}
 
 

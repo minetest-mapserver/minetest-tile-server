@@ -17,7 +17,7 @@ public class CodeGen {
 		jdbc.setDriver("org.postgresql.Driver");
 		jdbc.setPassword("enter");
 		jdbc.setUsername("postgres");
-		jdbc.setUrl("jdbc:postgresql://127.0.0.1:5432/pandorabox");
+		jdbc.setUrl("jdbc:postgresql://127.0.0.1:5432/minetest");
 		cfg.setJdbc(jdbc);
 	
 		Generator generator = new Generator();
@@ -25,7 +25,7 @@ public class CodeGen {
 		
 		Database database = new Database();
 		database.setName("org.jooq.util.postgres.PostgresDatabase");
-		database.setIncludes("blocks|player|player_metadata|player_inventory|chat|tileserver_block_changes|tileserver_block_depth|tileserver_tiles");
+		database.setIncludes("blocks|player|player_metadata|player_inventory|chat|tileserver_tiles");
 		database.setInputSchema("public");
 		database.setOutputSchemaToDefault(true);
 		generator.setDatabase(database);

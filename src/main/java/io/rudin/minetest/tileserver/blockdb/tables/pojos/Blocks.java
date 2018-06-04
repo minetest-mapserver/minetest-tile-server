@@ -5,6 +5,7 @@ package io.rudin.minetest.tileserver.blockdb.tables.pojos;
 
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 import javax.annotation.Generated;
 
@@ -22,12 +23,13 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Blocks implements Serializable {
 
-    private static final long serialVersionUID = 1275221715;
+    private static final long serialVersionUID = 72369797;
 
-    private Integer posx;
-    private Integer posy;
-    private Integer posz;
-    private byte[]  data;
+    private Integer   posx;
+    private Integer   posy;
+    private Integer   posz;
+    private byte[]    data;
+    private Timestamp mtime;
 
     public Blocks() {}
 
@@ -36,18 +38,21 @@ public class Blocks implements Serializable {
         this.posy = value.posy;
         this.posz = value.posz;
         this.data = value.data;
+        this.mtime = value.mtime;
     }
 
     public Blocks(
-        Integer posx,
-        Integer posy,
-        Integer posz,
-        byte[]  data
+        Integer   posx,
+        Integer   posy,
+        Integer   posz,
+        byte[]    data,
+        Timestamp mtime
     ) {
         this.posx = posx;
         this.posy = posy;
         this.posz = posz;
         this.data = data;
+        this.mtime = mtime;
     }
 
     public Integer getPosx() {
@@ -82,6 +87,14 @@ public class Blocks implements Serializable {
         this.data = data;
     }
 
+    public Timestamp getMtime() {
+        return this.mtime;
+    }
+
+    public void setMtime(Timestamp mtime) {
+        this.mtime = mtime;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Blocks (");
@@ -90,6 +103,7 @@ public class Blocks implements Serializable {
         sb.append(", ").append(posy);
         sb.append(", ").append(posz);
         sb.append(", ").append("[binary...]");
+        sb.append(", ").append(mtime);
 
         sb.append(")");
         return sb.toString();
