@@ -22,7 +22,7 @@ public interface TileServerConfig extends Config {
 	int tilesMinY();
 
 	@Key("tilerenderer.processes")
-	@DefaultValue("4")
+	@DefaultValue("8")
 	int tilerendererProcesses();
 
 	@Key("tiles.directory")
