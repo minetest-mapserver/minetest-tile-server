@@ -53,8 +53,6 @@ public class PlayerRoute implements Route {
 			list.add(new PlayerInfo(player, metadata));
 		}
 
-		System.out.println(list.size());
-
 		return list;
 	}
 

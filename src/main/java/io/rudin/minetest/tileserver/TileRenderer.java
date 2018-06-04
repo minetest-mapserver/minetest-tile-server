@@ -91,7 +91,10 @@ public class TileRenderer {
 				.fetchOne(DSL.count());
 		
 			if (count == 0) {
-				return WhiteTile.getPNG();
+				byte[] data = WhiteTile.getPNG();
+				cache.put(tileX, tileY, zoom, data);
+
+				return data;
 			}
 			
 		}
@@ -103,8 +106,6 @@ public class TileRenderer {
 		ImageIO.write(image, "png", output);
 
 		byte[] data = output.toByteArray();
-
-		cache.put(tileX, tileY, zoom, data);
 
 		return data;
 
@@ -152,7 +153,15 @@ public class TileRenderer {
 			);
 			
 			graphics.drawImage(scaledInstance, 0, 0, CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE, null);
-			
+
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			ImageIO.write(tile, "png", output);
+
+			byte[] data = output.toByteArray();
+
+			cache.put(tileX, tileY, zoom, data);
+
+
 			return tile;
 
 
@@ -189,6 +198,14 @@ public class TileRenderer {
 			image = renderImage(nextZoomX+1, nextZoomY+1, nextZoom);
 			scaledInstance = image.getScaledInstance(HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, Image.SCALE_FAST);
 			graphics.drawImage(scaledInstance, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, null);
+
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			ImageIO.write(tile, "png", output);
+
+			byte[] data = output.toByteArray();
+
+			cache.put(tileX, tileY, zoom, data);
+
 
 			return tile;
 
@@ -246,6 +263,15 @@ public class TileRenderer {
 			else
 				logger.warn(msg, tileX, tileY, fetchTime, renderTime);
 		}
+
+
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		ImageIO.write(image, "png", output);
+
+		byte[] data = output.toByteArray();
+
+		cache.put(tileX, tileY, zoom, data);
+
 
 		return image;
 	}

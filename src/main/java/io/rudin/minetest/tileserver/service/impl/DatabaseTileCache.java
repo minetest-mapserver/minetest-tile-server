@@ -54,10 +54,6 @@ public class DatabaseTileCache implements TileCache {
         writeLock.lock();
 
         try {
-            //re-check in lock
-            if (has(x,y,z))
-                return;
-
             TileserverTilesRecord record = ctx.newRecord(TILESERVER_TILES);
             record.setTile(data);
             record.setX(x);
