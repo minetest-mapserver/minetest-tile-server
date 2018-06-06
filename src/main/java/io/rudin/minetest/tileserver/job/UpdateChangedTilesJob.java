@@ -19,6 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Singleton
 public class UpdateChangedTilesJob implements Runnable {
@@ -45,6 +48,10 @@ public class UpdateChangedTilesJob implements Runnable {
 	private Long latestTimestamp = null;
 
 	private final Condition yCondition;
+
+	private String getTileKey(TileInfo tile){
+		return "Tile:" + tile.x + "/" + tile.y + "/" + tile.zoom;
+	}
 
 	@Override
 	public void run() {
@@ -75,18 +82,21 @@ public class UpdateChangedTilesJob implements Runnable {
 
 		try {
 			running = true;
+			final int LIMIT = 500;
 
 			Result<BlocksRecord> blocks = ctx
 					.selectFrom(BLOCKS)
 					.where(BLOCKS.MTIME.ge(latestTimestamp))
 					.and(yCondition)
 					.orderBy(BLOCKS.MTIME.asc()) //oldest first
-					.limit(200)
+					.limit(LIMIT)
 					.fetch();
 
-			if (blocks.size() == 200){
-				logger.warn("Got max-blocks from update-queue");
+			if (blocks.size() == LIMIT){
+				logger.warn("Got max-blocks ({}) from update-queue", LIMIT);
 			}
+
+			List<String> updatedTileKeys = new ArrayList<>();
 
 			for (BlocksRecord record: blocks) {
 				Integer x = record.getPosx();
@@ -102,14 +112,20 @@ public class UpdateChangedTilesJob implements Runnable {
 				//remove all tiles in every zoom
 				for (int i=CoordinateResolver.MAX_ZOOM; i>=CoordinateResolver.MIN_ZOOM; i--) {
 					TileInfo zoomedTile = tileInfo.toZoom(i);
+					String tileKey = getTileKey(zoomedTile);
 
-					EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
-					event.x = zoomedTile.x;
-					event.y = zoomedTile.y;
-					event.zoom = zoomedTile.zoom;
-					event.mapblockX = x;
-					event.mapblockZ = z;
-					eventBus.post(event);
+					if (!updatedTileKeys.contains(tileKey)) {
+
+						EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
+						event.x = zoomedTile.x;
+						event.y = zoomedTile.y;
+						event.zoom = zoomedTile.zoom;
+						event.mapblockX = x;
+						event.mapblockZ = z;
+						eventBus.post(event);
+
+						updatedTileKeys.add(tileKey);
+					}
 
 					tileCache.remove(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
 				}
