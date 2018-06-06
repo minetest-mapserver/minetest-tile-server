@@ -1,6 +1,7 @@
 package io.rudin.minetest.tileserver.job;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
+import static io.rudin.minetest.tileserver.blockdb.tables.TileserverTiles.TILESERVER_TILES;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -15,6 +16,7 @@ import io.rudin.minetest.tileserver.service.TileCache;
 import io.rudin.minetest.tileserver.util.CoordinateResolver;
 import io.rudin.minetest.tileserver.util.CoordinateResolver.TileInfo;
 import org.jooq.Result;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,14 +50,28 @@ public class UpdateChangedTilesJob implements Runnable {
 			return;
 		}
 
+		logger.debug("Gathering latest tile time from db");
+		long start = System.currentTimeMillis();
+
+		Long latestTileTime = ctx
+				.select(DSL.max(TILESERVER_TILES.MTIME))
+				.from(TILESERVER_TILES)
+				.fetchOne(DSL.max(TILESERVER_TILES.MTIME));
+
+		long diff = System.currentTimeMillis() - start;
+
+		logger.debug("Newest tile time is {}", latestTileTime);
+
+		if (diff > 1000){
+			logger.warn("Tile time fetch took {} ms", diff);
+		}
+
 		try {
 			running = true;
 
-			Timestamp now = new Timestamp(System.currentTimeMillis());
-
 			Result<BlocksRecord> blocks = ctx
 					.selectFrom(BLOCKS)
-					.where(BLOCKS.MTIME.ge(now))
+					.where(BLOCKS.MTIME.ge(latestTileTime))
 					.limit(200)
 					.fetch();
 

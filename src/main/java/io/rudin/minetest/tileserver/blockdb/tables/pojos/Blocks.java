@@ -5,7 +5,6 @@ package io.rudin.minetest.tileserver.blockdb.tables.pojos;
 
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 
 import javax.annotation.Generated;
 
@@ -23,13 +22,13 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Blocks implements Serializable {
 
-    private static final long serialVersionUID = 72369797;
+    private static final long serialVersionUID = 1714192211;
 
-    private Integer   posx;
-    private Integer   posy;
-    private Integer   posz;
-    private byte[]    data;
-    private Timestamp mtime;
+    private Integer posx;
+    private Integer posy;
+    private Integer posz;
+    private byte[]  data;
+    private Long    mtime;
 
     public Blocks() {}
 
@@ -42,11 +41,11 @@ public class Blocks implements Serializable {
     }
 
     public Blocks(
-        Integer   posx,
-        Integer   posy,
-        Integer   posz,
-        byte[]    data,
-        Timestamp mtime
+        Integer posx,
+        Integer posy,
+        Integer posz,
+        byte[]  data,
+        Long    mtime
     ) {
         this.posx = posx;
         this.posy = posy;
@@ -87,11 +86,11 @@ public class Blocks implements Serializable {
         this.data = data;
     }
 
-    public Timestamp getMtime() {
+    public Long getMtime() {
         return this.mtime;
     }
 
-    public void setMtime(Timestamp mtime) {
+    public void setMtime(Long mtime) {
         this.mtime = mtime;
     }
 

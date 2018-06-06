@@ -7,7 +7,6 @@ package io.rudin.minetest.tileserver.blockdb.tables.daos;
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import javax.annotation.Generated;
@@ -83,7 +82,7 @@ public class BlocksDao extends DAOImpl<BlocksRecord, io.rudin.minetest.tileserve
     /**
      * Fetch records that have <code>mtime IN (values)</code>
      */
-    public List<io.rudin.minetest.tileserver.blockdb.tables.pojos.Blocks> fetchByMtime(Timestamp... values) {
+    public List<io.rudin.minetest.tileserver.blockdb.tables.pojos.Blocks> fetchByMtime(Long... values) {
         return fetch(Blocks.BLOCKS.MTIME, values);
     }
 }

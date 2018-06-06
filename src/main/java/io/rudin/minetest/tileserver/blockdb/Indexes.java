@@ -34,6 +34,7 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     public static final Index BLOCKS_PKEY = Indexes0.BLOCKS_PKEY;
+    public static final Index BLOCKS_TIME = Indexes0.BLOCKS_TIME;
     public static final Index PLAYER_PKEY = Indexes0.PLAYER_PKEY;
     public static final Index PLAYER_METADATA_PKEY = Indexes0.PLAYER_METADATA_PKEY;
     public static final Index TILESERVER_TILES_PKEY = Indexes0.TILESERVER_TILES_PKEY;
@@ -44,6 +45,7 @@ public class Indexes {
 
     private static class Indexes0 {
         public static Index BLOCKS_PKEY = Internal.createIndex("blocks_pkey", Blocks.BLOCKS, new OrderField[] { Blocks.BLOCKS.POSX, Blocks.BLOCKS.POSY, Blocks.BLOCKS.POSZ }, true);
+        public static Index BLOCKS_TIME = Internal.createIndex("blocks_time", Blocks.BLOCKS, new OrderField[] { Blocks.BLOCKS.MTIME }, false);
         public static Index PLAYER_PKEY = Internal.createIndex("player_pkey", Player.PLAYER, new OrderField[] { Player.PLAYER.NAME }, true);
         public static Index PLAYER_METADATA_PKEY = Internal.createIndex("player_metadata_pkey", PlayerMetadata.PLAYER_METADATA, new OrderField[] { PlayerMetadata.PLAYER_METADATA.PLAYER, PlayerMetadata.PLAYER_METADATA.ATTR }, true);
         public static Index TILESERVER_TILES_PKEY = Internal.createIndex("tileserver_tiles_pkey", TileserverTiles.TILESERVER_TILES, new OrderField[] { TileserverTiles.TILESERVER_TILES.X, TileserverTiles.TILESERVER_TILES.Y, TileserverTiles.TILESERVER_TILES.Z }, true);
