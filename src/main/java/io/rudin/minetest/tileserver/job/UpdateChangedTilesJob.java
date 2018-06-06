@@ -7,15 +7,13 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
+import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.service.EventBus;
-import org.jooq.Cursor;
-import org.jooq.DSLContext;
-import org.jooq.Record2;
+import org.jooq.*;
 
 import io.rudin.minetest.tileserver.service.TileCache;
 import io.rudin.minetest.tileserver.util.CoordinateResolver;
 import io.rudin.minetest.tileserver.util.CoordinateResolver.TileInfo;
-import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +26,12 @@ public class UpdateChangedTilesJob implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(UpdateChangedTilesJob.class);
 
 	@Inject
-	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus) {
+	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg) {
 		this.ctx = ctx;
 		this.tileCache = tileCache;
 		this.eventBus = eventBus;
+
+		this.yCondition = BLOCKS.POSY.between(cfg.tilesMinY(), cfg.tilesMaxY());
 	}
 
 	private final EventBus eventBus;
@@ -42,6 +42,10 @@ public class UpdateChangedTilesJob implements Runnable {
 
 	private boolean running = false;
 
+	private Long latestTimestamp = null;
+
+	private final Condition yCondition;
+
 	@Override
 	public void run() {
 
@@ -50,28 +54,33 @@ public class UpdateChangedTilesJob implements Runnable {
 			return;
 		}
 
-		logger.debug("Gathering latest tile time from db");
-		long start = System.currentTimeMillis();
+		if (latestTimestamp == null) {
+			logger.debug("Gathering latest tile time from db");
+			long start = System.currentTimeMillis();
 
-		Long latestTileTime = ctx
-				.select(DSL.max(TILESERVER_TILES.MTIME))
-				.from(TILESERVER_TILES)
-				.fetchOne(DSL.max(TILESERVER_TILES.MTIME));
+			latestTimestamp = ctx
+					.select(DSL.max(TILESERVER_TILES.MTIME))
+					.from(TILESERVER_TILES)
+					.fetchOne(DSL.max(TILESERVER_TILES.MTIME));
 
-		long diff = System.currentTimeMillis() - start;
+			long diff = System.currentTimeMillis() - start;
 
-		logger.debug("Newest tile time is {}", latestTileTime);
+			logger.debug("Newest tile time is {}", latestTimestamp);
 
-		if (diff > 1000){
-			logger.warn("Tile time fetch took {} ms", diff);
+			if (diff > 1000){
+				logger.warn("Tile time fetch took {} ms", diff);
+			}
 		}
+
 
 		try {
 			running = true;
 
 			Result<BlocksRecord> blocks = ctx
 					.selectFrom(BLOCKS)
-					.where(BLOCKS.MTIME.ge(latestTileTime))
+					.where(BLOCKS.MTIME.ge(latestTimestamp))
+					.and(yCondition)
+					.orderBy(BLOCKS.MTIME.asc()) //oldest first
 					.limit(200)
 					.fetch();
 
@@ -83,6 +92,10 @@ public class UpdateChangedTilesJob implements Runnable {
 				Integer x = record.getPosx();
 				Integer z = record.getPosz();
 
+				if (record.getMtime() > latestTimestamp){
+					//Update timestamp
+					latestTimestamp = record.getMtime();
+				}
 
 				TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
 
