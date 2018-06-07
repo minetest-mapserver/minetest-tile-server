@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>tileserver.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/tileserver-%d{yyyy-MM-dd}.%i.txt</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.jooq.Constants" level="WARN"></logger>
+
+    <logger name="io.rudin.minetest.tileserver.job.UpdateChangedTilesJob" level="DEBUG"></logger>
+    <logger name="io.rudin.minetest.tileserver.job.UpdatePlayerJob" level="DEBUG"></logger>
+
+    <root level="info">
+        <appender-ref ref="logfile" />
+        <appender-ref ref="console" />
+    </root>
+
+</configuration>

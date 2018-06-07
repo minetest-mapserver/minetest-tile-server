@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.jooq.Constants" level="WARN"></logger>
+    
+    <root level="debug">
+        <appender-ref ref="logfile" />
+        <appender-ref ref="console" />
+    </root>
+
+</configuration>

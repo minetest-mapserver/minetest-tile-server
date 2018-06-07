@@ -96,6 +96,8 @@ public class UpdateChangedTilesJob implements Runnable {
 				logger.warn("Got max-blocks ({}) from update-queue", LIMIT);
 			}
 
+			logger.debug("Got {} updated blocks", blocks.size());
+
 			List<String> updatedTileKeys = new ArrayList<>();
 
 			for (BlocksRecord record: blocks) {

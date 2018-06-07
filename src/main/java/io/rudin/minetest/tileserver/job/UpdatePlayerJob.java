@@ -3,13 +3,18 @@ package io.rudin.minetest.tileserver.job;
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Player;
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.PlayerMetadata;
 import io.rudin.minetest.tileserver.entity.PlayerInfo;
+import io.rudin.minetest.tileserver.route.TileRoute;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Player.PLAYER;
@@ -17,6 +22,8 @@ import static io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata.PLAYER_
 
 @Singleton
 public class UpdatePlayerJob implements Runnable {
+
+    private static final Logger logger = LoggerFactory.getLogger(UpdatePlayerJob.class);
 
     @Inject
     public UpdatePlayerJob(DSLContext ctx, EventBus eventBus){
@@ -28,9 +35,11 @@ public class UpdatePlayerJob implements Runnable {
 
     private final EventBus eventBus;
 
-    private Timestamp timestamp = new Timestamp(0L);
+    private Timestamp timestamp = null;
 
     private boolean running = false;
+
+    private final List<Player> previousPlayers = new ArrayList<>();
 
     @Override
     public void run() {
@@ -39,6 +48,15 @@ public class UpdatePlayerJob implements Runnable {
 
         try {
             running = true;
+
+            if (timestamp == null){
+                timestamp = ctx
+                        .select(DSL.max(PLAYER.MODIFICATION_DATE))
+                        .from(PLAYER)
+                        .fetchOne(DSL.max(PLAYER.MODIFICATION_DATE));
+
+                logger.debug("Fetched last timestamp: {}", timestamp);
+            }
 
             List<Player> players = ctx
                     .selectFrom(PLAYER)
@@ -62,10 +80,44 @@ public class UpdatePlayerJob implements Runnable {
 
                 PlayerInfo info = new PlayerInfo(player, metadata);
 
-                EventBus.PlayerMovedEvent event = new EventBus.PlayerMovedEvent();
-                event.info = info;
-                eventBus.post(event);
+                if (!previousPlayers.contains(player)){
+                    //new player
+                    logger.debug("Player '{}' joined", player.getName());
+
+                    EventBus.PlayerJoinedEvent event = new EventBus.PlayerJoinedEvent();
+                    event.info = info;
+                    eventBus.post(event);
+
+                } else {
+                    //previous player
+                    EventBus.PlayerMovedEvent event = new EventBus.PlayerMovedEvent();
+                    event.info = info;
+                    eventBus.post(event);
+                }
             }
+
+            for (Player previousPlayer: previousPlayers){
+                if (!players.contains(previousPlayer)){
+                    //Player left
+                    logger.debug("Player '{}' left", previousPlayer.getName());
+
+                    List<PlayerMetadata> metadata = ctx
+                            .selectFrom(PLAYER_METADATA)
+                            .where(PLAYER_METADATA.PLAYER.eq(previousPlayer.getName()))
+                            .fetchInto(PlayerMetadata.class);
+
+                    PlayerInfo info = new PlayerInfo(previousPlayer, metadata);
+
+                    EventBus.PlayerLeftEvent event = new EventBus.PlayerLeftEvent();
+                    event.info = info;
+                    eventBus.post(event);
+                }
+            }
+
+            //Replace previous list
+            previousPlayers.clear();
+            previousPlayers.addAll(players);
+
         } finally {
             running = false;
 
