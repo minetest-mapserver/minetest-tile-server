@@ -19,7 +19,7 @@ public class MapBlockParser {
 	 * @throws IllegalArgumentException
 	 * @throws DataFormatException 
 	 */
-	public static MapBlock parse(byte[] data) throws IllegalArgumentException, DataFormatException {
+	public static MapBlock parse(byte[] data) throws IllegalArgumentException {
 		if (data == null || data.length == 0)
 			throw new IllegalArgumentException("invalid data");
 
@@ -50,10 +50,15 @@ public class MapBlockParser {
 		
 		byte[] mapData = new byte[16384];
 
-		int mapDataLength = inflater.inflate(mapData);
-		
-		if (mapDataLength != 16384) {
-			throw new IllegalArgumentException("map data size does not line up: " + mapDataLength);
+		try {
+			int mapDataLength = inflater.inflate(mapData);
+
+			if (mapDataLength != 16384) {
+				throw new IllegalArgumentException("map data size does not line up: " + mapDataLength);
+			}
+
+		} catch (DataFormatException e){
+			throw new IllegalArgumentException(e);
 		}
 		
 		block.mapData = mapData;
@@ -64,8 +69,14 @@ public class MapBlockParser {
 		inflater.setInput(data, dataOffset, data.length - dataOffset);
 
 		byte[] md = new byte[256000]; //TODO: limits?
-		int mapMdLength = inflater.inflate(md); //unused
-		//TODO: parse meta: https://github.com/minetest/minetest/blob/master/doc/world_format.txt#L330
+
+		try {
+			int mapMdLength = inflater.inflate(md); //unused
+			//TODO: parse meta: https://github.com/minetest/minetest/blob/master/doc/world_format.txt#L330
+
+		} catch (DataFormatException e){
+			throw new IllegalArgumentException(e);
+		}
 		
 		dataOffset += inflater.getTotalIn();
 

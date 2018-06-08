@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.zip.DataFormatException;
 
 import javax.imageio.ImageIO;
@@ -58,7 +59,7 @@ public class TileRenderer {
 
 	private final int DEFAULT_BLOCK_ZOOM = 13;
 
-	public byte[] render(int tileX, int tileY, int zoom) throws IllegalArgumentException, DataFormatException, IOException {
+	public byte[] render(int tileX, int tileY, int zoom) throws IllegalArgumentException, DataFormatException, IOException, ExecutionException {
 
 		//Check binary cache
 		if (cache.has(tileX, tileY, zoom)) {
@@ -112,7 +113,7 @@ public class TileRenderer {
 	}
 
 
-	public BufferedImage renderImage(int tileX, int tileY, int zoom) throws IllegalArgumentException, DataFormatException, IOException {
+	public BufferedImage renderImage(int tileX, int tileY, int zoom) throws IllegalArgumentException, DataFormatException, IOException, ExecutionException {
 
 		//Check if binary cached, use cached version for rendering
 		if (cache.has(tileX, tileY, zoom)) {
@@ -252,7 +253,7 @@ public class TileRenderer {
 
 			now = System.currentTimeMillis();
 
-			blockRenderer.render(blocks, graphics, 16);
+			blockRenderer.render(mapblockX, mapblockZ, graphics, 16);
 
 			long renderTime = System.currentTimeMillis() - now;
 

@@ -2,12 +2,15 @@ package io.rudin.minetest.tileserver;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.zip.DataFormatException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.rudin.minetest.tileserver.util.MapBlockAccessor;
 import org.jooq.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,22 +26,27 @@ public class MapBlockRenderer {
 	private static final int BLOCK_SIZE = 16;
 	
 	@Inject
-	public MapBlockRenderer(ColorTable colorTable) {
+	public MapBlockRenderer(ColorTable colorTable, MapBlockAccessor mapBlockAccessor) {
 		this.colorTable = colorTable;
+		this.mapBlockAccessor = mapBlockAccessor;
 	}
+
+	private final MapBlockAccessor mapBlockAccessor;
 
 	private final ColorTable colorTable;
 
-	public void render(Result<BlocksRecord> mapblocks, Graphics graphics) throws IllegalArgumentException, DataFormatException {
-		render(mapblocks, graphics, 1);
+	public void render(int x, int z, Graphics graphics) throws IllegalArgumentException, DataFormatException, ExecutionException {
+		render(x, z, graphics, 1);
 	}
 
-	public void render(Result<BlocksRecord> mapblocks, Graphics graphics, int scale) throws IllegalArgumentException, DataFormatException {
+	public void render(int mapBlockX, int mapBlockZ, Graphics graphics, int scale) throws IllegalArgumentException, DataFormatException, ExecutionException {
 
 		int foundBlocks = 0;
 		final int expectedBlocks = 16 * 16;
 
 		boolean[][] xz_coords = new boolean[16][16];
+
+		List<BlocksRecord> mapblocks = mapBlockAccessor.getTopDownYStride(mapBlockX, mapBlockZ);
 
 		for (BlocksRecord block: mapblocks) {
 			MapBlock mapBlock = MapBlockParser.parse(block.getData());
