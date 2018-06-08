@@ -6,6 +6,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.rudin.minetest.tileserver.MapBlock;
+import io.rudin.minetest.tileserver.MapBlockParser;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import org.jooq.DSLContext;
@@ -21,13 +22,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 
 /**
  * Cached mapblock accessor/fetcher
  */
 @Singleton
-public class MapBlockAccessor extends CacheLoader<MapBlockAccessor.Key, List<BlocksRecord>> {
+public class MapBlockAccessor extends CacheLoader<MapBlockAccessor.Key, List<MapBlock>> {
 
     private static final Logger logger = LoggerFactory.getLogger(MapBlockAccessor.class);
 
@@ -43,10 +45,11 @@ public class MapBlockAccessor extends CacheLoader<MapBlockAccessor.Key, List<Blo
                 .build(this);
     }
 
-    private final LoadingCache<Key, List<BlocksRecord>> cache;
+    //TODO: hashmap instead of list for y values
+    private final LoadingCache<Key, List<MapBlock>> cache;
 
     @Override
-    public List<BlocksRecord> load(Key key) throws Exception {
+    public List<MapBlock> load(Key key) throws Exception {
 
 
         long now = System.currentTimeMillis();
@@ -75,7 +78,7 @@ public class MapBlockAccessor extends CacheLoader<MapBlockAccessor.Key, List<Blo
         }
 
 
-        return blocks;
+        return blocks.stream().map(MapBlockParser::parse).collect(Collectors.toList());
     }
 
     /**
@@ -109,7 +112,7 @@ public class MapBlockAccessor extends CacheLoader<MapBlockAccessor.Key, List<Blo
 
     private final DSLContext ctx;
 
-    public List<BlocksRecord> getTopDownYStride(int x, int z) throws ExecutionException {
+    public List<MapBlock> getTopDownYStride(int x, int z) throws ExecutionException {
         return cache.get(new Key(x,z));
     }
 
@@ -121,11 +124,11 @@ public class MapBlockAccessor extends CacheLoader<MapBlockAccessor.Key, List<Blo
      * @return
      * @throws DataFormatException
      */
-    public BlocksRecord get(int x, int y, int z) throws DataFormatException {
-        List<BlocksRecord> blocks = cache.getIfPresent(new Key(x, z));
-        for (BlocksRecord r: blocks){
-            if (r.getPosy() == y)
-                return r;
+    public MapBlock get(int x, int y, int z) throws DataFormatException, ExecutionException {
+        List<MapBlock> blocks = cache.get(new Key(x, z));
+        for (MapBlock block: blocks){
+            if (block.y == y)
+                return block;
         }
 
         return null;

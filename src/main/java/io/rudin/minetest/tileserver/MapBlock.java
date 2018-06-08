@@ -6,6 +6,14 @@ import java.util.Optional;
 
 public class MapBlock {
 
+	public MapBlock(int x, int y, int z){
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
+	public final int x,y,z;
+
 	public int version;
 	
 	public boolean underground;

@@ -34,7 +34,7 @@ public class MapBlockParserTest {
 	
 	@Test
 	public void test() throws IllegalArgumentException, DataFormatException {
-		MapBlock block = MapBlockParser.parse(mapblock);
+		MapBlock block = MapBlockParser.parse(mapblock, 0,0,0);
 		
 		System.out.println("Version: " + block.version);
 		

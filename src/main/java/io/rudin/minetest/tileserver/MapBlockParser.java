@@ -1,5 +1,7 @@
 package io.rudin.minetest.tileserver;
 
+import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
+
 import java.util.Map;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -10,20 +12,30 @@ public class MapBlockParser {
 		return ((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff);
 	}
 
-	/**
-	 * Ref: https://github.com/minetest/minetest/blob/master/doc/world_format.txt
-	 * Impl: https://github.com/minetest/minetestmapper/blob/master/BlockDecoder.cpp
-	 * 
-	 * @param data
-	 * @return
-	 * @throws IllegalArgumentException
-	 * @throws DataFormatException 
-	 */
-	public static MapBlock parse(byte[] data) throws IllegalArgumentException {
+
+	public static MapBlock parse(BlocksRecord record) throws IllegalArgumentException {
+		return parse(
+				record.getData(),
+				record.getPosx(),
+				record.getPosy(),
+				record.getPosz()
+		);
+	}
+
+		/**
+         * Ref: https://github.com/minetest/minetest/blob/master/doc/world_format.txt
+         * Impl: https://github.com/minetest/minetestmapper/blob/master/BlockDecoder.cpp
+         *
+         * @param data
+         * @return
+         * @throws IllegalArgumentException
+         * @throws DataFormatException
+         */
+	public static MapBlock parse(byte[] data, int x, int y, int z) throws IllegalArgumentException {
 		if (data == null || data.length == 0)
 			throw new IllegalArgumentException("invalid data");
 
-		MapBlock block = new MapBlock();
+		MapBlock block = new MapBlock(x,y,z);
 
 		block.version = data[0];
 

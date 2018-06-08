@@ -46,12 +46,11 @@ public class MapBlockRenderer {
 
 		boolean[][] xz_coords = new boolean[16][16];
 
-		List<BlocksRecord> mapblocks = mapBlockAccessor.getTopDownYStride(mapBlockX, mapBlockZ);
+		List<MapBlock> mapblocks = mapBlockAccessor.getTopDownYStride(mapBlockX, mapBlockZ);
 
-		for (BlocksRecord block: mapblocks) {
-			MapBlock mapBlock = MapBlockParser.parse(block.getData());
+		for (MapBlock mapBlock: mapblocks) {
 
-			logger.debug("Checking blocky: {}", block.getPosy());
+			logger.debug("Checking blocky: {}", mapBlock.y);
 
 			if (mapBlock.isEmpty())
 				continue;
@@ -76,13 +75,86 @@ public class MapBlockRenderer {
 						Color color = colorTable.getColorMap().get(name);
 
 						if (color != null) {
-							logger.debug("Found node '{}' @ {}/{}/{} in blocky: {}", name, x, y, z, block.getPosy());
+							logger.debug("Found node '{}' @ {}/{}/{} in blocky: {}", name, x, y, z, mapBlock.y);
 
-							graphics.setColor(new java.awt.Color(color.r, color.g, color.b));
+							//get left node
+							Optional<String> left;
+							Optional<String> leftAbove;
+
+							//top node
+							Optional<String> top;
+							Optional<String> topAbove;
+
+							if (x > 0){
+								//same mapblock
+								left = mapBlock.getNode(x-1, y, z);
+								leftAbove = mapBlock.getNode(x-1, y+1, z);
+							} else {
+								//neighbouring mapblock
+								MapBlock leftMapBlock = mapBlockAccessor.get(mapBlockX - 1, mapBlock.y, mapBlockZ);
+								left = leftMapBlock.getNode(15, y, z);
+								leftAbove = leftMapBlock.getNode(15, y+1, z);
+							}
+
+							if (z < 14){
+								//same mapblock
+								top = mapBlock.getNode(x, y, z+1);
+								topAbove = mapBlock.getNode(x, y+1, z+1);
+							} else {
+								//neighbouring mapblock
+								MapBlock leftMapBlock = mapBlockAccessor.get(mapBlockX, mapBlock.y, mapBlockZ+1);
+								top = leftMapBlock.getNode(x, y, 0);
+								topAbove = leftMapBlock.getNode(x, y+1, 0);
+							}
+
+
+
 							int graphicX = x;
 							int graphicY = 15 - z;
-							
+
+							java.awt.Color pixelColor = new java.awt.Color(color.r, color.g, color.b);
+
+							if (leftAbove.isPresent())
+								pixelColor = pixelColor.darker();
+
+							if (topAbove.isPresent())
+								pixelColor = pixelColor.brighter();
+
+							if (!left.isPresent())
+								pixelColor = pixelColor.brighter();
+
+							if (!top.isPresent())
+								pixelColor = pixelColor.brighter();
+
+							graphics.setColor(pixelColor);
 							graphics.fillRect(graphicX * scale, graphicY * scale, scale, scale);
+
+							/*
+							if (!left.isPresent()){
+								//no node to the left or top
+								graphics.setColor(pixelColor.brighter());
+								graphics.fillRect(graphicX * scale, graphicY * scale, 8, scale);
+							}
+
+							if (!top.isPresent()){
+								//no node to the left or top
+								graphics.setColor(pixelColor.brighter());
+								graphics.fillRect(graphicX * scale, graphicY * scale, scale, 8);
+							}
+
+							if (leftAbove.isPresent()){
+								//node casts shadow
+								graphics.setColor(pixelColor.darker());
+								graphics.fillRect(graphicX * scale, graphicY * scale, 8, scale);
+							}
+
+							if (topAbove.isPresent()){
+								//node casts shadow
+								graphics.setColor(pixelColor.darker());
+								graphics.fillRect(graphicX * scale, graphicY * scale, scale, 8);
+							}
+							*/
+
 
 							xz_coords[x][z] = true;
 							foundBlocks++;
