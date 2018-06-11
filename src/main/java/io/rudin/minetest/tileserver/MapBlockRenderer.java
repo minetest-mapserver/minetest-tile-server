@@ -95,12 +95,12 @@ public class MapBlockRenderer {
 							logger.debug("Found node '{}' @ {}/{}/{} in blocky: {}", name, x, y, z, mapBlock.y);
 
 							//get left node
-							Optional<String> left;
-							Optional<String> leftAbove;
+							Optional<String> left = Optional.empty();
+							Optional<String> leftAbove = Optional.empty();
 
 							//top node
-							Optional<String> top;
-							Optional<String> topAbove;
+							Optional<String> top = Optional.empty();
+							Optional<String> topAbove = Optional.empty();
 
 							if (x > 0){
 								//same mapblock
@@ -109,8 +109,10 @@ public class MapBlockRenderer {
 							} else {
 								//neighbouring mapblock
 								MapBlock leftMapBlock = mapBlockAccessor.get(mapBlockX - 1, mapBlock.y, mapBlockZ);
-								left = leftMapBlock.getNode(15, y, z);
-								leftAbove = leftMapBlock.getNode(15, y+1, z);
+								if (leftMapBlock != null) {
+									left = leftMapBlock.getNode(15, y, z);
+									leftAbove = leftMapBlock.getNode(15, y + 1, z);
+								}
 							}
 
 							if (z < 14){
@@ -120,8 +122,10 @@ public class MapBlockRenderer {
 							} else {
 								//neighbouring mapblock
 								MapBlock leftMapBlock = mapBlockAccessor.get(mapBlockX, mapBlock.y, mapBlockZ+1);
-								top = leftMapBlock.getNode(x, y, 0);
-								topAbove = leftMapBlock.getNode(x, y+1, 0);
+								if (leftMapBlock != null) {
+									top = leftMapBlock.getNode(x, y, 0);
+									topAbove = leftMapBlock.getNode(x, y + 1, 0);
+								}
 							}
 
 
