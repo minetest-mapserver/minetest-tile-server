@@ -227,42 +227,32 @@ public class TileRenderer {
 		int mapblockX = coordinateInfo.x;
 		int mapblockZ = coordinateInfo.z;
 
-		long now = System.currentTimeMillis();
 
-		Result<BlocksRecord> blocks = ctx
-				.selectFrom(BLOCKS)
+		Integer count = ctx
+				.select(DSL.count())
+				.from(BLOCKS)
 				.where(
 						BLOCKS.POSX.eq(mapblockX)
 								.and(BLOCKS.POSZ.eq(mapblockZ))
 								.and(yCondition)
 				)
-				.orderBy(BLOCKS.POSY.desc())
-				.fetch();
+				.fetchOne(DSL.count());
 
-		long fetchTime = System.currentTimeMillis() - now;
 
-		logger.debug("Got {} blocks for mapblockX={} mapblockZ={} tileX={} tileY={}",
-				blocks.size(),
-				mapblockX,
-				mapblockZ,
-				tileX,
-				tileY
-		);
+		if (count > 0) {
 
-		if (!blocks.isEmpty()) {
-
-			now = System.currentTimeMillis();
+			long now = System.currentTimeMillis();
 
 			blockRenderer.render(mapblockX, mapblockZ, graphics, 16);
 
 			long renderTime = System.currentTimeMillis() - now;
 
-			String msg = "Timings of tile X={} Y={}: fetch={} ms render={} ms";
+			String msg = "Timings of tile X={} Y={}: render={} ms";
 
-			if (renderTime < 500 && fetchTime < 500)
-				logger.debug(msg, tileX, tileY, fetchTime, renderTime);
+			if (renderTime < 500)
+				logger.debug(msg, tileX, tileY, renderTime);
 			else
-				logger.warn(msg, tileX, tileY, fetchTime, renderTime);
+				logger.warn(msg, tileX, tileY, renderTime);
 		}
 
 

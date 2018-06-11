@@ -35,6 +35,23 @@ public class MapBlockRenderer {
 
 	private final ColorTable colorTable;
 
+	private int safeColorComponent(int value){
+		if (value > 255)
+			return 255;
+		if (value < 0)
+			return 0;
+		return value;
+	}
+
+	private java.awt.Color addAlpha(java.awt.Color color, int value){
+
+		int red = safeColorComponent(color.getRed() + value);
+		int green = safeColorComponent(color.getGreen() + value);
+		int blue = safeColorComponent(color.getBlue() + value);
+
+		return new java.awt.Color(red,green,blue);
+	}
+
 	public void render(int x, int z, Graphics graphics) throws IllegalArgumentException, DataFormatException, ExecutionException {
 		render(x, z, graphics, 1);
 	}
@@ -115,16 +132,16 @@ public class MapBlockRenderer {
 							java.awt.Color pixelColor = new java.awt.Color(color.r, color.g, color.b);
 
 							if (leftAbove.isPresent())
-								pixelColor = pixelColor.darker();
+								pixelColor = addAlpha(pixelColor, -5);
 
 							if (topAbove.isPresent())
-								pixelColor = pixelColor.brighter();
+								pixelColor = addAlpha(pixelColor, -5);
 
 							if (!left.isPresent())
-								pixelColor = pixelColor.brighter();
+								pixelColor = addAlpha(pixelColor, 5);
 
 							if (!top.isPresent())
-								pixelColor = pixelColor.brighter();
+								pixelColor = addAlpha(pixelColor, 5);
 
 							graphics.setColor(pixelColor);
 							graphics.fillRect(graphicX * scale, graphicY * scale, scale, scale);

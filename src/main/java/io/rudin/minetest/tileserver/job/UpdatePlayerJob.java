@@ -83,6 +83,7 @@ public class UpdatePlayerJob implements Runnable {
                 if (!previousPlayers.contains(player)){
                     //new player
                     logger.debug("Player '{}' joined", player.getName());
+                    previousPlayers.add(player);
 
                     EventBus.PlayerJoinedEvent event = new EventBus.PlayerJoinedEvent();
                     event.info = info;
