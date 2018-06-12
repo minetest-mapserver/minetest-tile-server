@@ -16,11 +16,17 @@ public class DBMigration {
 		flyway.setDataSource(cfg.minetestDatabaseUrl(), cfg.minetestDatabaseUsername(), cfg.minetestDatabasePassword());
 		flyway.setBaselineVersionAsString("0");
 		flyway.setBaselineOnMigrate(true);
+
+		this.tileFlyway = new Flyway();
+		tileFlyway.setDataSource(cfg.tileDatabaseUrl(), cfg.tileDatabaseUsername(), cfg.tileDatabasePassword());
+		tileFlyway.setSqlMigrationPrefix("TILEV");
 	}
-	
+
 	private final Flyway flyway;
+	private final Flyway tileFlyway;
 
 	public void migrate() {
+		tileFlyway.migrate();
 		flyway.migrate();
 	}
 

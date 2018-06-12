@@ -1,13 +1,14 @@
 package io.rudin.minetest.tileserver.job;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
-import static io.rudin.minetest.tileserver.blockdb.tables.TileserverTiles.TILESERVER_TILES;
+import static io.rudin.minetest.tileserver.tiledb.tables.Tiles.TILES;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
+import io.rudin.minetest.tileserver.qualifier.TileDB;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.*;
 
@@ -29,8 +30,9 @@ public class UpdateChangedTilesJob implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(UpdateChangedTilesJob.class);
 
 	@Inject
-	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg) {
+	public UpdateChangedTilesJob(DSLContext ctx, @TileDB DSLContext tileCtx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg) {
 		this.ctx = ctx;
+		this.tileCtx = tileCtx;
 		this.tileCache = tileCache;
 		this.eventBus = eventBus;
 
@@ -39,7 +41,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 	private final EventBus eventBus;
 
-	private final DSLContext ctx;
+	private final DSLContext ctx, tileCtx;
 	
 	private final TileCache tileCache;
 
@@ -65,10 +67,10 @@ public class UpdateChangedTilesJob implements Runnable {
 			logger.debug("Gathering latest tile time from db");
 			long start = System.currentTimeMillis();
 
-			latestTimestamp = ctx
-					.select(DSL.max(TILESERVER_TILES.MTIME))
-					.from(TILESERVER_TILES)
-					.fetchOne(DSL.max(TILESERVER_TILES.MTIME));
+			latestTimestamp = tileCtx
+					.select(DSL.max(TILES.MTIME))
+					.from(TILES)
+					.fetchOne(DSL.max(TILES.MTIME));
 
 			long diff = System.currentTimeMillis() - start;
 

@@ -36,7 +36,11 @@ public interface TileServerConfig extends Config {
 	@Key("tiles.directory")
 	@DefaultValue("target/tiles")
 	String tileDirectory();
-	
+
+	/*
+	 Default minetest db
+	 */
+
 	@Key("minetest.db.url")
 	@DefaultValue("jdbc:postgresql://127.0.0.1:5432/minetest")
 	String minetestDatabaseUrl();
@@ -52,5 +56,25 @@ public interface TileServerConfig extends Config {
 	@Key("minetest.db.driver")
 	@DefaultValue("org.postgresql.Driver")
 	String minetestDatabaseDriver();
-	
+
+	/*
+	 Tile cache DB
+	 */
+
+	@Key("tile.db.url")
+	@DefaultValue("jdbc:postgresql://127.0.0.1:5432/tiles")
+	String tileDatabaseUrl();
+
+	@Key("tile.db.username")
+	@DefaultValue("postgres")
+	String tileDatabaseUsername();
+
+	@Key("tile.db.password")
+	@DefaultValue("enter")
+	String tileDatabasePassword();
+
+	@Key("tile.db.driver")
+	@DefaultValue("org.postgresql.Driver")
+	String tileDatabaseDriver();
+
 }

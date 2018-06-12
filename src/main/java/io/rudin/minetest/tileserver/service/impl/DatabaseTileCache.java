@@ -1,10 +1,9 @@
 package io.rudin.minetest.tileserver.service.impl;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.Striped;
-import io.rudin.minetest.tileserver.blockdb.tables.records.TileserverTilesRecord;
+import io.rudin.minetest.tileserver.qualifier.TileDB;
 import io.rudin.minetest.tileserver.service.TileCache;
+import io.rudin.minetest.tileserver.tiledb.tables.records.TilesRecord;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
@@ -13,13 +12,13 @@ import javax.inject.Singleton;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
-import static io.rudin.minetest.tileserver.blockdb.tables.TileserverTiles.TILESERVER_TILES;
+import static io.rudin.minetest.tileserver.tiledb.tables.Tiles.TILES;
 
 @Singleton
 public class DatabaseTileCache implements TileCache {
 
     @Inject
-    public DatabaseTileCache(DSLContext ctx){
+    public DatabaseTileCache(@TileDB DSLContext ctx){
         this.ctx = ctx;
         this.lock = Striped.lazyWeakReadWriteLock(50);
     }
@@ -52,7 +51,7 @@ public class DatabaseTileCache implements TileCache {
                 return;
             }
 
-            TileserverTilesRecord record = ctx.newRecord(TILESERVER_TILES);
+            TilesRecord record = ctx.newRecord(TILES);
             record.setTile(data);
             record.setX(x);
             record.setY(y);
@@ -70,12 +69,12 @@ public class DatabaseTileCache implements TileCache {
     public byte[] get(int x, int y, int z) {
 
         return ctx
-                .select(TILESERVER_TILES.TILE)
-                .from(TILESERVER_TILES)
-                .where(TILESERVER_TILES.X.eq(x))
-                .and(TILESERVER_TILES.Y.eq(y))
-                .and(TILESERVER_TILES.Z.eq(z))
-                .fetchOne(TILESERVER_TILES.TILE);
+                .select(TILES.TILE)
+                .from(TILES)
+                .where(TILES.X.eq(x))
+                .and(TILES.Y.eq(y))
+                .and(TILES.Z.eq(z))
+                .fetchOne(TILES.TILE);
 
     }
 
@@ -83,10 +82,10 @@ public class DatabaseTileCache implements TileCache {
     public boolean has(int x, int y, int z) {
         Integer count = ctx
                 .select(DSL.count())
-                .from(TILESERVER_TILES)
-                .where(TILESERVER_TILES.X.eq(x))
-                .and(TILESERVER_TILES.Y.eq(y))
-                .and(TILESERVER_TILES.Z.eq(z))
+                .from(TILES)
+                .where(TILES.X.eq(x))
+                .and(TILES.Y.eq(y))
+                .and(TILES.Z.eq(z))
                 .fetchOne(DSL.count());
 
         return count > 0;
@@ -99,10 +98,10 @@ public class DatabaseTileCache implements TileCache {
         writeLock.lock();
 
         try {
-            ctx.delete(TILESERVER_TILES)
-                    .where(TILESERVER_TILES.X.eq(x))
-                    .and(TILESERVER_TILES.Y.eq(y))
-                    .and(TILESERVER_TILES.Z.eq(z))
+            ctx.delete(TILES)
+                    .where(TILES.X.eq(x))
+                    .and(TILES.Y.eq(y))
+                    .and(TILES.Z.eq(z))
                     .execute();
 
         } finally {

@@ -7,11 +7,9 @@ package io.rudin.minetest.tileserver.blockdb;
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
-import io.rudin.minetest.tileserver.blockdb.tables.TileserverTiles;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerMetadataRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerRecord;
-import io.rudin.minetest.tileserver.blockdb.tables.records.TileserverTilesRecord;
 
 import javax.annotation.Generated;
 
@@ -46,7 +44,6 @@ public class Keys {
     public static final UniqueKey<BlocksRecord> BLOCKS_PKEY = UniqueKeys0.BLOCKS_PKEY;
     public static final UniqueKey<PlayerRecord> PLAYER_PKEY = UniqueKeys0.PLAYER_PKEY;
     public static final UniqueKey<PlayerMetadataRecord> PLAYER_METADATA_PKEY = UniqueKeys0.PLAYER_METADATA_PKEY;
-    public static final UniqueKey<TileserverTilesRecord> TILESERVER_TILES_PKEY = UniqueKeys0.TILESERVER_TILES_PKEY;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -62,7 +59,6 @@ public class Keys {
         public static final UniqueKey<BlocksRecord> BLOCKS_PKEY = Internal.createUniqueKey(Blocks.BLOCKS, "blocks_pkey", Blocks.BLOCKS.POSX, Blocks.BLOCKS.POSY, Blocks.BLOCKS.POSZ);
         public static final UniqueKey<PlayerRecord> PLAYER_PKEY = Internal.createUniqueKey(Player.PLAYER, "player_pkey", Player.PLAYER.NAME);
         public static final UniqueKey<PlayerMetadataRecord> PLAYER_METADATA_PKEY = Internal.createUniqueKey(PlayerMetadata.PLAYER_METADATA, "player_metadata_pkey", PlayerMetadata.PLAYER_METADATA.PLAYER, PlayerMetadata.PLAYER_METADATA.ATTR);
-        public static final UniqueKey<TileserverTilesRecord> TILESERVER_TILES_PKEY = Internal.createUniqueKey(TileserverTiles.TILESERVER_TILES, "tileserver_tiles_pkey", TileserverTiles.TILESERVER_TILES.X, TileserverTiles.TILESERVER_TILES.Y, TileserverTiles.TILESERVER_TILES.Z);
     }
 
     private static class ForeignKeys0 {

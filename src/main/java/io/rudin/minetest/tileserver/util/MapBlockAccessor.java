@@ -40,7 +40,7 @@ public class MapBlockAccessor extends CacheLoader<MapBlockAccessor.Key, List<Map
         this.minY = cfg.tilesMinY();
 
         this.cache = CacheBuilder.newBuilder()
-                .expireAfterAccess(10, TimeUnit.SECONDS)
+                .expireAfterAccess(20, TimeUnit.SECONDS)
                 .maximumSize(500)
                 .build(this);
     }

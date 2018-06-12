@@ -8,7 +8,6 @@ import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
 import io.rudin.minetest.tileserver.blockdb.tables.Chat;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
-import io.rudin.minetest.tileserver.blockdb.tables.TileserverTiles;
 
 import javax.annotation.Generated;
 
@@ -45,9 +44,4 @@ public class Tables {
      * The table <code>player_metadata</code>.
      */
     public static final PlayerMetadata PLAYER_METADATA = io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata.PLAYER_METADATA;
-
-    /**
-     * The table <code>tileserver_tiles</code>.
-     */
-    public static final TileserverTiles TILESERVER_TILES = io.rudin.minetest.tileserver.blockdb.tables.TileserverTiles.TILESERVER_TILES;
 }

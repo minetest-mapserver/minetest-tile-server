@@ -1,14 +1,13 @@
 package io.rudin.minetest.tileserver.module;
 
+import com.google.inject.Key;
+import io.rudin.minetest.tileserver.qualifier.TileDB;
+import io.rudin.minetest.tileserver.provider.*;
 import org.jooq.DSLContext;
 
 import com.google.inject.AbstractModule;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
-import io.rudin.minetest.tileserver.provider.DSLContextProvider;
-import io.rudin.minetest.tileserver.provider.HikariConfigProvider;
-import io.rudin.minetest.tileserver.provider.HikariDatasourceProvider;
 
 public class DBModule extends AbstractModule {
 
@@ -17,6 +16,10 @@ public class DBModule extends AbstractModule {
 		bind(HikariConfig.class).toProvider(HikariConfigProvider.class);
 		bind(HikariDataSource.class).toProvider(HikariDatasourceProvider.class);
 		bind(DSLContext.class).toProvider(DSLContextProvider.class);
+
+		bind(Key.get(HikariConfig.class, TileDB.class)).toProvider(TileDBHikariConfigProvider.class);
+		bind(Key.get(HikariDataSource.class, TileDB.class)).toProvider(TileDBHikariDatasourceProvider.class);
+		bind(Key.get(DSLContext.class, TileDB.class)).toProvider(TileDBDSLContextProvider.class);
 	}
 	
 }
