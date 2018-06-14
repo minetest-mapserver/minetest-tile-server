@@ -13,6 +13,7 @@ import io.rudin.minetest.tileserver.job.UpdatePlayerJob;
 import io.rudin.minetest.tileserver.module.ConfigModule;
 import io.rudin.minetest.tileserver.module.DBModule;
 import io.rudin.minetest.tileserver.module.ServiceModule;
+import io.rudin.minetest.tileserver.route.ConfigRoute;
 import io.rudin.minetest.tileserver.route.PlayerRoute;
 import io.rudin.minetest.tileserver.route.TileRoute;
 import io.rudin.minetest.tileserver.transformer.JsonTransformer;
@@ -44,6 +45,7 @@ public class TileServer {
 		webSocket("/ws", WebSocketHandler.class);
 		get("/tiles/:z/:x/:y", injector.getInstance(TileRoute.class));
 		get("/player", injector.getInstance(PlayerRoute.class), json);
+		get("/config", injector.getInstance(ConfigRoute.class), json);
 
 		//Initialize web server
 		init();

@@ -38,6 +38,15 @@ public interface TileServerConfig extends Config {
 	String tileDirectory();
 
 	/*
+	 Matomo tracker id
+	 */
+	@Key("tracker.matomo.id")
+	String matomoTrackerId();
+
+	@Key("tracker.matomo.url")
+	String matomoTrackerUrl();
+
+	/*
 	 Default minetest db
 	 */
 
