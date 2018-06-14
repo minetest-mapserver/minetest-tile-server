@@ -9,8 +9,10 @@
     </appender>
 
     <logger name="org.jooq.Constants" level="WARN"></logger>
-    
-    <root level="debug">
+    <logger name="io.rudin.minetest.tileserver.TileRenderer" level="DEBUG"/>
+    <logger name="io.rudin.minetest.tileserver.util.MapBlockAccessor" level="DEBUG"/>
+
+    <root level="info">
         <appender-ref ref="logfile" />
         <appender-ref ref="console" />
     </root>

@@ -22,7 +22,7 @@ public interface TileServerConfig extends Config {
 	int tilesMinY();
 
 	@Key("tilerenderer.processes")
-	@DefaultValue("8")
+	@DefaultValue("24")
 	int tilerendererProcesses();
 
 	@Key("tilerenderer.updateinterval")

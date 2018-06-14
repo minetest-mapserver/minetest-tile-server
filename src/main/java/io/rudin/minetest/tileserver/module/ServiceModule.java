@@ -15,9 +15,19 @@ import io.rudin.minetest.tileserver.service.impl.EventBusImpl;
 
 public class ServiceModule extends AbstractModule {
 
+	public ServiceModule(){
+		this(DatabaseTileCache.class);
+	}
+
+	public ServiceModule(Class<? extends TileCache> cacheImpl){
+		this.cacheImpl = cacheImpl;
+	}
+
+	private final Class<? extends TileCache> cacheImpl;
+
 	@Override
 	protected void configure() {
-		bind(TileCache.class).to(DatabaseTileCache.class);
+		bind(TileCache.class).to(cacheImpl);
 		//bind(TileCache.class).to(FileTileCache.class);
 		bind(EventBus.class).to(EventBusImpl.class);
 		bind(ColorTable.class).toProvider(ColorTableProvider.class);
