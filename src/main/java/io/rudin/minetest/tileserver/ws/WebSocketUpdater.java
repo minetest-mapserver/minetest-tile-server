@@ -30,47 +30,6 @@ public class WebSocketUpdater {
         public Object data;
     }
 
-    @Subscribe void onPlayerMove(EventBus.PlayerLeftEvent e){
-        try {
-            EventContainer container = new EventContainer();
-            container.data = e;
-            container.type = "player-left";
-            String json = mapper.writeValueAsString(container);
-
-            for (Session session : WebSocketHandler.sessions) {
-                try {
-                    session.getRemote().sendString(json);
-
-                } catch (Exception e3) {
-                    //TODO
-                }
-            }
-        } catch (Exception e2){
-            e2.printStackTrace();
-        }
-
-    }
-
-    @Subscribe void onPlayerMove(EventBus.PlayerJoinedEvent e){
-        try {
-            EventContainer container = new EventContainer();
-            container.data = e;
-            container.type = "player-joined";
-            String json = mapper.writeValueAsString(container);
-
-            for (Session session : WebSocketHandler.sessions) {
-                try {
-                    session.getRemote().sendString(json);
-
-                } catch (Exception e3) {
-                    //TODO
-                }
-            }
-        } catch (Exception e2){
-            e2.printStackTrace();
-        }
-
-    }
 
     @Subscribe void onPlayerMove(EventBus.PlayerMovedEvent e){
         try {

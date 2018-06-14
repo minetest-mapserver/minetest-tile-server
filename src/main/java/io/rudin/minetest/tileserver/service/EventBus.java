@@ -21,12 +21,4 @@ public interface EventBus {
         public PlayerInfo info;
     }
 
-    class PlayerJoinedEvent {
-        public PlayerInfo info;
-    }
-
-    class PlayerLeftEvent {
-        public String playerName;
-    }
-
 }

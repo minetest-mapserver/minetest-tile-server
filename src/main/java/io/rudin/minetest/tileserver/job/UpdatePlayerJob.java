@@ -40,7 +40,6 @@ public class UpdatePlayerJob implements Runnable {
 
     private boolean running = false;
 
-    private final List<String> previousPlayers = new ArrayList<>();
 
     @Override
     public void run() {
@@ -65,7 +64,6 @@ public class UpdatePlayerJob implements Runnable {
                     .fetch()
                     .into(Player.class);
 
-            List<String> currentPlayerNames = players.stream().map(p -> p.getName()).collect(Collectors.toList());
 
             for (Player player : players) {
 
@@ -83,37 +81,10 @@ public class UpdatePlayerJob implements Runnable {
 
                 PlayerInfo info = new PlayerInfo(player, metadata);
 
-                if (!previousPlayers.contains(player.getName())){
-                    //new player
-                    logger.debug("Player '{}' joined", player.getName());
-                    previousPlayers.add(player.getName());
-
-                    EventBus.PlayerJoinedEvent event = new EventBus.PlayerJoinedEvent();
-                    event.info = info;
-                    eventBus.post(event);
-
-                } else {
-                    //previous player
-                    EventBus.PlayerMovedEvent event = new EventBus.PlayerMovedEvent();
-                    event.info = info;
-                    eventBus.post(event);
-                }
+                EventBus.PlayerMovedEvent event = new EventBus.PlayerMovedEvent();
+                event.info = info;
+                eventBus.post(event);
             }
-
-            for (String previousPlayer: previousPlayers){
-                if (!currentPlayerNames.contains(previousPlayer)){
-                    //Player left
-                    logger.debug("Player '{}' left", previousPlayer);
-
-                    EventBus.PlayerLeftEvent event = new EventBus.PlayerLeftEvent();
-                    event.playerName = previousPlayer;
-                    eventBus.post(event);
-                }
-            }
-
-            //Replace previous list
-            previousPlayers.clear();
-            previousPlayers.addAll(currentPlayerNames);
 
         } finally {
             running = false;
