@@ -23,9 +23,6 @@
 
     <logger name="org.jooq.Constants" level="WARN"></logger>
 
-    <logger name="io.rudin.minetest.tileserver.job.UpdateChangedTilesJob" level="DEBUG"></logger>
-    <logger name="io.rudin.minetest.tileserver.job.UpdatePlayerJob" level="DEBUG"></logger>
-
     <root level="info">
         <appender-ref ref="logfile" />
         <appender-ref ref="console" />
