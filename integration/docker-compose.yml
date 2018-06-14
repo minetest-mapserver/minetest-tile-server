@@ -8,7 +8,7 @@ services:
    - "postgres"
   volumes:
    - "./minetest:/data"
-  command: minetestserver --config /data/minetest.conf --world /data/world/ --quiet
+  command: minetestserver --config /data/minetest.conf --world /data/world/
   ports:
    - "30000:30000/udp"
 
