@@ -2,6 +2,7 @@ package io.rudin.minetest.tileserver;
 
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 
+import java.io.FileOutputStream;
 import java.util.Map;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -10,6 +11,14 @@ public class MapBlockParser {
 
 	public static int readU16(byte[] data, int offset) {
 		return ((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff);
+	}
+
+	public static long readU32(byte[] data, int offset) {
+		long value = data[offset+3] & 0xFF;
+		value |= (data[offset+2] << 8) & 0xFFFF;
+		value |= (data[offset+1] << 16) & 0xFFFFFF;
+		value |= (data[offset] << 24) & 0xFFFFFFFF;
+		return value;
 	}
 
 
@@ -86,7 +95,7 @@ public class MapBlockParser {
 			int mapMdLength = inflater.inflate(md); //unused
 			//TODO: parse meta: https://github.com/minetest/minetest/blob/master/doc/world_format.txt#L330
 
-		} catch (DataFormatException e){
+		} catch (Exception e){
 			throw new IllegalArgumentException(e);
 		}
 		
