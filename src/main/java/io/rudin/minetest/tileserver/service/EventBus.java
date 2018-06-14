@@ -26,7 +26,7 @@ public interface EventBus {
     }
 
     class PlayerLeftEvent {
-        public PlayerInfo info;
+        public String playerName;
     }
 
 }

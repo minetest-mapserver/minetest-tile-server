@@ -16,6 +16,7 @@ import javax.inject.Singleton;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Player.PLAYER;
 import static io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata.PLAYER_METADATA;
@@ -39,7 +40,7 @@ public class UpdatePlayerJob implements Runnable {
 
     private boolean running = false;
 
-    private final List<Player> previousPlayers = new ArrayList<>();
+    private final List<String> previousPlayers = new ArrayList<>();
 
     @Override
     public void run() {
@@ -64,6 +65,8 @@ public class UpdatePlayerJob implements Runnable {
                     .fetch()
                     .into(Player.class);
 
+            List<String> currentPlayerNames = players.stream().map(p -> p.getName()).collect(Collectors.toList());
+
             for (Player player : players) {
 
                 Timestamp modificationDate = player.getModificationDate();
@@ -80,10 +83,10 @@ public class UpdatePlayerJob implements Runnable {
 
                 PlayerInfo info = new PlayerInfo(player, metadata);
 
-                if (!previousPlayers.contains(player)){
+                if (!previousPlayers.contains(player.getName())){
                     //new player
                     logger.debug("Player '{}' joined", player.getName());
-                    previousPlayers.add(player);
+                    previousPlayers.add(player.getName());
 
                     EventBus.PlayerJoinedEvent event = new EventBus.PlayerJoinedEvent();
                     event.info = info;
@@ -97,27 +100,20 @@ public class UpdatePlayerJob implements Runnable {
                 }
             }
 
-            for (Player previousPlayer: previousPlayers){
-                if (!players.contains(previousPlayer)){
+            for (String previousPlayer: previousPlayers){
+                if (!currentPlayerNames.contains(previousPlayer)){
                     //Player left
-                    logger.debug("Player '{}' left", previousPlayer.getName());
-
-                    List<PlayerMetadata> metadata = ctx
-                            .selectFrom(PLAYER_METADATA)
-                            .where(PLAYER_METADATA.PLAYER.eq(previousPlayer.getName()))
-                            .fetchInto(PlayerMetadata.class);
-
-                    PlayerInfo info = new PlayerInfo(previousPlayer, metadata);
+                    logger.debug("Player '{}' left", previousPlayer);
 
                     EventBus.PlayerLeftEvent event = new EventBus.PlayerLeftEvent();
-                    event.info = info;
+                    event.playerName = previousPlayer;
                     eventBus.post(event);
                 }
             }
 
             //Replace previous list
             previousPlayers.clear();
-            previousPlayers.addAll(players);
+            previousPlayers.addAll(currentPlayerNames);
 
         } finally {
             running = false;
