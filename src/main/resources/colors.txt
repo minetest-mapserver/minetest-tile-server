@@ -316,3 +316,12 @@ xpanes:pane_flat 194 194 227 64 16
 
 travelnet:travelnet 255 0 0
 moreblocks:stone_tile 131 131 131
+
+bridger:deck_steel 43 44 45
+bridger:block_steel 43 44 45
+bridger:block_red 193 94 81
+bridger:block_green 88 193 81
+bridger:block_yellow 218 221 108
+bridger:block_white 226 226 217
+bridger:girder_mid_steel 43 44 45
+
