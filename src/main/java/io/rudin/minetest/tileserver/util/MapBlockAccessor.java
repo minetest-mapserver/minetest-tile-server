@@ -67,10 +67,11 @@ public class MapBlockAccessor extends CacheLoader<MapBlockAccessor.Key, List<Map
 
         long fetchTime = System.currentTimeMillis() - now;
 
-        logger.debug("Got {} blocks for mapblockX={} mapblockZ={}",
+        logger.debug("Got {} blocks for mapblockX={} mapblockZ={} in {} ms",
                 blocks.size(),
                 key.x,
-                key.z
+                key.z,
+                fetchTime
         );
 
         if (fetchTime > 500){

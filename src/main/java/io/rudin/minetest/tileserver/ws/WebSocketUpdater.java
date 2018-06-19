@@ -30,6 +30,7 @@ public class WebSocketUpdater {
         public Object data;
     }
 
+
     @Subscribe void onPlayerMove(EventBus.PlayerMovedEvent e){
         try {
             EventContainer container = new EventContainer();

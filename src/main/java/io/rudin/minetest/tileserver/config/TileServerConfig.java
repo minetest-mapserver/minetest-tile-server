@@ -22,7 +22,7 @@ public interface TileServerConfig extends Config {
 	int tilesMinY();
 
 	@Key("tilerenderer.processes")
-	@DefaultValue("8")
+	@DefaultValue("24")
 	int tilerendererProcesses();
 
 	@Key("tilerenderer.updateinterval")
@@ -36,6 +36,15 @@ public interface TileServerConfig extends Config {
 	@Key("tiles.directory")
 	@DefaultValue("target/tiles")
 	String tileDirectory();
+
+	/*
+	 Matomo tracker id
+	 */
+	@Key("tracker.matomo.id")
+	String matomoTrackerId();
+
+	@Key("tracker.matomo.url")
+	String matomoTrackerUrl();
 
 	/*
 	 Default minetest db
