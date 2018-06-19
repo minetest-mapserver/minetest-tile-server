@@ -22,6 +22,8 @@
     </appender>
 
     <logger name="org.jooq.Constants" level="WARN"></logger>
+    <logger name="io.rudin.minetest.tileserver.TileRenderer" level="INFO"/>
+    <logger name="io.rudin.minetest.tileserver.util.MapBlockAccessor" level="INFO"/>
 
     <root level="info">
         <appender-ref ref="logfile" />
