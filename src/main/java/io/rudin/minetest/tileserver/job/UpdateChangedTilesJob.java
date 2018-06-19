@@ -88,7 +88,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 			Result<BlocksRecord> blocks = ctx
 					.selectFrom(BLOCKS)
-					.where(BLOCKS.MTIME.ge(latestTimestamp))
+					.where(BLOCKS.MTIME.gt(latestTimestamp))
 					.and(yCondition)
 					.orderBy(BLOCKS.MTIME.asc()) //oldest first
 					.limit(LIMIT)
@@ -119,6 +119,7 @@ public class UpdateChangedTilesJob implements Runnable {
 					String tileKey = getTileKey(zoomedTile);
 
 					if (!updatedTileKeys.contains(tileKey)) {
+						tileCache.remove(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
 
 						EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
 						event.x = zoomedTile.x;
@@ -131,7 +132,6 @@ public class UpdateChangedTilesJob implements Runnable {
 						updatedTileKeys.add(tileKey);
 					}
 
-					tileCache.remove(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
 				}
 
 
