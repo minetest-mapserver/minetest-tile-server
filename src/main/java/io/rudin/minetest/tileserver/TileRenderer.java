@@ -161,7 +161,7 @@ public class TileRenderer {
 			
 			graphics.drawImage(scaledInstance, 0, 0, CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE, null);
 
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			ByteArrayOutputStream output = new ByteArrayOutputStream(12000);
 			ImageIO.write(tile, "png", output);
 
 			byte[] data = output.toByteArray();
@@ -205,7 +205,7 @@ public class TileRenderer {
 			Image lowerRightScaledInstance = lowerRightImage.getScaledInstance(HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, Image.SCALE_FAST);
 			graphics.drawImage(lowerRightScaledInstance, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, null);
 
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			ByteArrayOutputStream output = new ByteArrayOutputStream(12000);
 			ImageIO.write(tile, "png", output);
 
 			byte[] data = output.toByteArray();

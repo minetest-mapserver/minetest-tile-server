@@ -1,7 +1,6 @@
 package io.rudin.minetest.tileserver;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -11,12 +10,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.rudin.minetest.tileserver.util.MapBlockAccessor;
-import org.jooq.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.rudin.minetest.tileserver.ColorTable.Color;
-import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 
 @Singleton
 public class MapBlockRenderer {
@@ -34,23 +30,6 @@ public class MapBlockRenderer {
 	private final MapBlockAccessor mapBlockAccessor;
 
 	private final ColorTable colorTable;
-
-	private int safeColorComponent(int value){
-		if (value > 255)
-			return 255;
-		if (value < 0)
-			return 0;
-		return value;
-	}
-
-	private java.awt.Color addAlpha(java.awt.Color color, int value){
-
-		int red = safeColorComponent(color.getRed() + value);
-		int green = safeColorComponent(color.getGreen() + value);
-		int blue = safeColorComponent(color.getBlue() + value);
-
-		return new java.awt.Color(red,green,blue);
-	}
 
 	public void render(int x, int z, Graphics graphics) throws IllegalArgumentException, DataFormatException, ExecutionException {
 		render(x, z, graphics, 1);
@@ -89,9 +68,13 @@ public class MapBlockRenderer {
 
 						String name = node.get();
 
-						Color color = colorTable.getColorMap().get(name);
+						ColorTable.RGBData rgb = colorTable.getColorMap().get(name);
 
-						if (color != null) {
+						if (rgb != null) {
+
+							//working copy
+							rgb = new ColorTable.RGBData(rgb);
+
 							logger.debug("Found node '{}' @ {}/{}/{} in blocky: {}", name, x, y, z, mapBlock.y);
 
 							//get left node
@@ -133,48 +116,20 @@ public class MapBlockRenderer {
 							int graphicX = x;
 							int graphicY = 15 - z;
 
-							java.awt.Color pixelColor = new java.awt.Color(color.r, color.g, color.b);
-
 							if (leftAbove.isPresent())
-								pixelColor = addAlpha(pixelColor, -5);
+								rgb.addComponent(-5);
 
 							if (topAbove.isPresent())
-								pixelColor = addAlpha(pixelColor, -5);
+								rgb.addComponent(-5);
 
 							if (!left.isPresent())
-								pixelColor = addAlpha(pixelColor, 5);
+								rgb.addComponent(5);
 
 							if (!top.isPresent())
-								pixelColor = addAlpha(pixelColor, 5);
+								rgb.addComponent(5);
 
-							graphics.setColor(pixelColor);
+							graphics.setColor(rgb.toColor());
 							graphics.fillRect(graphicX * scale, graphicY * scale, scale, scale);
-
-							/*
-							if (!left.isPresent()){
-								//no node to the left or top
-								graphics.setColor(pixelColor.brighter());
-								graphics.fillRect(graphicX * scale, graphicY * scale, 8, scale);
-							}
-
-							if (!top.isPresent()){
-								//no node to the left or top
-								graphics.setColor(pixelColor.brighter());
-								graphics.fillRect(graphicX * scale, graphicY * scale, scale, 8);
-							}
-
-							if (leftAbove.isPresent()){
-								//node casts shadow
-								graphics.setColor(pixelColor.darker());
-								graphics.fillRect(graphicX * scale, graphicY * scale, 8, scale);
-							}
-
-							if (topAbove.isPresent()){
-								//node casts shadow
-								graphics.setColor(pixelColor.darker());
-								graphics.fillRect(graphicX * scale, graphicY * scale, scale, 8);
-							}
-							*/
 
 
 							xz_coords[x][z] = true;

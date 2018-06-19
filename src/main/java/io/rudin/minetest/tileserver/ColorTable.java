@@ -51,7 +51,7 @@ public class ColorTable {
 				}
 				
 				if (name != null && r >= 0 && g >= 0 && b >= 0) {
-					colorMap.put(name, new Color(r,g,b));
+					colorMap.put(name, new RGBData(r,g,b));
 				}
 				
 			}
@@ -63,20 +63,48 @@ public class ColorTable {
 		}
 	}
 
-	public Map<String, Color> getColorMap() {
+	public Map<String, RGBData> getColorMap() {
 		return colorMap;
 	}
 
-	private final Map<String, Color> colorMap = new HashMap<>();
+	private final Map<String, RGBData> colorMap = new HashMap<>();
 
-	public static class Color {
-		public Color(int r, int g,int b) {
+	private static int safeColorComponent(int value){
+		if (value > 255)
+			return 255;
+		if (value < 0)
+			return 0;
+		return value;
+	}
+
+	public static class RGBData {
+
+		public RGBData(){}
+
+		public RGBData(RGBData copy){
+			this.r = copy.r;
+			this.g = copy.g;
+			this.b = copy.b;
+		}
+
+		public RGBData(int r, int g,int b) {
 			this.r = r;
 			this.g = g;
 			this.b = b;
 		}
 
-		public final int r,g,b;
+
+		public java.awt.Color toColor(){
+			return new java.awt.Color(r,g,b);
+		}
+
+		public void addComponent(int value){
+			this.r = safeColorComponent(r + value);
+			this.g = safeColorComponent(g + value);
+			this.b = safeColorComponent(b + value);
+		}
+
+		public int r,g,b;
 	}
 
 }
