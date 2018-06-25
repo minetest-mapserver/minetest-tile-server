@@ -1,9 +1,13 @@
 package io.rudin.minetest.tileserver.service.impl;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.google.common.util.concurrent.Striped;
 import io.rudin.minetest.tileserver.qualifier.TileDB;
 import io.rudin.minetest.tileserver.service.TileCache;
 import io.rudin.minetest.tileserver.tiledb.tables.records.TilesRecord;
+import io.rudin.minetest.tileserver.util.MapBlockAccessor;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -11,7 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
@@ -27,7 +33,15 @@ public class DatabaseTileCache implements TileCache {
         this.ctx = ctx;
         this.lock = Striped.lazyWeakReadWriteLock(50);
         this.executor = executor;
+
+        this.cache = CacheBuilder
+                .newBuilder()
+                .expireAfterWrite(10, TimeUnit.SECONDS)
+                .build();
     }
+
+
+    private final Cache<String, byte[]> cache;
 
     private final ExecutorService executor;
 
@@ -48,6 +62,8 @@ public class DatabaseTileCache implements TileCache {
 
         final String key = getKey(x,y,z);
 
+        cache.put(key, data);
+
         ReadWriteLock lock = getLock(x, y, z);
 
         long now = System.currentTimeMillis();
@@ -63,6 +79,11 @@ public class DatabaseTileCache implements TileCache {
         executor.submit(job);
     }
 
+
+
+    /**
+     * Async insert job
+     */
     public class AsyncTileInsertJob implements Runnable {
 
         AsyncTileInsertJob(TilesRecord record, ReadWriteLock lock){
@@ -83,7 +104,7 @@ public class DatabaseTileCache implements TileCache {
 
             try {
                 //re-check in critical section
-                if (has(record.getX(),record.getY(),record.getZ())){
+                if (has(record.getX(),record.getY(),record.getZ(), false)){
                     //already inserted
                     return;
                 }
@@ -105,6 +126,12 @@ public class DatabaseTileCache implements TileCache {
     @Override
     public byte[] get(int x, int y, int z) {
 
+        String key = getKey(x, y, z);
+        byte[] data = cache.getIfPresent(key);
+
+        if (data != null)
+            return data;
+
         return ctx
                 .select(TILES.TILE)
                 .from(TILES)
@@ -115,8 +142,17 @@ public class DatabaseTileCache implements TileCache {
 
     }
 
-    @Override
-    public boolean has(int x, int y, int z) {
+
+    public boolean has(int x, int y, int z, boolean useCache) {
+
+        if (useCache) {
+            String key = getKey(x, y, z);
+            byte[] data = cache.getIfPresent(key);
+
+            if (data != null)
+                return true;
+        }
+
         Integer count = ctx
                 .select(DSL.count())
                 .from(TILES)
@@ -128,8 +164,18 @@ public class DatabaseTileCache implements TileCache {
         return count > 0;
     }
 
+
+    @Override
+    public boolean has(int x, int y, int z) {
+        return has(x,y,z,true);
+    }
+
     @Override
     public void remove(int x, int y, int z) {
+
+        String key = getKey(x, y, z);
+        cache.invalidate(key);
+
         ReadWriteLock lock = getLock(x, y, z);
         Lock writeLock = lock.writeLock();
         writeLock.lock();
