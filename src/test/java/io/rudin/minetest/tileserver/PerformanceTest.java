@@ -6,6 +6,7 @@ import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.module.ConfigModule;
 import io.rudin.minetest.tileserver.module.DBModule;
 import io.rudin.minetest.tileserver.module.ServiceModule;
+import io.rudin.minetest.tileserver.service.MemoryCache;
 import io.rudin.minetest.tileserver.service.NoOpCache;
 import io.rudin.minetest.tileserver.service.TileCache;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ public class PerformanceTest {
     private static Injector injector = Guice.createInjector(
             new ConfigModule(),
             new DBModule(),
-            new ServiceModule(NoOpCache.class)
+            new ServiceModule(MemoryCache.class)
     );
 
     public static void main(String[] args) throws ExecutionException, IOException, DataFormatException {
@@ -33,7 +34,7 @@ public class PerformanceTest {
         dbMigration.migrate();
 
         TileRenderer renderer = injector.getInstance(TileRenderer.class);
-        NoOpCache cache = injector.getInstance(NoOpCache.class);
+        MemoryCache cache = injector.getInstance(MemoryCache.class);
 
         final int x = 0, y = 0, zoom = 10;
 
@@ -44,7 +45,9 @@ public class PerformanceTest {
         long diff = System.currentTimeMillis() - start;
 
         logger.info("Rendering took {} ms and produced {} bytes", diff, tile.length);
-        logger.info("Cache put-count: {}", cache.getPutCount());
+        logger.info("Cache stats: Hit: {}, Miss: {}, Put: {}, Check: {}, Remove: {}",
+                cache.hitCount, cache.missCount, cache.putCount, cache.checkCount, cache.removeCount
+        );
 
 
     }

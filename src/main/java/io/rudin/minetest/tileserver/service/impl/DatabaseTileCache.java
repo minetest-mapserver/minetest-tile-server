@@ -6,9 +6,12 @@ import io.rudin.minetest.tileserver.service.TileCache;
 import io.rudin.minetest.tileserver.tiledb.tables.records.TilesRecord;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
@@ -17,11 +20,16 @@ import static io.rudin.minetest.tileserver.tiledb.tables.Tiles.TILES;
 @Singleton
 public class DatabaseTileCache implements TileCache {
 
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseTileCache.class);
+
     @Inject
-    public DatabaseTileCache(@TileDB DSLContext ctx){
+    public DatabaseTileCache(@TileDB DSLContext ctx, ExecutorService executor){
         this.ctx = ctx;
         this.lock = Striped.lazyWeakReadWriteLock(50);
+        this.executor = executor;
     }
+
+    private final ExecutorService executor;
 
     private final Striped<ReadWriteLock> lock;
 
@@ -41,27 +49,56 @@ public class DatabaseTileCache implements TileCache {
         final String key = getKey(x,y,z);
 
         ReadWriteLock lock = getLock(x, y, z);
-        Lock writeLock = lock.writeLock();
-        writeLock.lock();
 
-        try {
-            //re-check in critical section
-            if (has(x,y,z)){
-                //already inserted
-                return;
+        long now = System.currentTimeMillis();
+
+        TilesRecord record = ctx.newRecord(TILES);
+        record.setTile(data);
+        record.setX(x);
+        record.setY(y);
+        record.setZ(z);
+        record.setMtime(now);
+
+        AsyncTileInsertJob job = new AsyncTileInsertJob(record, lock);
+        executor.submit(job);
+    }
+
+    public class AsyncTileInsertJob implements Runnable {
+
+        AsyncTileInsertJob(TilesRecord record, ReadWriteLock lock){
+            this.record = record;
+            this.lock = lock;
+        }
+
+        private final ReadWriteLock lock;
+
+        private final TilesRecord record;
+
+        @Override
+        public void run() {
+            Lock writeLock = lock.writeLock();
+            writeLock.lock();
+
+            long now = System.currentTimeMillis();
+
+            try {
+                //re-check in critical section
+                if (has(record.getX(),record.getY(),record.getZ())){
+                    //already inserted
+                    return;
+                }
+
+
+                record.insert();
+
+            } finally {
+                writeLock.unlock();
+
+                long diff = System.currentTimeMillis() - now;
+                if (diff > 1000){
+                    logger.warn("Insert of tile {}/{}/{} took {} ms", record.getX(), record.getY(), record.getZ(), diff);
+                }
             }
-
-            TilesRecord record = ctx.newRecord(TILES);
-            record.setTile(data);
-            record.setX(x);
-            record.setY(y);
-            record.setZ(z);
-            record.setMtime(System.currentTimeMillis());
-            record.insert();
-
-        } finally {
-            writeLock.unlock();
-
         }
     }
 

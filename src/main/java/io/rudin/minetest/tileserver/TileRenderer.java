@@ -183,15 +183,14 @@ public class TileRenderer {
 			int nextZoomX = tileX * 2;
 			int nextZoomY = tileY * 2;
 
-			Graphics2D graphics = tile.createGraphics();
-
-
 			BufferedImage upperLeft = renderImage(nextZoomX, nextZoomY, nextZoom);
 			BufferedImage upperRightImage = renderImage(nextZoomX+1, nextZoomY, nextZoom);
 			BufferedImage lowerLeftImage = renderImage(nextZoomX, nextZoomY+1, nextZoom);
 			BufferedImage lowerRightImage = renderImage(nextZoomX+1, nextZoomY+1, nextZoom);
 
 			long start = System.currentTimeMillis();
+
+			Graphics2D graphics = tile.createGraphics();
 
 			Image upperLeftScaledInstance = upperLeft.getScaledInstance(HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, Image.SCALE_FAST);
 			graphics.drawImage(upperLeftScaledInstance, 0, 0, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, null);
