@@ -28,11 +28,50 @@ Requirements:
 - Java runtime (8+)
 - Modern machine with enough (2GB+) RAM and CPU
 
+Testing was done on a fairly new minetest version (0.4.17)
+There **will** be failures in the MapBlock Parser if the version found is not met (older minetest-versions).
+
+Please create an issue with minetest-version and MapBlock info in the bug-tracker if that happens to you.
+
 # Installing
 
 * Download the jar in the releases section
+* Set up a tileserver database (empty, `create database tiles;`)
+* **Backup** your minetest database (**THIS IS IMPORTANT!!**) as the db schema gets updated (see **How it works**)
 * Configure the database connections according to the **Configuration** section if they are not default value
 * Start the server with: `java -jar tileserver.jar`
+
+# How it works
+
+The **blocks** table in the minetest database gets a new column for the modification time.
+Triggers for `insert` and `update` on the table ensure the time gets updated after each change: 
+
+```sql
+alter table blocks add column mtime bigint not null default 0;
+create index BLOCKS_TIME on blocks(mtime);
+
+create or replace function on_blocks_change() returns trigger as
+$BODY$
+BEGIN
+    NEW.mtime = floor(EXTRACT(EPOCH from now()) * 1000);
+    return NEW;
+END;
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger blocks_update
+ before insert or update
+ on blocks
+ for each row
+ execute procedure on_blocks_change();
+
+```
+**These changes get applied atomatically with the initial DB-Migration, so please create a backup before starting the Tileserver!!**
+
+With this information and the modification-time on the created tiles the
+periodically scheduled Updater-Job removes the stale Tiles in the tile-cache.
+
+On the next access (browsing on the web-interface to the coordinates) the Tile gets re-rendered.
 
 # Configuring
 
