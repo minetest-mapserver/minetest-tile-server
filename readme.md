@@ -19,7 +19,7 @@ The resulting tiles are cached in a database and served to the client if unchang
 
 # Demo
 
-* See: https://pandorabox.io/map
+* See: https://pandorabox.io/map/#-1830.125/426.5/11
 
 # Compatibility
 
