@@ -69,13 +69,15 @@ public class TileRenderer {
 			return cache.get(tileX, tileY, zoom);
 		}
 
+		MapBlockCoordinateInfo mapblockInfo = CoordinateResolver.fromTile(tileX, tileY, zoom);
 
+		if (mapblockInfo.x > 32000 || mapblockInfo.x < -32000 || mapblockInfo.z > 32000 || mapblockInfo.z < -32000)
+			//Out of range...
+			return WhiteTile.getPNG();
 		
 		if (zoom < DEFAULT_BLOCK_ZOOM) {
 			//TODO: fail-fast for regions without map-blocks -> white
 
-			MapBlockCoordinateInfo mapblockInfo = CoordinateResolver.fromTile(tileX, tileY, zoom);
-		
 			int x1 = mapblockInfo.x;
 			int x2 = mapblockInfo.x + (int)mapblockInfo.width;
 			
