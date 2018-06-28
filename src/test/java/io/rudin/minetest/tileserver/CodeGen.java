@@ -26,7 +26,6 @@ public class CodeGen {
 		
 		Database database = new Database();
 		database.setName("org.jooq.util.postgres.PostgresDatabase");
-		database.setIncludes("blocks|player|player_metadata|player_inventory|chat");
 		database.setInputSchema("public");
 		database.setOutputSchemaToDefault(true);
 		generator.setDatabase(database);

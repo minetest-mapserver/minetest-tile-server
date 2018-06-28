@@ -5,15 +5,24 @@ package io.rudin.minetest.tileserver.blockdb;
 
 
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
+import io.rudin.minetest.tileserver.blockdb.tables.FlywaySchemaHistory;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
+import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventories;
+import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
+import io.rudin.minetest.tileserver.blockdb.tables.Poi;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
+import io.rudin.minetest.tileserver.blockdb.tables.records.FlywaySchemaHistoryRecord;
+import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerInventoriesRecord;
+import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerInventoryItemsRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerMetadataRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerRecord;
+import io.rudin.minetest.tileserver.blockdb.tables.records.PoiRecord;
 
 import javax.annotation.Generated;
 
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.Internal;
 
@@ -36,32 +45,47 @@ public class Keys {
     // IDENTITY definitions
     // -------------------------------------------------------------------------
 
+    public static final Identity<PoiRecord, Integer> IDENTITY_POI = Identities0.IDENTITY_POI;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
     public static final UniqueKey<BlocksRecord> BLOCKS_PKEY = UniqueKeys0.BLOCKS_PKEY;
+    public static final UniqueKey<FlywaySchemaHistoryRecord> FLYWAY_SCHEMA_HISTORY_PK = UniqueKeys0.FLYWAY_SCHEMA_HISTORY_PK;
     public static final UniqueKey<PlayerRecord> PLAYER_PKEY = UniqueKeys0.PLAYER_PKEY;
+    public static final UniqueKey<PlayerInventoriesRecord> PLAYER_INVENTORIES_PKEY = UniqueKeys0.PLAYER_INVENTORIES_PKEY;
+    public static final UniqueKey<PlayerInventoryItemsRecord> PLAYER_INVENTORY_ITEMS_PKEY = UniqueKeys0.PLAYER_INVENTORY_ITEMS_PKEY;
     public static final UniqueKey<PlayerMetadataRecord> PLAYER_METADATA_PKEY = UniqueKeys0.PLAYER_METADATA_PKEY;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final ForeignKey<PlayerInventoriesRecord, PlayerRecord> PLAYER_INVENTORIES__PLAYER_INVENTORIES_FKEY = ForeignKeys0.PLAYER_INVENTORIES__PLAYER_INVENTORIES_FKEY;
+    public static final ForeignKey<PlayerInventoryItemsRecord, PlayerRecord> PLAYER_INVENTORY_ITEMS__PLAYER_INVENTORY_ITEMS_FKEY = ForeignKeys0.PLAYER_INVENTORY_ITEMS__PLAYER_INVENTORY_ITEMS_FKEY;
     public static final ForeignKey<PlayerMetadataRecord, PlayerRecord> PLAYER_METADATA__PLAYER_METADATA_FKEY = ForeignKeys0.PLAYER_METADATA__PLAYER_METADATA_FKEY;
 
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
     // -------------------------------------------------------------------------
 
+    private static class Identities0 {
+        public static Identity<PoiRecord, Integer> IDENTITY_POI = Internal.createIdentity(Poi.POI, Poi.POI.ID);
+    }
+
     private static class UniqueKeys0 {
         public static final UniqueKey<BlocksRecord> BLOCKS_PKEY = Internal.createUniqueKey(Blocks.BLOCKS, "blocks_pkey", Blocks.BLOCKS.POSX, Blocks.BLOCKS.POSY, Blocks.BLOCKS.POSZ);
+        public static final UniqueKey<FlywaySchemaHistoryRecord> FLYWAY_SCHEMA_HISTORY_PK = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, "flyway_schema_history_pk", FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK);
         public static final UniqueKey<PlayerRecord> PLAYER_PKEY = Internal.createUniqueKey(Player.PLAYER, "player_pkey", Player.PLAYER.NAME);
+        public static final UniqueKey<PlayerInventoriesRecord> PLAYER_INVENTORIES_PKEY = Internal.createUniqueKey(PlayerInventories.PLAYER_INVENTORIES, "player_inventories_pkey", PlayerInventories.PLAYER_INVENTORIES.PLAYER, PlayerInventories.PLAYER_INVENTORIES.INV_ID);
+        public static final UniqueKey<PlayerInventoryItemsRecord> PLAYER_INVENTORY_ITEMS_PKEY = Internal.createUniqueKey(PlayerInventoryItems.PLAYER_INVENTORY_ITEMS, "player_inventory_items_pkey", PlayerInventoryItems.PLAYER_INVENTORY_ITEMS.PLAYER, PlayerInventoryItems.PLAYER_INVENTORY_ITEMS.INV_ID, PlayerInventoryItems.PLAYER_INVENTORY_ITEMS.SLOT_ID);
         public static final UniqueKey<PlayerMetadataRecord> PLAYER_METADATA_PKEY = Internal.createUniqueKey(PlayerMetadata.PLAYER_METADATA, "player_metadata_pkey", PlayerMetadata.PLAYER_METADATA.PLAYER, PlayerMetadata.PLAYER_METADATA.ATTR);
     }
 
     private static class ForeignKeys0 {
+        public static final ForeignKey<PlayerInventoriesRecord, PlayerRecord> PLAYER_INVENTORIES__PLAYER_INVENTORIES_FKEY = Internal.createForeignKey(io.rudin.minetest.tileserver.blockdb.Keys.PLAYER_PKEY, PlayerInventories.PLAYER_INVENTORIES, "player_inventories__player_inventories_fkey", PlayerInventories.PLAYER_INVENTORIES.PLAYER);
+        public static final ForeignKey<PlayerInventoryItemsRecord, PlayerRecord> PLAYER_INVENTORY_ITEMS__PLAYER_INVENTORY_ITEMS_FKEY = Internal.createForeignKey(io.rudin.minetest.tileserver.blockdb.Keys.PLAYER_PKEY, PlayerInventoryItems.PLAYER_INVENTORY_ITEMS, "player_inventory_items__player_inventory_items_fkey", PlayerInventoryItems.PLAYER_INVENTORY_ITEMS.PLAYER);
         public static final ForeignKey<PlayerMetadataRecord, PlayerRecord> PLAYER_METADATA__PLAYER_METADATA_FKEY = Internal.createForeignKey(io.rudin.minetest.tileserver.blockdb.Keys.PLAYER_PKEY, PlayerMetadata.PLAYER_METADATA, "player_metadata__player_metadata_fkey", PlayerMetadata.PLAYER_METADATA.PLAYER);
     }
 }

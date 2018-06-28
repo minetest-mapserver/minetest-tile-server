@@ -5,9 +5,12 @@ package io.rudin.minetest.tileserver.blockdb;
 
 
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
-import io.rudin.minetest.tileserver.blockdb.tables.Chat;
+import io.rudin.minetest.tileserver.blockdb.tables.FlywaySchemaHistory;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
+import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventories;
+import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
+import io.rudin.minetest.tileserver.blockdb.tables.Poi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +19,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.jooq.Catalog;
+import org.jooq.Sequence;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
 
@@ -33,7 +37,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = 1405536522;
+    private static final long serialVersionUID = 181188052;
 
     /**
      * The reference instance of <code></code>
@@ -46,9 +50,9 @@ public class DefaultSchema extends SchemaImpl {
     public final Blocks BLOCKS = io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
     /**
-     * The table <code>chat</code>.
+     * The table <code>flyway_schema_history</code>.
      */
-    public final Chat CHAT = io.rudin.minetest.tileserver.blockdb.tables.Chat.CHAT;
+    public final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = io.rudin.minetest.tileserver.blockdb.tables.FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
 
     /**
      * The table <code>player</code>.
@@ -56,9 +60,24 @@ public class DefaultSchema extends SchemaImpl {
     public final Player PLAYER = io.rudin.minetest.tileserver.blockdb.tables.Player.PLAYER;
 
     /**
+     * The table <code>player_inventories</code>.
+     */
+    public final PlayerInventories PLAYER_INVENTORIES = io.rudin.minetest.tileserver.blockdb.tables.PlayerInventories.PLAYER_INVENTORIES;
+
+    /**
+     * The table <code>player_inventory_items</code>.
+     */
+    public final PlayerInventoryItems PLAYER_INVENTORY_ITEMS = io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems.PLAYER_INVENTORY_ITEMS;
+
+    /**
      * The table <code>player_metadata</code>.
      */
     public final PlayerMetadata PLAYER_METADATA = io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata.PLAYER_METADATA;
+
+    /**
+     * The table <code>poi</code>.
+     */
+    public final Poi POI = io.rudin.minetest.tileserver.blockdb.tables.Poi.POI;
 
     /**
      * No further instances allowed
@@ -77,6 +96,18 @@ public class DefaultSchema extends SchemaImpl {
     }
 
     @Override
+    public final List<Sequence<?>> getSequences() {
+        List result = new ArrayList();
+        result.addAll(getSequences0());
+        return result;
+    }
+
+    private final List<Sequence<?>> getSequences0() {
+        return Arrays.<Sequence<?>>asList(
+            Sequences.POI_ID_SEQ);
+    }
+
+    @Override
     public final List<Table<?>> getTables() {
         List result = new ArrayList();
         result.addAll(getTables0());
@@ -86,8 +117,11 @@ public class DefaultSchema extends SchemaImpl {
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
             Blocks.BLOCKS,
-            Chat.CHAT,
+            FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,
             Player.PLAYER,
-            PlayerMetadata.PLAYER_METADATA);
+            PlayerInventories.PLAYER_INVENTORIES,
+            PlayerInventoryItems.PLAYER_INVENTORY_ITEMS,
+            PlayerMetadata.PLAYER_METADATA,
+            Poi.POI);
     }
 }

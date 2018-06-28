@@ -5,9 +5,12 @@ package io.rudin.minetest.tileserver.blockdb;
 
 
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
-import io.rudin.minetest.tileserver.blockdb.tables.Chat;
+import io.rudin.minetest.tileserver.blockdb.tables.FlywaySchemaHistory;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
+import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventories;
+import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
+import io.rudin.minetest.tileserver.blockdb.tables.Poi;
 
 import javax.annotation.Generated;
 
@@ -31,9 +34,9 @@ public class Tables {
     public static final Blocks BLOCKS = io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
     /**
-     * The table <code>chat</code>.
+     * The table <code>flyway_schema_history</code>.
      */
-    public static final Chat CHAT = io.rudin.minetest.tileserver.blockdb.tables.Chat.CHAT;
+    public static final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = io.rudin.minetest.tileserver.blockdb.tables.FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
 
     /**
      * The table <code>player</code>.
@@ -41,7 +44,22 @@ public class Tables {
     public static final Player PLAYER = io.rudin.minetest.tileserver.blockdb.tables.Player.PLAYER;
 
     /**
+     * The table <code>player_inventories</code>.
+     */
+    public static final PlayerInventories PLAYER_INVENTORIES = io.rudin.minetest.tileserver.blockdb.tables.PlayerInventories.PLAYER_INVENTORIES;
+
+    /**
+     * The table <code>player_inventory_items</code>.
+     */
+    public static final PlayerInventoryItems PLAYER_INVENTORY_ITEMS = io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems.PLAYER_INVENTORY_ITEMS;
+
+    /**
      * The table <code>player_metadata</code>.
      */
     public static final PlayerMetadata PLAYER_METADATA = io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata.PLAYER_METADATA;
+
+    /**
+     * The table <code>poi</code>.
+     */
+    public static final Poi POI = io.rudin.minetest.tileserver.blockdb.tables.Poi.POI;
 }
