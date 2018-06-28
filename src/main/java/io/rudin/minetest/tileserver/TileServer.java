@@ -16,6 +16,7 @@ import io.rudin.minetest.tileserver.module.ServiceModule;
 import io.rudin.minetest.tileserver.poi.PoiMapBlockListener;
 import io.rudin.minetest.tileserver.route.ConfigRoute;
 import io.rudin.minetest.tileserver.route.PlayerRoute;
+import io.rudin.minetest.tileserver.route.PoiRoute;
 import io.rudin.minetest.tileserver.route.TileRoute;
 import io.rudin.minetest.tileserver.transformer.JsonTransformer;
 import io.rudin.minetest.tileserver.ws.WebSocketHandler;
@@ -47,6 +48,7 @@ public class TileServer {
 		get("/tiles/:z/:x/:y", injector.getInstance(TileRoute.class));
 		get("/player", injector.getInstance(PlayerRoute.class), json);
 		get("/config", injector.getInstance(ConfigRoute.class), json);
+		get("/poi", injector.getInstance(PoiRoute.class), json);
 
 		//Initialize web server
 		init();
