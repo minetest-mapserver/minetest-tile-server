@@ -13,6 +13,7 @@ import io.rudin.minetest.tileserver.job.UpdatePlayerJob;
 import io.rudin.minetest.tileserver.module.ConfigModule;
 import io.rudin.minetest.tileserver.module.DBModule;
 import io.rudin.minetest.tileserver.module.ServiceModule;
+import io.rudin.minetest.tileserver.poi.PoiMapBlockListener;
 import io.rudin.minetest.tileserver.route.ConfigRoute;
 import io.rudin.minetest.tileserver.route.PlayerRoute;
 import io.rudin.minetest.tileserver.route.TileRoute;
@@ -53,6 +54,9 @@ public class TileServer {
 		//Initialize ws updater
 		injector.getInstance(WebSocketUpdater.class).init();
 
+		//Register poi mapblock listener
+		injector.getInstance(PoiMapBlockListener.class).setup();
+
 		ScheduledExecutorService executor = injector.getInstance(ScheduledExecutorService.class);
 
 		executor.scheduleAtFixedRate(injector.getInstance(UpdateChangedTilesJob.class), 0, cfg.tilerendererUpdateInterval(), TimeUnit.SECONDS);
@@ -62,7 +66,6 @@ public class TileServer {
 
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			stop();
-			executor.shutdownNow();
 			running.set(false);
 		}));
 

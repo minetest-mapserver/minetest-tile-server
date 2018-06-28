@@ -19,13 +19,21 @@ public class MapBlock {
 	public boolean underground;
 	
 	public byte[] mapData;
+
+	public byte[] metadata;
+	public int metadataLength;
+
 	public final Map<Integer, String> mapping = new HashMap<>();
-	
+
+	public static int toPosition(int x, int y, int z){
+		return x + (y * 16) + (z * 256);
+	}
+
 	public Optional<String> getNode(int x, int y, int z) {
 		if (mapping.isEmpty())
 			return Optional.empty();
 
-		int position = x + (y * 16) + (z * 256);
+		int position = toPosition(x,y,z);
 		
 		int id = MapBlockParser.readU16(mapData, position * 2);
 		

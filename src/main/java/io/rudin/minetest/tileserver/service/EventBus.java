@@ -1,5 +1,6 @@
 package io.rudin.minetest.tileserver.service;
 
+import io.rudin.minetest.tileserver.MapBlock;
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Player;
 import io.rudin.minetest.tileserver.entity.PlayerInfo;
 
@@ -11,6 +12,10 @@ public interface EventBus {
     void post(Object obj);
 
     void register(Object listener);
+
+    class MapBlockParsedEvent {
+        public MapBlock mapblock;
+    }
 
     class TileChangedEvent {
         public int x,y,zoom;

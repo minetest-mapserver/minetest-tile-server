@@ -1,7 +1,9 @@
 package io.rudin.minetest.tileserver.parser;
 
 import io.rudin.minetest.tileserver.MapBlockParser;
+import org.jooq.Meta;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class MetadataParser {
@@ -17,11 +19,18 @@ public class MetadataParser {
         return true;
     }
 
-    public static void parse(byte[] metadata, int length){
+    public static Metadata parse(byte[] metadata, int length){
+
+        Metadata md = new Metadata();
+
         int offset = 0;
 
         //doc says =1, actual =2!
         int version = metadata[offset];
+
+        if (version != 2){
+            throw new IllegalArgumentException("Metadata version incompatible: " + version);
+        }
 
         offset++;
         int count = MapBlockParser.readU16(metadata, offset);
@@ -31,6 +40,12 @@ public class MetadataParser {
         for (int i=0; i<count; i++){
             int position = MapBlockParser.readU16(metadata, offset);
             offset+=2;
+
+            Map<String, String> map = md.map.get(position);
+            if (map == null){
+                map = new HashMap<>();
+                md.map.put(position, map);
+            }
 
             long valuecount = MapBlockParser.readU32(metadata, offset);
             offset+=4;
@@ -48,6 +63,8 @@ public class MetadataParser {
 
                 String value = new String(metadata, offset, (int)valueLength);
 
+                map.put(key, value);
+
                 offset+=valueLength;
                 offset++; //undocumented!
 
@@ -64,6 +81,8 @@ public class MetadataParser {
             }
 
         }
+
+        return md;
 
     }
 

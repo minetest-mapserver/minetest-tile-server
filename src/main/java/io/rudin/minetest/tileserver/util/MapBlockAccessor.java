@@ -9,6 +9,7 @@ import io.rudin.minetest.tileserver.MapBlock;
 import io.rudin.minetest.tileserver.MapBlockParser;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
+import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.slf4j.Logger;
@@ -16,10 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -34,8 +32,9 @@ public class MapBlockAccessor extends CacheLoader<MapBlockAccessor.Key, List<Map
     private static final Logger logger = LoggerFactory.getLogger(MapBlockAccessor.class);
 
     @Inject
-    public MapBlockAccessor(DSLContext ctx, TileServerConfig cfg){
+    public MapBlockAccessor(DSLContext ctx, TileServerConfig cfg, EventBus eventBus){
         this.ctx = ctx;
+        this.eventBus = eventBus;
         this.maxY = cfg.tilesMaxY();
         this.minY = cfg.tilesMinY();
 
@@ -44,6 +43,8 @@ public class MapBlockAccessor extends CacheLoader<MapBlockAccessor.Key, List<Map
                 .maximumSize(500)
                 .build(this);
     }
+
+    private final EventBus eventBus;
 
     //TODO: hashmap instead of list for y values
     private final LoadingCache<Key, List<MapBlock>> cache;
@@ -78,8 +79,19 @@ public class MapBlockAccessor extends CacheLoader<MapBlockAccessor.Key, List<Map
             logger.warn("Mapblock fetch of x={} z={} took {} ms", key.x, key.z, fetchTime);
         }
 
+        List<MapBlock> mapblocks = new ArrayList<>();
 
-        return blocks.stream().map(MapBlockParser::parse).collect(Collectors.toList());
+        for (BlocksRecord record: blocks){
+            MapBlock mapBlock = MapBlockParser.parse(record);
+
+            EventBus.MapBlockParsedEvent event = new EventBus.MapBlockParsedEvent();
+            event.mapblock = mapBlock;
+            eventBus.post(event);
+
+            mapblocks.add(mapBlock);
+        }
+
+        return mapblocks;
     }
 
     /**

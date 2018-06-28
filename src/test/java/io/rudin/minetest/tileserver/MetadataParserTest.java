@@ -1,5 +1,6 @@
 package io.rudin.minetest.tileserver;
 
+import io.rudin.minetest.tileserver.parser.Metadata;
 import io.rudin.minetest.tileserver.parser.MetadataParser;
 import org.junit.Before;
 import org.junit.Test;
@@ -7,6 +8,7 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.zip.DataFormatException;
 
 public class MetadataParserTest {
@@ -35,7 +37,16 @@ public class MetadataParserTest {
 	
 	@Test
 	public void test() throws IllegalArgumentException, DataFormatException {
-		MetadataParser.parse(metadata, metadata.length);
+		Metadata md = MetadataParser.parse(metadata, metadata.length);
+
+		for (Map.Entry<Integer, Map<String, String>> entry : md.map.entrySet()) {
+			System.out.println("Position: " + entry.getKey());
+
+			for (Map.Entry<String, String> mdEntry: entry.getValue().entrySet()){
+				System.out.println("- " + mdEntry.getKey() + "=" + mdEntry.getValue());
+			}
+		}
+
 
 	}
 	

@@ -92,7 +92,12 @@ public class MapBlockParser {
 		byte[] md = new byte[256000]; //TODO: limits?
 
 		try {
-			int mapMdLength = inflater.inflate(md); //unused
+			int mapMdLength = inflater.inflate(md);
+
+			//TODO: use stripped length
+			block.metadata = md;
+			block.metadataLength = mapMdLength;
+
 			//TODO: parse meta: https://github.com/minetest/minetest/blob/master/doc/world_format.txt#L330
 
 		} catch (Exception e){
