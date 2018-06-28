@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Poi extends TableImpl<PoiRecord> {
 
-    private static final long serialVersionUID = 1062247745;
+    private static final long serialVersionUID = -1911319382;
 
     /**
      * The reference instance of <code>poi</code>
@@ -76,7 +76,7 @@ public class Poi extends TableImpl<PoiRecord> {
     /**
      * The column <code>poi.active</code>.
      */
-    public final TableField<PoiRecord, String> ACTIVE = createField("active", org.jooq.impl.SQLDataType.CHAR(1).nullable(false), this, "");
+    public final TableField<PoiRecord, Boolean> ACTIVE = createField("active", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>poi.x</code>.

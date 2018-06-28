@@ -5,7 +5,7 @@ create table poi(
     name varchar not null,
     category varchar not null,
     owner varchar not null,
-    active bit not null,
+    active boolean not null,
 
     -- block coordinates
     x int not null,

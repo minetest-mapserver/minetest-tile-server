@@ -22,13 +22,13 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Poi implements Serializable {
 
-    private static final long serialVersionUID = -1799471784;
+    private static final long serialVersionUID = 1615396414;
 
     private Integer id;
     private String  name;
     private String  category;
     private String  owner;
-    private String  active;
+    private Boolean active;
     private Integer x;
     private Integer y;
     private Integer z;
@@ -59,7 +59,7 @@ public class Poi implements Serializable {
         String  name,
         String  category,
         String  owner,
-        String  active,
+        Boolean active,
         Integer x,
         Integer y,
         Integer z,
@@ -114,11 +114,11 @@ public class Poi implements Serializable {
         this.owner = owner;
     }
 
-    public String getActive() {
+    public Boolean getActive() {
         return this.active;
     }
 
-    public void setActive(String active) {
+    public void setActive(Boolean active) {
         this.active = active;
     }
 
