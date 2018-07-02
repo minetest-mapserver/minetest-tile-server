@@ -57,7 +57,9 @@ public class TileServer {
 		injector.getInstance(WebSocketUpdater.class).init();
 
 		//Register poi mapblock listener
-		injector.getInstance(PoiMapBlockListener.class).setup();
+		if (cfg.poiEnable()) {
+			injector.getInstance(PoiMapBlockListener.class).setup();
+		}
 
 		ScheduledExecutorService executor = injector.getInstance(ScheduledExecutorService.class);
 

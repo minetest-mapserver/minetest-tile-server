@@ -37,8 +37,17 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("2")
 	int playerUpdateInterval();
 
+	/*
+	POI stuff
+	 */
+
+	@Key("poi.enable")
+	@DefaultValue("true")
+	boolean poiEnable();
+
 	@Key("tiles.directory")
 	@DefaultValue("target/tiles")
+	@Deprecated
 	String tileDirectory();
 
 	/*
