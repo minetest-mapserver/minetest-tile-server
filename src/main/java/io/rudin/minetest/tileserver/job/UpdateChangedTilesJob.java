@@ -37,7 +37,10 @@ public class UpdateChangedTilesJob implements Runnable {
 		this.eventBus = eventBus;
 
 		this.yCondition = BLOCKS.POSY.between(cfg.tilesMinY(), cfg.tilesMaxY());
+		this.cfg = cfg;
 	}
+
+	private final TileServerConfig cfg;
 
 	private final EventBus eventBus;
 
@@ -84,7 +87,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 		try {
 			running = true;
-			final int LIMIT = 500;
+			final int LIMIT = cfg.tilerendererUpdateMaxBlocks();
 
 			Result<BlocksRecord> blocks = ctx
 					.selectFrom(BLOCKS)

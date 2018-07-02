@@ -29,6 +29,10 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("20")
 	int tilerendererUpdateInterval();
 
+	@Key("tilerenderer.maxupdateblocks")
+	@DefaultValue("500")
+	int tilerendererUpdateMaxBlocks();
+
 	@Key("player.updateinterval")
 	@DefaultValue("2")
 	int playerUpdateInterval();
