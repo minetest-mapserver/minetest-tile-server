@@ -21,6 +21,15 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("-1")
 	int tilesMinY();
 
+	/*
+	Tile renderer stuff
+	 */
+
+	//This should only be enabled once after a fresh install
+	@Key("tilerenderer.initialrendering.enable")
+	@DefaultValue("false")
+	boolean tilerendererEnableInitialRendering();
+
 	@Key("tilerenderer.processes")
 	@DefaultValue("24")
 	int tilerendererProcesses();

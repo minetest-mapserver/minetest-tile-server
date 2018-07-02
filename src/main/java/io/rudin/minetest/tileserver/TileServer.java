@@ -8,6 +8,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import io.rudin.minetest.tileserver.config.TileServerConfig;
+import io.rudin.minetest.tileserver.job.InitialTileRendererJob;
 import io.rudin.minetest.tileserver.job.UpdateChangedTilesJob;
 import io.rudin.minetest.tileserver.job.UpdatePlayerJob;
 import io.rudin.minetest.tileserver.module.ConfigModule;
@@ -65,6 +66,11 @@ public class TileServer {
 
 		executor.scheduleAtFixedRate(injector.getInstance(UpdateChangedTilesJob.class), 0, cfg.tilerendererUpdateInterval(), TimeUnit.SECONDS);
 		executor.scheduleAtFixedRate(injector.getInstance(UpdatePlayerJob.class), 0, cfg.playerUpdateInterval(), TimeUnit.SECONDS);
+
+		if (cfg.tilerendererEnableInitialRendering()){
+			//Start initial rendering
+			executor.submit(injector.getInstance(InitialTileRendererJob.class));
+		}
 
 		AtomicBoolean running = new AtomicBoolean(true);
 

@@ -71,7 +71,7 @@ public class TileRenderer {
 
 		MapBlockCoordinateInfo mapblockInfo = CoordinateResolver.fromTile(tileX, tileY, zoom);
 
-		if (mapblockInfo.x > 32000 || mapblockInfo.x < -32000 || mapblockInfo.z > 32000 || mapblockInfo.z < -32000)
+		if (mapblockInfo.x > 2048 || mapblockInfo.x < -2048 || mapblockInfo.z > 2048 || mapblockInfo.z < -2048)
 			//Out of range...
 			return WhiteTile.getPNG();
 		

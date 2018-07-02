@@ -11,7 +11,7 @@ public class ExecutorProvider implements Provider<ScheduledExecutorService> {
 
 	public ExecutorProvider() {
 		
-		executor = Executors.newScheduledThreadPool(10);
+		executor = Executors.newScheduledThreadPool(64);
 		
 		//TODO: war-package-case
 		Runtime.getRuntime().addShutdownHook(new Thread(this::stop));

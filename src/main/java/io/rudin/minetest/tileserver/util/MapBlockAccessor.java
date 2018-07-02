@@ -40,6 +40,7 @@ public class MapBlockAccessor extends CacheLoader<MapBlockAccessor.Key, List<Map
 
         this.cache = CacheBuilder.newBuilder()
                 .expireAfterAccess(20, TimeUnit.SECONDS)
+                .weakValues()
                 .maximumSize(500)
                 .build(this);
     }

@@ -37,6 +37,8 @@ public class DatabaseTileCache implements TileCache {
         this.cache = CacheBuilder
                 .newBuilder()
                 .expireAfterWrite(10, TimeUnit.SECONDS)
+                .weakValues()
+                .maximumSize(500)
                 .build();
     }
 
