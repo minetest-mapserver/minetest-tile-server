@@ -97,7 +97,7 @@ public class UpdateChangedTilesJob implements Runnable {
 					.limit(LIMIT)
 					.fetch();
 
-			if (blocks.size() == LIMIT){
+			if (blocks.size() == LIMIT) {
 				logger.warn("Got max-blocks ({}) from update-queue", LIMIT);
 			}
 
@@ -105,11 +105,11 @@ public class UpdateChangedTilesJob implements Runnable {
 
 			List<String> updatedTileKeys = new ArrayList<>();
 
-			for (BlocksRecord record: blocks) {
+			for (BlocksRecord record : blocks) {
 				Integer x = record.getPosx();
 				Integer z = record.getPosz();
 
-				if (record.getMtime() > latestTimestamp){
+				if (record.getMtime() > latestTimestamp) {
 					//Update timestamp
 					latestTimestamp = record.getMtime();
 				}
@@ -117,7 +117,7 @@ public class UpdateChangedTilesJob implements Runnable {
 				TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
 
 				//remove all tiles in every zoom
-				for (int i=CoordinateResolver.MAX_ZOOM; i>=CoordinateResolver.MIN_ZOOM; i--) {
+				for (int i = CoordinateResolver.MAX_ZOOM; i >= CoordinateResolver.MIN_ZOOM; i--) {
 					TileInfo zoomedTile = tileInfo.toZoom(i);
 					String tileKey = getTileKey(zoomedTile);
 
@@ -140,6 +140,8 @@ public class UpdateChangedTilesJob implements Runnable {
 
 			}
 
+		} catch(Exception e){
+			logger.error("tile-updater", e);
 
 		} finally {
 			running = false;

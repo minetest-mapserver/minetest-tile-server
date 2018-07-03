@@ -24,15 +24,12 @@ public class TileRoute implements Route {
 	@Inject
 	public TileRoute(TileRenderer renderer, TileServerConfig cfg, TileCache cache) {
 		this.renderer = renderer;
-		this.executorService = Executors.newFixedThreadPool(cfg.tilerendererProcesses());
 		this.cache = cache;
 	}
 
 	private final TileRenderer renderer;
 
 	private final TileCache cache;
-
-	private final ExecutorService executorService;
 
 	@Override
 	public Object handle(Request req, Response res) throws Exception {
@@ -49,10 +46,7 @@ public class TileRoute implements Route {
 
 		logger.debug("Rendering tile @ {}/{} zoom: {}", x,y,z);
 
-		//dispatch rendering to fixed pool
-		Future<byte[]> future = executorService.submit(() -> renderer.render(x, y, z));
-
-		return future.get();
+		return renderer.render(x, y, z);
 	}
 
 }

@@ -100,10 +100,6 @@ Max y value for blocks to render (in Mapblocks)
 Min y value for blocks to render (in Mapblocks)
 * Default: **-1** (Equals -16 blocks)
 
-### tilerenderer.processes
-Number of processes to allow for rendering
-* Default: **24**
-
 ### tilerenderer.updateinterval
 Update interval to check for new tiles (in seconds)
 * Default: **20**

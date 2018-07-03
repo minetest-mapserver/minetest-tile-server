@@ -30,10 +30,6 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("false")
 	boolean tilerendererEnableInitialRendering();
 
-	@Key("tilerenderer.processes")
-	@DefaultValue("24")
-	int tilerendererProcesses();
-
 	@Key("tilerenderer.updateinterval")
 	@DefaultValue("20")
 	int tilerendererUpdateInterval();

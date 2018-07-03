@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -29,10 +30,9 @@ public class DatabaseTileCache implements TileCache {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseTileCache.class);
 
     @Inject
-    public DatabaseTileCache(@TileDB DSLContext ctx, ExecutorService executor){
+    public DatabaseTileCache(@TileDB DSLContext ctx){
         this.ctx = ctx;
         this.lock = Striped.lazyWeakReadWriteLock(50);
-        this.executor = executor;
 
         this.cache = CacheBuilder
                 .newBuilder()
@@ -45,15 +45,13 @@ public class DatabaseTileCache implements TileCache {
 
     private final Cache<String, byte[]> cache;
 
-    private final ExecutorService executor;
-
-    private final Striped<ReadWriteLock> lock;
-
     private final DSLContext ctx;
 
     private String getKey(int x, int y, int z){
         return x + "/" + y + "/" + z;
     }
+
+    private final Striped<ReadWriteLock> lock;
 
     private ReadWriteLock getLock(int x, int y, int z){
         return lock.get(getKey(x,y,z));
@@ -63,67 +61,51 @@ public class DatabaseTileCache implements TileCache {
     public void put(int x, int y, int z, byte[] data) {
 
         final String key = getKey(x,y,z);
-
         cache.put(key, data);
 
         ReadWriteLock lock = getLock(x, y, z);
+        Lock writeLock = lock.writeLock();
+        writeLock.lock();
 
-        long now = System.currentTimeMillis();
-
-        TilesRecord record = ctx.newRecord(TILES);
-        record.setTile(data);
-        record.setX(x);
-        record.setY(y);
-        record.setZ(z);
-        record.setMtime(now);
-
-        AsyncTileInsertJob job = new AsyncTileInsertJob(record, lock);
-        executor.submit(job);
-    }
-
-
-
-    /**
-     * Async insert job
-     */
-    public class AsyncTileInsertJob implements Runnable {
-
-        AsyncTileInsertJob(TilesRecord record, ReadWriteLock lock){
-            this.record = record;
-            this.lock = lock;
-        }
-
-        private final ReadWriteLock lock;
-
-        private final TilesRecord record;
-
-        @Override
-        public void run() {
-            Lock writeLock = lock.writeLock();
-            writeLock.lock();
+        try {
 
             long now = System.currentTimeMillis();
 
-            try {
-                //re-check in critical section
-                if (has(record.getX(),record.getY(),record.getZ(), false)){
-                    //already inserted
-                    return;
-                }
+            TilesRecord record = ctx
+                    .selectFrom(TILES)
+                    .where(TILES.X.eq(x))
+                    .and(TILES.Y.eq(y))
+                    .and(TILES.Z.eq(z))
+                    .fetchOne();
 
+            if (record == null) {
+                //Insert
+                record = ctx.newRecord(TILES);
+                record.setX(x);
+                record.setY(y);
+                record.setZ(z);
 
-                record.insert();
-
-            } finally {
-                writeLock.unlock();
-
-                long diff = System.currentTimeMillis() - now;
-                if (diff > 1000){
-                    logger.warn("Insert of tile {}/{}/{} took {} ms", record.getX(), record.getY(), record.getZ(), diff);
-                }
             }
+
+            //update
+            record.setTile(data);
+            record.setMtime(now);
+
+            record.store();
+
+
+            long diff = System.currentTimeMillis() - now;
+            if (diff > 1000){
+                logger.warn("Insert of tile {}/{}/{} took {} ms", record.getX(), record.getY(), record.getZ(), diff);
+            }
+
+        } finally {
+            writeLock.unlock();
+
         }
     }
+
+
 
     @Override
     public byte[] get(int x, int y, int z) {
