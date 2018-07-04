@@ -16,23 +16,24 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
 import static io.rudin.minetest.tileserver.tiledb.tables.Tiles.TILES;
 
 @Singleton
-public class DatabaseTileCache implements TileCache {
+public class DatabaseTileCache implements TileCache, Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseTileCache.class);
 
     @Inject
-    public DatabaseTileCache(@TileDB DSLContext ctx){
+    public DatabaseTileCache(@TileDB DSLContext ctx, ScheduledExecutorService executor){
         this.ctx = ctx;
-        this.lock = Striped.lazyWeakReadWriteLock(50);
+        this.executor = executor;
+
+        //Initial run
+        executor.submit(this);
 
         this.cache = CacheBuilder
                 .newBuilder()
@@ -42,6 +43,7 @@ public class DatabaseTileCache implements TileCache {
                 .build();
     }
 
+    private final ScheduledExecutorService executor;
 
     private final Cache<String, byte[]> cache;
 
@@ -51,58 +53,32 @@ public class DatabaseTileCache implements TileCache {
         return x + "/" + y + "/" + z;
     }
 
-    private final Striped<ReadWriteLock> lock;
-
-    private ReadWriteLock getLock(int x, int y, int z){
-        return lock.get(getKey(x,y,z));
-    }
+    private LinkedBlockingQueue<TilesRecord> tileInsertQueue = new LinkedBlockingQueue<>();
 
     @Override
     public void put(int x, int y, int z, byte[] data) {
 
-        final String key = getKey(x,y,z);
-        cache.put(key, data);
+        TilesRecord record = ctx
+                .selectFrom(TILES)
+                .where(TILES.X.eq(x))
+                .and(TILES.Y.eq(y))
+                .and(TILES.Z.eq(z))
+                .fetchOne();
 
-        ReadWriteLock lock = getLock(x, y, z);
-        Lock writeLock = lock.writeLock();
-        writeLock.lock();
-
-        try {
-
-            long now = System.currentTimeMillis();
-
-            TilesRecord record = ctx
-                    .selectFrom(TILES)
-                    .where(TILES.X.eq(x))
-                    .and(TILES.Y.eq(y))
-                    .and(TILES.Z.eq(z))
-                    .fetchOne();
-
-            if (record == null) {
-                //Insert
-                record = ctx.newRecord(TILES);
-                record.setX(x);
-                record.setY(y);
-                record.setZ(z);
-
-            }
-
-            //update
-            record.setTile(data);
-            record.setMtime(now);
-
-            record.store();
-
-
-            long diff = System.currentTimeMillis() - now;
-            if (diff > 1000){
-                logger.warn("Insert of tile {}/{}/{} took {} ms", record.getX(), record.getY(), record.getZ(), diff);
-            }
-
-        } finally {
-            writeLock.unlock();
+        if (record == null) {
+            //Insert
+            record = ctx.newRecord(TILES);
+            record.setX(x);
+            record.setY(y);
+            record.setZ(z);
 
         }
+
+        //update
+        record.setTile(data);
+        record.setMtime(System.currentTimeMillis());
+
+        tileInsertQueue.add(record);
     }
 
 
@@ -160,20 +136,41 @@ public class DatabaseTileCache implements TileCache {
         String key = getKey(x, y, z);
         cache.invalidate(key);
 
-        ReadWriteLock lock = getLock(x, y, z);
-        Lock writeLock = lock.writeLock();
-        writeLock.lock();
+        ctx.delete(TILES)
+                .where(TILES.X.eq(x))
+                .and(TILES.Y.eq(y))
+                .and(TILES.Z.eq(z))
+                .execute();
+    }
+
+    @Override
+    public void run() {
 
         try {
-            ctx.delete(TILES)
-                    .where(TILES.X.eq(x))
-                    .and(TILES.Y.eq(y))
-                    .and(TILES.Z.eq(z))
-                    .execute();
+            while (true) {
+                //TODO: batch insert
+                TilesRecord record = tileInsertQueue.take();
 
-        } finally {
-            writeLock.unlock();
+                ctx
+                        .insertInto(TILES, record.fields())
+                        .values(record.intoArray())
+                        .onDuplicateKeyUpdate()
+                        .set(TILES.X, record.getX())
+                        .set(TILES.Y, record.getY())
+                        .set(TILES.Z, record.getZ())
+                        .set(TILES.MTIME, record.getMtime())
+                        .set(TILES.TILE, record.getTile())
+                        .execute();
+            }
 
+        } catch (InterruptedException e) {
+            logger.error("run", e);
+
+        } catch (RuntimeException e){
+            logger.error("run", e);
+
+            //re-schedule
+            executor.schedule(this, 500, TimeUnit.MILLISECONDS);
         }
     }
 }
