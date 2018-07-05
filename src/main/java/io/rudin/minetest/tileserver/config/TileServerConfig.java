@@ -43,6 +43,14 @@ public interface TileServerConfig extends Config {
 	int playerUpdateInterval();
 
 	/*
+	Logging stuff
+	 */
+
+	@Key("log.tile.updatetimings")
+	@DefaultValue("false")
+	boolean logTileUpdateTimings();
+
+	/*
 	POI stuff
 	 */
 

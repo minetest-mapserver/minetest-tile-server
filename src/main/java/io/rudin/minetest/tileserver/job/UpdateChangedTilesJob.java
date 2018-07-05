@@ -84,8 +84,11 @@ public class UpdateChangedTilesJob implements Runnable {
 			}
 		}
 
-
 		try {
+
+			long start = System.currentTimeMillis();
+
+
 			running = true;
 			final int LIMIT = cfg.tilerendererUpdateMaxBlocks();
 
@@ -96,6 +99,9 @@ public class UpdateChangedTilesJob implements Runnable {
 					.orderBy(BLOCKS.MTIME.asc()) //oldest first
 					.limit(LIMIT)
 					.fetch();
+
+			int count = blocks.size();
+			int invalidatedTiles = 0;
 
 			if (blocks.size() == LIMIT) {
 				logger.warn("Got max-blocks ({}) from update-queue", LIMIT);
@@ -122,6 +128,7 @@ public class UpdateChangedTilesJob implements Runnable {
 					String tileKey = getTileKey(zoomedTile);
 
 					if (!updatedTileKeys.contains(tileKey)) {
+						invalidatedTiles++;
 						tileCache.remove(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
 
 						EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
@@ -139,6 +146,18 @@ public class UpdateChangedTilesJob implements Runnable {
 
 
 			}
+
+			final String msg = "Tile update job took {} ms for {} tiles (invalidated {} tiles)";
+			final Object[] params = new Object[]{
+					System.currentTimeMillis()-start,
+					count,
+					invalidatedTiles
+			};
+
+			if (cfg.logTileUpdateTimings())
+				logger.info(msg, params);
+			else
+				logger.debug(msg, params);
 
 		} catch(Exception e){
 			logger.error("tile-updater", e);
