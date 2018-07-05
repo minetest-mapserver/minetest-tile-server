@@ -147,7 +147,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 			}
 
-			final String msg = "Tile update job took {} ms for {} tiles (invalidated {} tiles)";
+			final String msg = "Tile update job took {} ms for {} blocks (invalidated {} tiles)";
 			final Object[] params = new Object[]{
 					System.currentTimeMillis()-start,
 					count,
