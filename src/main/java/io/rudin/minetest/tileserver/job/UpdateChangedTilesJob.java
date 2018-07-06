@@ -66,18 +66,28 @@ public class UpdateChangedTilesJob implements Runnable {
 		}
 
 		if (latestTimestamp == null) {
-			logger.debug("Gathering latest tile time from tile cache");
-			long start = System.currentTimeMillis();
 
-			latestTimestamp = tileCache.getLatestTimestamp();
 
-			long diff = System.currentTimeMillis() - start;
+			if (cfg.tilerendererEnableInitialRendering()){
+				logger.info("Initial rendering detected, ignoring updated blocks since now");
+				latestTimestamp = System.currentTimeMillis();
 
-			logger.debug("Newest tile time is {}", latestTimestamp);
+			} else {
 
-			if (diff > 1000){
-				logger.warn("Tile time fetch took {} ms", diff);
+				logger.debug("Gathering latest tile time from tile cache");
+				long start = System.currentTimeMillis();
+
+				latestTimestamp = tileCache.getLatestTimestamp();
+
+				long diff = System.currentTimeMillis() - start;
+
+				logger.debug("Newest tile time is {}", latestTimestamp);
+
+				if (diff > 1000){
+					logger.warn("Tile time fetch took {} ms", diff);
+				}
 			}
+
 		}
 
 		try {
