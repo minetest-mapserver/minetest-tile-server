@@ -150,7 +150,10 @@ public class TileRenderer {
 		//Check if binary cached, use cached version for rendering
 		if (cache.has(tileX, tileY, zoom)) {
 			byte[] data = cache.get(tileX, tileY, zoom);
-			return ImageIO.read(new ByteArrayInputStream(data));
+
+			if (data != null)
+				//In case the cache disappears
+				return ImageIO.read(new ByteArrayInputStream(data));
 		}
 
 		ReadWriteLock lock = getLock(tileX, tileY, zoom);
