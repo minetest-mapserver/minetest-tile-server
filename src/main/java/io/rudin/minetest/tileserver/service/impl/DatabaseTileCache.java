@@ -136,11 +136,26 @@ public class DatabaseTileCache implements TileCache, Runnable {
         String key = getKey(x, y, z);
         cache.invalidate(key);
 
+        long start = System.currentTimeMillis();
+
         ctx.delete(TILES)
                 .where(TILES.X.eq(x))
                 .and(TILES.Y.eq(y))
                 .and(TILES.Z.eq(z))
                 .execute();
+
+        long diff = System.currentTimeMillis() - start;
+        if (diff > 500){
+            logger.warn("Tile removal ({},{},{}) took {} ms", x,y,z, diff);
+        }
+    }
+
+    @Override
+    public long getLatestTimestamp() {
+        return ctx
+                .select(DSL.max(TILES.MTIME))
+                .from(TILES)
+                .fetchOne(DSL.max(TILES.MTIME));
     }
 
     @Override

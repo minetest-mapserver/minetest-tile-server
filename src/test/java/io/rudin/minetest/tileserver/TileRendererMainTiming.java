@@ -7,18 +7,20 @@ import io.rudin.minetest.tileserver.module.ConfigModule;
 import io.rudin.minetest.tileserver.module.DBModule;
 import io.rudin.minetest.tileserver.module.ServiceModule;
 import io.rudin.minetest.tileserver.service.TileCache;
+import org.aeonbits.owner.ConfigFactory;
 
 public class TileRendererMainTiming {
-    private static Injector injector = Guice.createInjector(
-            new ConfigModule(),
-            new DBModule(),
-            new ServiceModule()
-    );
 
     public static void main(String[] args) throws Exception {
 
-        TileServerConfig cfg = injector.getInstance(TileServerConfig.class);
+        TileServerConfig cfg = ConfigFactory.create(TileServerConfig.class);
 
+
+        Injector injector = Guice.createInjector(
+                new ConfigModule(cfg),
+                new DBModule(cfg),
+                new ServiceModule(cfg)
+        );
         DBMigration dbMigration = injector.getInstance(DBMigration.class);
         dbMigration.migrate();
 

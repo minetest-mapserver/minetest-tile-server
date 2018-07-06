@@ -17,16 +17,20 @@ public class DBMigration {
 		flyway.setBaselineVersionAsString("0");
 		flyway.setBaselineOnMigrate(true);
 
-		this.tileFlyway = new Flyway();
-		tileFlyway.setDataSource(cfg.tileDatabaseUrl(), cfg.tileDatabaseUsername(), cfg.tileDatabasePassword());
-		tileFlyway.setSqlMigrationPrefix("TILEV");
+		if (cfg.tileCacheType() == TileServerConfig.CacheType.DATABASE) {
+			this.tileFlyway = new Flyway();
+			tileFlyway.setDataSource(cfg.tileDatabaseUrl(), cfg.tileDatabaseUsername(), cfg.tileDatabasePassword());
+			tileFlyway.setSqlMigrationPrefix("TILEV");
+		}
 	}
 
 	private final Flyway flyway;
-	private final Flyway tileFlyway;
+	private Flyway tileFlyway;
 
 	public void migrate() {
-		tileFlyway.migrate();
+		if (tileFlyway != null)
+			tileFlyway.migrate();
+
 		flyway.migrate();
 	}
 

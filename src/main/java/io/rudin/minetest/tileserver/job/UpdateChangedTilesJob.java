@@ -30,9 +30,8 @@ public class UpdateChangedTilesJob implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(UpdateChangedTilesJob.class);
 
 	@Inject
-	public UpdateChangedTilesJob(DSLContext ctx, @TileDB DSLContext tileCtx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg) {
+	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg) {
 		this.ctx = ctx;
-		this.tileCtx = tileCtx;
 		this.tileCache = tileCache;
 		this.eventBus = eventBus;
 
@@ -44,7 +43,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 	private final EventBus eventBus;
 
-	private final DSLContext ctx, tileCtx;
+	private final DSLContext ctx;
 	
 	private final TileCache tileCache;
 
@@ -67,13 +66,10 @@ public class UpdateChangedTilesJob implements Runnable {
 		}
 
 		if (latestTimestamp == null) {
-			logger.debug("Gathering latest tile time from db");
+			logger.debug("Gathering latest tile time from tile cache");
 			long start = System.currentTimeMillis();
 
-			latestTimestamp = tileCtx
-					.select(DSL.max(TILES.MTIME))
-					.from(TILES)
-					.fetchOne(DSL.max(TILES.MTIME));
+			latestTimestamp = tileCache.getLatestTimestamp();
 
 			long diff = System.currentTimeMillis() - start;
 

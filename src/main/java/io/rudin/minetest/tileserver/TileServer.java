@@ -22,20 +22,23 @@ import io.rudin.minetest.tileserver.route.TileRoute;
 import io.rudin.minetest.tileserver.transformer.JsonTransformer;
 import io.rudin.minetest.tileserver.ws.WebSocketHandler;
 import io.rudin.minetest.tileserver.ws.WebSocketUpdater;
+import org.aeonbits.owner.ConfigFactory;
 
 import static spark.Spark.*;
 
 public class TileServer {
 
-	private static Injector injector = Guice.createInjector(
-			new ConfigModule(),
-			new DBModule(),
-			new ServiceModule()
-	);
 	
 	public static void main(String[] args) throws Exception {
 
-		TileServerConfig cfg = injector.getInstance(TileServerConfig.class);
+		TileServerConfig cfg = ConfigFactory.create(TileServerConfig.class);
+
+
+		Injector injector = Guice.createInjector(
+				new ConfigModule(cfg),
+				new DBModule(cfg),
+				new ServiceModule(cfg)
+		);
 		
 		DBMigration dbMigration = injector.getInstance(DBMigration.class);
 		dbMigration.migrate();

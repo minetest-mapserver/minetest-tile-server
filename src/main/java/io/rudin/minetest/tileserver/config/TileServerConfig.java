@@ -58,9 +58,21 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("true")
 	boolean poiEnable();
 
+	/*
+	tile cache stuff
+	 */
+
+	@Key("tile.cache.impl")
+	@DefaultValue("FILE")
+	CacheType tileCacheType();
+
+	enum CacheType {
+		DATABASE,
+		FILE
+	}
+
 	@Key("tiles.directory")
-	@DefaultValue("target/tiles")
-	@Deprecated
+	@DefaultValue("tiles")
 	String tileDirectory();
 
 	/*

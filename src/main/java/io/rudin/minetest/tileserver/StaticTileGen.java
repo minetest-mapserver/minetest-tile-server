@@ -3,6 +3,7 @@ package io.rudin.minetest.tileserver;
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
 import io.rudin.minetest.tileserver.config.TileServerConfig;
+import org.aeonbits.owner.ConfigFactory;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
@@ -22,15 +23,16 @@ public class StaticTileGen {
 	public static void main(String[] args) throws Exception {
 		// TODO create tiles in directory with static html index file
 
+		TileServerConfig cfg = ConfigFactory.create(TileServerConfig.class);
+
 		Injector injector = Guice.createInjector(
-				new ConfigModule(),
-				new DBModule(),
-				new ServiceModule()
+				new ConfigModule(cfg),
+				new DBModule(cfg),
+				new ServiceModule(cfg)
 				);
 
 		DSLContext ctx = injector.getInstance(DSLContext.class);
 		TileRenderer tileRenderer = injector.getInstance(TileRenderer.class);
-		TileServerConfig cfg = injector.getInstance(TileServerConfig.class);
 
 		Condition yCondition = BLOCKS.POSY.between(cfg.tilesMinY(), cfg.tilesMaxY());
 
