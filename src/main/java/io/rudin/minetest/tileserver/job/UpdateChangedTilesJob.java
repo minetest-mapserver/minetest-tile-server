@@ -6,6 +6,9 @@ import static io.rudin.minetest.tileserver.tiledb.tables.Tiles.TILES;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.rudin.minetest.tileserver.accessor.BlocksRecordAccessor;
+import io.rudin.minetest.tileserver.accessor.Coordinate;
+import io.rudin.minetest.tileserver.accessor.MapBlockAccessor;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.qualifier.TileDB;
@@ -30,14 +33,21 @@ public class UpdateChangedTilesJob implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(UpdateChangedTilesJob.class);
 
 	@Inject
-	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg) {
+	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg, MapBlockAccessor mapBlockAccessor, BlocksRecordAccessor blocksRecordAccessor) {
 		this.ctx = ctx;
 		this.tileCache = tileCache;
 		this.eventBus = eventBus;
 
 		this.yCondition = BLOCKS.POSY.between(cfg.tilesMinY(), cfg.tilesMaxY());
 		this.cfg = cfg;
+
+		this.mapBlockAccessor = mapBlockAccessor;
+		this.blocksRecordAccessor = blocksRecordAccessor;
 	}
+
+	private final MapBlockAccessor mapBlockAccessor;
+
+	private final BlocksRecordAccessor blocksRecordAccessor;
 
 	private final TileServerConfig cfg;
 
@@ -118,6 +128,10 @@ public class UpdateChangedTilesJob implements Runnable {
 			List<String> updatedTileKeys = new ArrayList<>();
 
 			for (BlocksRecord record : blocks) {
+
+				blocksRecordAccessor.update(record);
+				mapBlockAccessor.invalidate(new Coordinate(record));
+
 				Integer x = record.getPosx();
 				Integer z = record.getPosz();
 

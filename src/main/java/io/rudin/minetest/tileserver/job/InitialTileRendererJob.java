@@ -55,6 +55,8 @@ public class InitialTileRendererJob implements Runnable {
             long byteCount = 0;
             int errorCount = 0;
             long lastProgressUpdate = 0;
+            int lastTileCount = 0;
+
             int tileCount = 0;
 
             logger.info("X-Stripe count: {} (from {} to {})", xStripes, minX, maxX);
@@ -107,9 +109,16 @@ public class InitialTileRendererJob implements Runnable {
                         //Report every 5 seconds
                         lastProgressUpdate = now;
 
-                        logger.info("Initial rendering status: x-progress({}%) z-progress({}%) tiles({}) data({} MB) posx({}) posz({})",
+                        int currentTileCount = tileCount - lastTileCount;
+
+                        double tilesPerSecond = (double)currentTileCount / ((double)diff / 1000d);
+
+                        //Reset count
+                        lastTileCount = tileCount;
+
+                        logger.info("Initial rendering status: x-progress({}%) z-progress({}%) tiles({}) data({} MB) posx({}) posz({}) speed({} tiles/s)",
                                 Math.floor(xProgress * 100), Math.floor(zProgress * 100), tileCount, Math.floor(byteCount / 1000) / 1000,
-                                posx, posz
+                                posx, posz, Math.floor(tilesPerSecond)
                         );
 
                         //Explicit gc()

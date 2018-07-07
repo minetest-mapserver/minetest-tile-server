@@ -2,12 +2,9 @@ package io.rudin.minetest.tileserver.service.impl;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.util.concurrent.Striped;
 import io.rudin.minetest.tileserver.qualifier.TileDB;
 import io.rudin.minetest.tileserver.service.TileCache;
 import io.rudin.minetest.tileserver.tiledb.tables.records.TilesRecord;
-import io.rudin.minetest.tileserver.util.MapBlockAccessor;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -15,10 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Objects;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 import static io.rudin.minetest.tileserver.tiledb.tables.Tiles.TILES;
 

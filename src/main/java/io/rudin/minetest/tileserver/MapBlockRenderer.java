@@ -1,7 +1,9 @@
 package io.rudin.minetest.tileserver;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.zip.DataFormatException;
@@ -9,7 +11,9 @@ import java.util.zip.DataFormatException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import io.rudin.minetest.tileserver.util.MapBlockAccessor;
+import io.rudin.minetest.tileserver.accessor.Coordinate;
+import io.rudin.minetest.tileserver.accessor.MapBlockAccessor;
+import io.rudin.minetest.tileserver.config.TileServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,10 +26,13 @@ public class MapBlockRenderer {
 	private static final int BLOCK_SIZE = 16;
 	
 	@Inject
-	public MapBlockRenderer(ColorTable colorTable, MapBlockAccessor mapBlockAccessor) {
+	public MapBlockRenderer(ColorTable colorTable, MapBlockAccessor mapBlockAccessor, TileServerConfig cfg) {
 		this.colorTable = colorTable;
 		this.mapBlockAccessor = mapBlockAccessor;
+		this.cfg = cfg;
 	}
+
+	private final TileServerConfig cfg;
 
 	private final MapBlockAccessor mapBlockAccessor;
 
@@ -42,9 +49,15 @@ public class MapBlockRenderer {
 
 		boolean[][] xz_coords = new boolean[16][16];
 
-		List<MapBlock> mapblocks = mapBlockAccessor.getTopDownYStride(mapBlockX, mapBlockZ);
+		mapBlockAccessor.prefetchTopDownYStride(mapBlockX, mapBlockZ, cfg.tilesMinY(), cfg.tilesMaxY());
 
-		for (MapBlock mapBlock: mapblocks) {
+		for (int blocky = cfg.tilesMaxY(); blocky>=cfg.tilesMinY(); blocky--){
+			Optional<MapBlock> optional = mapBlockAccessor.get(new Coordinate(mapBlockX, blocky, mapBlockZ));
+
+			if (!optional.isPresent())
+				continue;
+
+			MapBlock mapBlock = optional.get();
 
 			logger.debug("Checking blocky: {}", mapBlock.y);
 
@@ -91,10 +104,10 @@ public class MapBlockRenderer {
 								leftAbove = mapBlock.getNode(x-1, y+1, z);
 							} else {
 								//neighbouring mapblock
-								MapBlock leftMapBlock = mapBlockAccessor.get(mapBlockX - 1, mapBlock.y, mapBlockZ);
-								if (leftMapBlock != null) {
-									left = leftMapBlock.getNode(15, y, z);
-									leftAbove = leftMapBlock.getNode(15, y + 1, z);
+								Optional<MapBlock> leftMapBlock = mapBlockAccessor.get(new Coordinate(mapBlockX - 1, mapBlock.y, mapBlockZ));
+								if (leftMapBlock.isPresent()) {
+									left = leftMapBlock.get().getNode(15, y, z);
+									leftAbove = leftMapBlock.get().getNode(15, y + 1, z);
 								}
 							}
 
@@ -104,10 +117,10 @@ public class MapBlockRenderer {
 								topAbove = mapBlock.getNode(x, y+1, z+1);
 							} else {
 								//neighbouring mapblock
-								MapBlock leftMapBlock = mapBlockAccessor.get(mapBlockX, mapBlock.y, mapBlockZ+1);
-								if (leftMapBlock != null) {
-									top = leftMapBlock.getNode(x, y, 0);
-									topAbove = leftMapBlock.getNode(x, y + 1, 0);
+								Optional<MapBlock> leftMapBlock = mapBlockAccessor.get(new Coordinate(mapBlockX, mapBlock.y, mapBlockZ+1));
+								if (leftMapBlock.isPresent()) {
+									top = leftMapBlock.get().getNode(x, y, 0);
+									topAbove = leftMapBlock.get().getNode(x, y + 1, 0);
 								}
 							}
 
@@ -152,7 +165,7 @@ public class MapBlockRenderer {
 		}
 
 		if (foundBlocks != expectedBlocks) {
-			logger.debug("Only found {} blocks in {} layers!", foundBlocks, mapblocks.size());
+			logger.debug("Only found {} blocks", foundBlocks);
 		}
 	}
 
