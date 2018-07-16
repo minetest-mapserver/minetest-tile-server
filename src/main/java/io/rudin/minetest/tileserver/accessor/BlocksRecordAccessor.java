@@ -9,6 +9,8 @@ import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import jdk.nashorn.internal.ir.Block;
 import org.jooq.DSLContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -23,15 +25,19 @@ import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 @Singleton
 public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<BlocksRecord>> {
 
+    private static final Logger logger = LoggerFactory.getLogger(BlocksRecordAccessor.class);
+
     @Inject
-    public BlocksRecordAccessor(DSLContext ctx){
+    public BlocksRecordAccessor(DSLContext ctx, TileServerConfig cfg){
         this.ctx = ctx;
+        this.cfg = cfg;
         this.cache = CacheBuilder.newBuilder()
                 .maximumSize(5000)
                 .expireAfterAccess(10, TimeUnit.MINUTES)
                 .build(this);
     }
 
+    private final TileServerConfig cfg;
 
     private final LoadingCache<Coordinate, Optional<BlocksRecord>> cache;
 
@@ -46,6 +52,9 @@ public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<Block
     }
 
     public List<BlocksRecord> getTopyDownYStride(int x, int z, int minY, int maxY) {
+
+        long start = System.currentTimeMillis();
+
         List<BlocksRecord> list = ctx
                 .selectFrom(BLOCKS)
                 .where(BLOCKS.POSX.eq(x))
@@ -54,6 +63,12 @@ public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<Block
                 .and(BLOCKS.POSZ.eq(z))
                 .orderBy(BLOCKS.POSY.desc())
                 .fetch();
+
+        long diff = System.currentTimeMillis() - start;
+
+        if (diff > 500 && cfg.logQueryPerformance()){
+            logger.warn("getTopyDownYStride took {} ms", diff);
+        }
 
         for (BlocksRecord record: list){
             update(record);
@@ -69,11 +84,23 @@ public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<Block
 
     @Override
     public Optional<BlocksRecord> load(Coordinate coordinate) throws Exception {
-        return ctx
+
+        long start = System.currentTimeMillis();
+
+
+        Optional<BlocksRecord> record = ctx
                 .selectFrom(BLOCKS)
                 .where(BLOCKS.POSX.eq(coordinate.x))
                 .and(BLOCKS.POSY.eq(coordinate.y))
                 .and(BLOCKS.POSZ.eq(coordinate.z))
                 .fetchOptional();
+
+
+        long diff = System.currentTimeMillis() - start;
+
+        if (diff > 500 && cfg.logQueryPerformance()){
+            logger.warn("load took {} ms", diff);
+        }
+        return record;
     }
 }

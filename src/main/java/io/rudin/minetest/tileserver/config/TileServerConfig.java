@@ -46,6 +46,10 @@ public interface TileServerConfig extends Config {
 	Logging stuff
 	 */
 
+	@Key("log.query.performance")
+	@DefaultValue("false")
+	boolean logQueryPerformance();
+
 	@Key("log.tile.updatetimings")
 	@DefaultValue("false")
 	boolean logTileUpdateTimings();

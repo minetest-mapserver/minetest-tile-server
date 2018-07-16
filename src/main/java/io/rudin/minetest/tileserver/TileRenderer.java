@@ -98,7 +98,9 @@ public class TileRenderer {
 			
 			int z1 = mapblockInfo.z;
 			int z2 = mapblockInfo.z + ((int)mapblockInfo.height * -1);
-			
+
+			long start = System.currentTimeMillis();
+
 			Integer count = ctx
 				.select(DSL.count())
 				.from(BLOCKS)
@@ -110,6 +112,12 @@ public class TileRenderer {
 						.and(yCondition)
 				)
 				.fetchOne(DSL.count());
+
+			long diff = System.currentTimeMillis() - start;
+
+			if (diff > 250 && cfg.logQueryPerformance()){
+				logger.warn("white-count-query took {} ms", diff);
+			}
 		
 			if (count == 0) {
 				logger.debug("Fail-fast, got zero mapblock count for x={}-{} z={}-{}", x1,x2, z1,z2);
@@ -297,6 +305,11 @@ public class TileRenderer {
 
 			now = System.currentTimeMillis();
 			long timingZeroCountCheck = now - start;
+
+			if (timingZeroCountCheck > 250 && cfg.logQueryPerformance()){
+				logger.warn("count-zero-check took {} ms", timingZeroCountCheck);
+			}
+
 			start = now;
 
 			long timingRender = 0;
