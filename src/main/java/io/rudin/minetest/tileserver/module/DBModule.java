@@ -12,7 +12,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 public class DBModule extends AbstractModule {
 
-	public DBModule(TileServerConfig cfg) throws Exception {
+	public DBModule(TileServerConfig cfg) {
 		this.cfg = cfg;
 	}
 

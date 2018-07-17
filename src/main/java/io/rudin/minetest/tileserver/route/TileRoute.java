@@ -15,6 +15,7 @@ import spark.Route;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
 public class TileRoute implements Route {
@@ -25,11 +26,17 @@ public class TileRoute implements Route {
 	public TileRoute(TileRenderer renderer, TileServerConfig cfg, TileCache cache) {
 		this.renderer = renderer;
 		this.cache = cache;
+		this.cfg = cfg;
 	}
 
 	private final TileRenderer renderer;
 
 	private final TileCache cache;
+
+	private final TileServerConfig cfg;
+
+	//TODO: proper rate limit
+	private final AtomicInteger entryCount = new AtomicInteger();
 
 	@Override
 	public Object handle(Request req, Response res) throws Exception {
@@ -46,7 +53,17 @@ public class TileRoute implements Route {
 
 		logger.debug("Rendering tile @ {}/{} zoom: {}", x,y,z);
 
-		return renderer.render(x, y, z);
+		try {
+			while (entryCount.get() > cfg.tileRouteReentryCount()){
+				Thread.sleep(50);
+			}
+
+			entryCount.incrementAndGet();
+			return renderer.render(x, y, z);
+
+		} finally {
+			entryCount.decrementAndGet();
+		}
 	}
 
 }

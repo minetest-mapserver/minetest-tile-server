@@ -25,7 +25,7 @@ public class LoggingExecuteListener extends DefaultExecuteListener {
         super.executeEnd(ctx);
         if (watch.split() > 5_000_000_000L)
             logger.warn(
-                    "Slow SQL",
+                    "Slow SQL: " + ctx.sql(),
                     new SQLPerformanceWarning());
     }
 }

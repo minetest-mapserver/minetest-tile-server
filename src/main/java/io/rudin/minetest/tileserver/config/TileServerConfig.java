@@ -42,6 +42,10 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("2")
 	int playerUpdateInterval();
 
+	@Key("tile.route.reentrycount")
+	@DefaultValue("5000")
+	int tileRouteReentryCount();
+
 	/*
 	Logging stuff
 	 */
@@ -67,12 +71,13 @@ public interface TileServerConfig extends Config {
 	 */
 
 	@Key("tile.cache.impl")
-	@DefaultValue("FILE")
+	@DefaultValue("EHCACHE")
 	CacheType tileCacheType();
 
 	enum CacheType {
 		DATABASE,
-		FILE
+		FILE,
+		EHCACHE
 	}
 
 	@Key("tiles.directory")

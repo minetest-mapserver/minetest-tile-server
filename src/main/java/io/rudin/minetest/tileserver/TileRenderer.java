@@ -101,17 +101,17 @@ public class TileRenderer {
 
 			long start = System.currentTimeMillis();
 
-			Integer count = ctx
-				.select(DSL.count())
-				.from(BLOCKS)
-				.where(
-						BLOCKS.POSX.ge(Math.min(x1, x2))
-						.and(BLOCKS.POSX.le(Math.max(x1, x2)))
-						.and(BLOCKS.POSZ.ge(Math.min(z1, z2)))
-						.and(BLOCKS.POSZ.le(Math.max(z1, z2)))
-						.and(yCondition)
-				)
-				.fetchOne(DSL.count());
+			Result<BlocksRecord> firstResult = ctx
+					.selectFrom(BLOCKS)
+					.where(
+							BLOCKS.POSX.ge(Math.min(x1, x2))
+							.and(BLOCKS.POSX.le(Math.max(x1, x2)))
+							.and(BLOCKS.POSZ.ge(Math.min(z1, z2)))
+							.and(BLOCKS.POSZ.le(Math.max(z1, z2)))
+							.and(yCondition)
+					)
+					.limit(1)
+					.fetch();
 
 			long diff = System.currentTimeMillis() - start;
 
@@ -119,7 +119,7 @@ public class TileRenderer {
 				logger.warn("white-count-query took {} ms", diff);
 			}
 		
-			if (count == 0) {
+			if (firstResult.isEmpty()) {
 				logger.debug("Fail-fast, got zero mapblock count for x={}-{} z={}-{}", x1,x2, z1,z2);
 
 				byte[] data = WhiteTile.getPNG();
@@ -293,15 +293,15 @@ public class TileRenderer {
 			start = now;
 
 
-			Integer count = ctx
-					.select(DSL.count())
-					.from(BLOCKS)
+			Result<BlocksRecord> countList = ctx
+					.selectFrom(BLOCKS)
 					.where(
 							BLOCKS.POSX.eq(mapblockX)
 									.and(BLOCKS.POSZ.eq(mapblockZ))
 									.and(yCondition)
 					)
-					.fetchOne(DSL.count());
+					.limit(1)
+					.fetch();
 
 			now = System.currentTimeMillis();
 			long timingZeroCountCheck = now - start;
@@ -314,7 +314,7 @@ public class TileRenderer {
 
 			long timingRender = 0;
 
-			if (count > 0) {
+			if (!countList.isEmpty()) {
 
 
 				blockRenderer.render(mapblockX, mapblockZ, graphics, 16);

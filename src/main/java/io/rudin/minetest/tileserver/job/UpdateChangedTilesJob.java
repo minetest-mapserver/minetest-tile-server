@@ -119,6 +119,12 @@ public class UpdateChangedTilesJob implements Runnable {
 			int count = blocks.size();
 			int invalidatedTiles = 0;
 
+			long diff = start - System.currentTimeMillis();
+
+			if (diff > 1000 && cfg.logQueryPerformance()){
+				logger.warn("updated-tiles-query took {} ms", diff);
+			}
+
 			if (blocks.size() == LIMIT) {
 				logger.warn("Got max-blocks ({}) from update-queue", LIMIT);
 			}
