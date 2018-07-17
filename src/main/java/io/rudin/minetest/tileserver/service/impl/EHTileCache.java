@@ -42,10 +42,10 @@ public class EHTileCache implements TileCache {
                         CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, byte[].class,
                                 ResourcePoolsBuilder.newResourcePoolsBuilder()
                                         .heap(10, MemoryUnit.MB)
-                                        .offheap(50, MemoryUnit.MB)
-                                        .disk(10, MemoryUnit.GB, true)
+                                        .disk(100, MemoryUnit.GB, true)
                         )
-                ).build(true);
+                )
+                .build(true);
 
         cache = persistentCacheManager.getCache("cache", String.class, byte[].class);
 

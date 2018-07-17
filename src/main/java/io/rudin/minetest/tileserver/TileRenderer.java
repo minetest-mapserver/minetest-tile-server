@@ -164,9 +164,11 @@ public class TileRenderer {
 				return ImageIO.read(new ByteArrayInputStream(data));
 		}
 
+		/*
 		ReadWriteLock lock = getLock(tileX, tileY, zoom);
 		Lock writeLock = lock.writeLock();
-		//writeLock.lock();
+		writeLock.lock();
+		*/
 
 		try {
 

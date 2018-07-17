@@ -44,6 +44,8 @@ public class MapBlockRenderer {
 
 	public void render(int mapBlockX, int mapBlockZ, Graphics graphics, int scale) throws IllegalArgumentException, DataFormatException, ExecutionException {
 
+		logger.debug("Rendering block: x={} z={}", mapBlockX, mapBlockZ);
+
 		int foundBlocks = 0;
 		final int expectedBlocks = 16 * 16;
 
@@ -59,7 +61,7 @@ public class MapBlockRenderer {
 
 			MapBlock mapBlock = optional.get();
 
-			logger.debug("Checking blocky: {}", mapBlock.y);
+			logger.trace("Checking blocky: {}", mapBlock.y);
 
 			if (mapBlock.isEmpty())
 				continue;
@@ -88,7 +90,7 @@ public class MapBlockRenderer {
 							//working copy
 							rgb = new ColorTable.RGBData(rgb);
 
-							logger.debug("Found node '{}' @ {}/{}/{} in blocky: {}", name, x, y, z, mapBlock.y);
+							logger.trace("Found node '{}' @ {}/{}/{} in blocky: {}", name, x, y, z, mapBlock.y);
 
 							//get left node
 							Optional<String> left = Optional.empty();
