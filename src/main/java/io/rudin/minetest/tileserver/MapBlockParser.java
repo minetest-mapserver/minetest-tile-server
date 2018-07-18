@@ -89,7 +89,7 @@ public class MapBlockParser {
 		inflater = new Inflater();
 		inflater.setInput(data, dataOffset, data.length - dataOffset);
 
-		block.metadata = new byte[1024*100]; //100k
+		block.metadata = new byte[1024*1024]; //1M
 
 		try {
 			//Dummy inflation to get size
