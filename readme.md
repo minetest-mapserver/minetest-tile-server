@@ -10,21 +10,22 @@ Renders the mapblocks on-demand as an interactive map and displays the current p
 As players interact with the map the changed MapBlocks get re-rendered
 and updated in the web-client (near-realtime, 20 seconds default)
 
-The resulting tiles are cached in a database and served to the client if unchanged. 
+The resulting tiles are cached in a file-backend and served to the client if unchanged.
 
 # Development state
 
-* Active, Beta-Testing with one Production-Instance (see **Demo**)
+* Tested and live with one Production-Instance (see **Demo**)
 * Please file issues/requests in the github issue-tracker
 
 # Demo
 
 * See: https://pandorabox.io/map/#-1830.125/426.5/11
+![](img/Bildschirmfoto_2018-07-18_17-13-35.png?raw=true)
 
 # Compatibility
 
 Requirements:
-- Postgresql Database (for tile-cache and blocks)
+- Postgresql Database for minetest backend (existing)
 - Java runtime (8+)
 - Modern machine with enough (2GB+) RAM and CPU
 
@@ -49,8 +50,10 @@ Key and values should be separated by a `=` (see **Example config**)
 
 Example for a setup with server-name **myhost**:
 ```
+#tileserver.properties
 minetest.db.url=jdbc:postgresql://myhost:5432/postgres
-tile.db.url=jdbc:postgresql://myhost:5432/tiles
+minetest.db.username=postgres
+minetest.db.password=1234
 ```
 
 ## Configuration parameters
@@ -91,7 +94,13 @@ Username for DB Connection
 Driver for DB Connection (only psql supported for now)
 * Default: **org.postgresql.Driver**
 
+### block.parser.poi.enable
+Enable parsing of POI blocks, provided with the mod in this repository
+* Default: **true**
 
+### block.parser.travelnet.enable
+Enable parsing of Travelnet boxes
+* Default: **true**
 
 
 # How it works
