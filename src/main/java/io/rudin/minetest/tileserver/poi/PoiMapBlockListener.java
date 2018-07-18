@@ -30,16 +30,10 @@ public class PoiMapBlockListener {
     private static final String POIBLOCK_NAME = "tileserver:poi";
 
     @Inject
-    public PoiMapBlockListener(EventBus eventBus, DSLContext ctx, TileServerConfig cfg, BlocksRecordAccessor recordAccessor){
+    public PoiMapBlockListener(EventBus eventBus, DSLContext ctx){
         this.eventBus = eventBus;
         this.ctx = ctx;
-        this.cfg = cfg;
-        this.recordAccessor = recordAccessor;
     }
-
-    private final BlocksRecordAccessor recordAccessor;
-
-    private final TileServerConfig cfg;
 
     private final DSLContext ctx;
 
@@ -50,26 +44,7 @@ public class PoiMapBlockListener {
     }
 
     private void registerPOI(MapBlock mapBlock, int x, int y, int z){
-        Metadata metadata;
-
-        try {
-            metadata = MetadataParser.parse(mapBlock.metadata, mapBlock.metadataLength);
-        } catch (Exception e){
-
-            if (cfg.dumpInvalidMapblockData()){
-                try (OutputStream output = new FileOutputStream("mapblock_" + mapBlock.x + "." + mapBlock.y + "." + mapBlock.z + ".raw")) {
-
-                    Optional<BlocksRecord> record = recordAccessor.get(new Coordinate(mapBlock.x, mapBlock.y, mapBlock.z));
-                    output.write(record.get().getData());
-
-                } catch (Exception e2){
-                    e2.printStackTrace();
-                }
-            }
-
-            throw new IllegalArgumentException("parse-error on mapblock: " + mapBlock.x + "/" + mapBlock.y + "/" + mapBlock.z, e);
-
-        }
+        Metadata metadata = mapBlock.getMetadata();
 
         int position = MapBlock.toPosition(x, y, z);
 

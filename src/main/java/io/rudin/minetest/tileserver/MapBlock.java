@@ -1,5 +1,9 @@
 package io.rudin.minetest.tileserver;
 
+import io.rudin.minetest.tileserver.parser.Metadata;
+import io.rudin.minetest.tileserver.parser.MetadataParser;
+import org.slf4j.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +26,15 @@ public class MapBlock {
 
 	public byte[] metadata;
 	public int metadataLength;
+
+	private Metadata parsedMetadata;
+
+	public synchronized Metadata getMetadata(){
+		if (parsedMetadata == null)
+			parsedMetadata = MetadataParser.parse(metadata, metadataLength);
+
+		return parsedMetadata;
+	}
 
 	public final Map<Integer, String> mapping = new HashMap<>();
 
