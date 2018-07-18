@@ -5,12 +5,14 @@ package io.rudin.minetest.tileserver.blockdb;
 
 
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
+import io.rudin.minetest.tileserver.blockdb.tables.Chat;
 import io.rudin.minetest.tileserver.blockdb.tables.FlywaySchemaHistory;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventories;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
 import io.rudin.minetest.tileserver.blockdb.tables.Poi;
+import io.rudin.minetest.tileserver.blockdb.tables.Travelnet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +39,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = 181188052;
+    private static final long serialVersionUID = 616453005;
 
     /**
      * The reference instance of <code></code>
@@ -48,6 +50,11 @@ public class DefaultSchema extends SchemaImpl {
      * The table <code>blocks</code>.
      */
     public final Blocks BLOCKS = io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
+
+    /**
+     * The table <code>chat</code>.
+     */
+    public final Chat CHAT = io.rudin.minetest.tileserver.blockdb.tables.Chat.CHAT;
 
     /**
      * The table <code>flyway_schema_history</code>.
@@ -80,6 +87,11 @@ public class DefaultSchema extends SchemaImpl {
     public final Poi POI = io.rudin.minetest.tileserver.blockdb.tables.Poi.POI;
 
     /**
+     * The table <code>travelnet</code>.
+     */
+    public final Travelnet TRAVELNET = io.rudin.minetest.tileserver.blockdb.tables.Travelnet.TRAVELNET;
+
+    /**
      * No further instances allowed
      */
     private DefaultSchema() {
@@ -104,7 +116,8 @@ public class DefaultSchema extends SchemaImpl {
 
     private final List<Sequence<?>> getSequences0() {
         return Arrays.<Sequence<?>>asList(
-            Sequences.POI_ID_SEQ);
+            Sequences.POI_ID_SEQ,
+            Sequences.TRAVELNET_ID_SEQ);
     }
 
     @Override
@@ -117,11 +130,13 @@ public class DefaultSchema extends SchemaImpl {
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
             Blocks.BLOCKS,
+            Chat.CHAT,
             FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,
             Player.PLAYER,
             PlayerInventories.PLAYER_INVENTORIES,
             PlayerInventoryItems.PLAYER_INVENTORY_ITEMS,
             PlayerMetadata.PLAYER_METADATA,
-            Poi.POI);
+            Poi.POI,
+            Travelnet.TRAVELNET);
     }
 }

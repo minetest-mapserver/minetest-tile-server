@@ -15,6 +15,7 @@ import io.rudin.minetest.tileserver.module.ConfigModule;
 import io.rudin.minetest.tileserver.module.DBModule;
 import io.rudin.minetest.tileserver.module.ServiceModule;
 import io.rudin.minetest.tileserver.poi.PoiMapBlockListener;
+import io.rudin.minetest.tileserver.poi.TravelNetBlockListener;
 import io.rudin.minetest.tileserver.route.ConfigRoute;
 import io.rudin.minetest.tileserver.route.PlayerRoute;
 import io.rudin.minetest.tileserver.route.PoiRoute;
@@ -61,8 +62,12 @@ public class TileServer {
 		injector.getInstance(WebSocketUpdater.class).init();
 
 		//Register poi mapblock listener
-		if (cfg.poiEnable()) {
+		if (cfg.parserPoiEnable()) {
 			injector.getInstance(PoiMapBlockListener.class).setup();
+		}
+
+		if (cfg.parserTravelnetEnable()){
+			injector.getInstance(TravelNetBlockListener.class).setup();
 		}
 
 		ScheduledExecutorService executor = injector.getInstance(ScheduledExecutorService.class);

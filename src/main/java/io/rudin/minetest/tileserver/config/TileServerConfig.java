@@ -63,12 +63,16 @@ public interface TileServerConfig extends Config {
 	boolean dumpInvalidMapblockData();
 
 	/*
-	POI stuff
+	block parsing stuff
 	 */
 
-	@Key("poi.enable")
+	@Key("block.parser.poi.enable")
 	@DefaultValue("false")
-	boolean poiEnable();
+	boolean parserPoiEnable();
+
+	@Key("block.parser.travelnet.enable")
+	@DefaultValue("false")
+	boolean parserTravelnetEnable();
 
 	/*
 	tile cache stuff

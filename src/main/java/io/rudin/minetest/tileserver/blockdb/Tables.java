@@ -5,12 +5,14 @@ package io.rudin.minetest.tileserver.blockdb;
 
 
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
+import io.rudin.minetest.tileserver.blockdb.tables.Chat;
 import io.rudin.minetest.tileserver.blockdb.tables.FlywaySchemaHistory;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventories;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
 import io.rudin.minetest.tileserver.blockdb.tables.Poi;
+import io.rudin.minetest.tileserver.blockdb.tables.Travelnet;
 
 import javax.annotation.Generated;
 
@@ -32,6 +34,11 @@ public class Tables {
      * The table <code>blocks</code>.
      */
     public static final Blocks BLOCKS = io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
+
+    /**
+     * The table <code>chat</code>.
+     */
+    public static final Chat CHAT = io.rudin.minetest.tileserver.blockdb.tables.Chat.CHAT;
 
     /**
      * The table <code>flyway_schema_history</code>.
@@ -62,4 +69,9 @@ public class Tables {
      * The table <code>poi</code>.
      */
     public static final Poi POI = io.rudin.minetest.tileserver.blockdb.tables.Poi.POI;
+
+    /**
+     * The table <code>travelnet</code>.
+     */
+    public static final Travelnet TRAVELNET = io.rudin.minetest.tileserver.blockdb.tables.Travelnet.TRAVELNET;
 }

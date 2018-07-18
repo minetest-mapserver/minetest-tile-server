@@ -11,6 +11,7 @@ import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventories;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
 import io.rudin.minetest.tileserver.blockdb.tables.Poi;
+import io.rudin.minetest.tileserver.blockdb.tables.Travelnet;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.FlywaySchemaHistoryRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerInventoriesRecord;
@@ -18,6 +19,7 @@ import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerInventoryItemsR
 import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerMetadataRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PoiRecord;
+import io.rudin.minetest.tileserver.blockdb.tables.records.TravelnetRecord;
 
 import javax.annotation.Generated;
 
@@ -46,6 +48,7 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final Identity<PoiRecord, Integer> IDENTITY_POI = Identities0.IDENTITY_POI;
+    public static final Identity<TravelnetRecord, Integer> IDENTITY_TRAVELNET = Identities0.IDENTITY_TRAVELNET;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
@@ -72,6 +75,7 @@ public class Keys {
 
     private static class Identities0 {
         public static Identity<PoiRecord, Integer> IDENTITY_POI = Internal.createIdentity(Poi.POI, Poi.POI.ID);
+        public static Identity<TravelnetRecord, Integer> IDENTITY_TRAVELNET = Internal.createIdentity(Travelnet.TRAVELNET, Travelnet.TRAVELNET.ID);
     }
 
     private static class UniqueKeys0 {
