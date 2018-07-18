@@ -82,7 +82,7 @@ public class DefaultSchema extends SchemaImpl {
     public final PlayerMetadata PLAYER_METADATA = io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata.PLAYER_METADATA;
 
     /**
-     * The table <code>poi</code>.
+     * The table <code>listener</code>.
      */
     public final Poi POI = io.rudin.minetest.tileserver.blockdb.tables.Poi.POI;
 

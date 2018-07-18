@@ -11,11 +11,13 @@ import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.job.InitialTileRendererJob;
 import io.rudin.minetest.tileserver.job.UpdateChangedTilesJob;
 import io.rudin.minetest.tileserver.job.UpdatePlayerJob;
+import io.rudin.minetest.tileserver.listener.FancyVendAdminBlockListener;
+import io.rudin.minetest.tileserver.listener.SmartShopBlockListener;
 import io.rudin.minetest.tileserver.module.ConfigModule;
 import io.rudin.minetest.tileserver.module.DBModule;
 import io.rudin.minetest.tileserver.module.ServiceModule;
-import io.rudin.minetest.tileserver.poi.PoiMapBlockListener;
-import io.rudin.minetest.tileserver.poi.TravelNetBlockListener;
+import io.rudin.minetest.tileserver.listener.PoiMapBlockListener;
+import io.rudin.minetest.tileserver.listener.TravelNetBlockListener;
 import io.rudin.minetest.tileserver.route.ConfigRoute;
 import io.rudin.minetest.tileserver.route.PlayerRoute;
 import io.rudin.minetest.tileserver.route.PoiRoute;
@@ -53,7 +55,7 @@ public class TileServer {
 		get("/tiles/:z/:x/:y", injector.getInstance(TileRoute.class));
 		get("/player", injector.getInstance(PlayerRoute.class), json);
 		get("/config", injector.getInstance(ConfigRoute.class), json);
-		get("/poi", injector.getInstance(PoiRoute.class), json);
+		get("/listener", injector.getInstance(PoiRoute.class), json);
 
 		//Initialize web server
 		init();
@@ -61,13 +63,21 @@ public class TileServer {
 		//Initialize ws updater
 		injector.getInstance(WebSocketUpdater.class).init();
 
-		//Register poi mapblock listener
+		//Register listener mapblock listener
 		if (cfg.parserPoiEnable()) {
 			injector.getInstance(PoiMapBlockListener.class).setup();
 		}
 
 		if (cfg.parserTravelnetEnable()){
 			injector.getInstance(TravelNetBlockListener.class).setup();
+		}
+
+		if (cfg.parserSmartshopEnable()){
+			injector.getInstance(SmartShopBlockListener.class).setup();
+		}
+
+		if (cfg.parserFancyVendEnable()){
+			injector.getInstance(FancyVendAdminBlockListener.class).setup();
 		}
 
 		ScheduledExecutorService executor = injector.getInstance(ScheduledExecutorService.class);

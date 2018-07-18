@@ -30,168 +30,168 @@ public class PoiRecord extends TableRecordImpl<PoiRecord> implements Record12<In
     private static final long serialVersionUID = 587275238;
 
     /**
-     * Setter for <code>poi.id</code>.
+     * Setter for <code>listener.id</code>.
      */
     public void setId(Integer value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>poi.id</code>.
+     * Getter for <code>listener.id</code>.
      */
     public Integer getId() {
         return (Integer) get(0);
     }
 
     /**
-     * Setter for <code>poi.name</code>.
+     * Setter for <code>listener.name</code>.
      */
     public void setName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>poi.name</code>.
+     * Getter for <code>listener.name</code>.
      */
     public String getName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>poi.category</code>.
+     * Setter for <code>listener.category</code>.
      */
     public void setCategory(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>poi.category</code>.
+     * Getter for <code>listener.category</code>.
      */
     public String getCategory() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>poi.owner</code>.
+     * Setter for <code>listener.owner</code>.
      */
     public void setOwner(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>poi.owner</code>.
+     * Getter for <code>listener.owner</code>.
      */
     public String getOwner() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>poi.active</code>.
+     * Setter for <code>listener.active</code>.
      */
     public void setActive(Boolean value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>poi.active</code>.
+     * Getter for <code>listener.active</code>.
      */
     public Boolean getActive() {
         return (Boolean) get(4);
     }
 
     /**
-     * Setter for <code>poi.x</code>.
+     * Setter for <code>listener.x</code>.
      */
     public void setX(Integer value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>poi.x</code>.
+     * Getter for <code>listener.x</code>.
      */
     public Integer getX() {
         return (Integer) get(5);
     }
 
     /**
-     * Setter for <code>poi.y</code>.
+     * Setter for <code>listener.y</code>.
      */
     public void setY(Integer value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>poi.y</code>.
+     * Getter for <code>listener.y</code>.
      */
     public Integer getY() {
         return (Integer) get(6);
     }
 
     /**
-     * Setter for <code>poi.z</code>.
+     * Setter for <code>listener.z</code>.
      */
     public void setZ(Integer value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>poi.z</code>.
+     * Getter for <code>listener.z</code>.
      */
     public Integer getZ() {
         return (Integer) get(7);
     }
 
     /**
-     * Setter for <code>poi.posx</code>.
+     * Setter for <code>listener.posx</code>.
      */
     public void setPosx(Integer value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>poi.posx</code>.
+     * Getter for <code>listener.posx</code>.
      */
     public Integer getPosx() {
         return (Integer) get(8);
     }
 
     /**
-     * Setter for <code>poi.posy</code>.
+     * Setter for <code>listener.posy</code>.
      */
     public void setPosy(Integer value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>poi.posy</code>.
+     * Getter for <code>listener.posy</code>.
      */
     public Integer getPosy() {
         return (Integer) get(9);
     }
 
     /**
-     * Setter for <code>poi.posz</code>.
+     * Setter for <code>listener.posz</code>.
      */
     public void setPosz(Integer value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>poi.posz</code>.
+     * Getter for <code>listener.posz</code>.
      */
     public Integer getPosz() {
         return (Integer) get(10);
     }
 
     /**
-     * Setter for <code>poi.mtime</code>.
+     * Setter for <code>listener.mtime</code>.
      */
     public void setMtime(Long value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>poi.mtime</code>.
+     * Getter for <code>listener.mtime</code>.
      */
     public Long getMtime() {
         return (Long) get(11);

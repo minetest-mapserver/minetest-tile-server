@@ -41,7 +41,7 @@ public class Poi extends TableImpl<PoiRecord> {
     private static final long serialVersionUID = -1911319382;
 
     /**
-     * The reference instance of <code>poi</code>
+     * The reference instance of <code>listener</code>
      */
     public static final Poi POI = new Poi();
 
@@ -54,81 +54,81 @@ public class Poi extends TableImpl<PoiRecord> {
     }
 
     /**
-     * The column <code>poi.id</code>.
+     * The column <code>listener.id</code>.
      */
     public final TableField<PoiRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('poi_id_seq'::regclass)", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
-     * The column <code>poi.name</code>.
+     * The column <code>listener.name</code>.
      */
     public final TableField<PoiRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), this, "");
 
     /**
-     * The column <code>poi.category</code>.
+     * The column <code>listener.category</code>.
      */
     public final TableField<PoiRecord, String> CATEGORY = createField("category", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), this, "");
 
     /**
-     * The column <code>poi.owner</code>.
+     * The column <code>listener.owner</code>.
      */
     public final TableField<PoiRecord, String> OWNER = createField("owner", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), this, "");
 
     /**
-     * The column <code>poi.active</code>.
+     * The column <code>listener.active</code>.
      */
     public final TableField<PoiRecord, Boolean> ACTIVE = createField("active", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
-     * The column <code>poi.x</code>.
+     * The column <code>listener.x</code>.
      */
     public final TableField<PoiRecord, Integer> X = createField("x", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>poi.y</code>.
+     * The column <code>listener.y</code>.
      */
     public final TableField<PoiRecord, Integer> Y = createField("y", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>poi.z</code>.
+     * The column <code>listener.z</code>.
      */
     public final TableField<PoiRecord, Integer> Z = createField("z", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>poi.posx</code>.
+     * The column <code>listener.posx</code>.
      */
     public final TableField<PoiRecord, Integer> POSX = createField("posx", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>poi.posy</code>.
+     * The column <code>listener.posy</code>.
      */
     public final TableField<PoiRecord, Integer> POSY = createField("posy", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>poi.posz</code>.
+     * The column <code>listener.posz</code>.
      */
     public final TableField<PoiRecord, Integer> POSZ = createField("posz", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>poi.mtime</code>.
+     * The column <code>listener.mtime</code>.
      */
     public final TableField<PoiRecord, Long> MTIME = createField("mtime", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * Create a <code>poi</code> table reference
+     * Create a <code>listener</code> table reference
      */
     public Poi() {
-        this(DSL.name("poi"), null);
+        this(DSL.name("listener"), null);
     }
 
     /**
-     * Create an aliased <code>poi</code> table reference
+     * Create an aliased <code>listener</code> table reference
      */
     public Poi(String alias) {
         this(DSL.name(alias), POI);
     }
 
     /**
-     * Create an aliased <code>poi</code> table reference
+     * Create an aliased <code>listener</code> table reference
      */
     public Poi(Name alias) {
         this(alias, POI);

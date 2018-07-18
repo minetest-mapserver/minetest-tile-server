@@ -1,4 +1,4 @@
-package io.rudin.minetest.tileserver.poi;
+package io.rudin.minetest.tileserver.listener;
 
 import com.google.common.eventbus.Subscribe;
 import io.rudin.minetest.tileserver.MapBlock;
@@ -12,7 +12,6 @@ import javax.inject.Singleton;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.rudin.minetest.tileserver.blockdb.tables.Poi.POI;
 import static io.rudin.minetest.tileserver.blockdb.tables.Travelnet.TRAVELNET;
 
 @Singleton

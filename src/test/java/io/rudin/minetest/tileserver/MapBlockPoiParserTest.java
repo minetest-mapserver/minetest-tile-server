@@ -38,7 +38,7 @@ public class MapBlockPoiParserTest {
 		
 		System.out.println("Version: " + block.version);
 
-		//poi block @ x13, y2, z2
+		//listener block @ x13, y2, z2
 		for (int x=0; x<16; x++) {
 			for (int z=0; z<16; z++) {
 				System.out.println("x=" + x + " z=" + z + ": " + block.getNode(x, 2, z));

@@ -1,24 +1,14 @@
-package io.rudin.minetest.tileserver.poi;
+package io.rudin.minetest.tileserver.listener;
 
 import com.google.common.eventbus.Subscribe;
 import io.rudin.minetest.tileserver.MapBlock;
-import io.rudin.minetest.tileserver.accessor.BlocksRecordAccessor;
-import io.rudin.minetest.tileserver.accessor.Coordinate;
-import io.rudin.minetest.tileserver.blockdb.tables.Poi;
-import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PoiRecord;
-import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.parser.Metadata;
-import io.rudin.minetest.tileserver.parser.MetadataParser;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.DSLContext;
-import org.jooq.Result;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -27,7 +17,7 @@ import static io.rudin.minetest.tileserver.blockdb.tables.Poi.POI;
 @Singleton
 public class PoiMapBlockListener {
 
-    private static final String POIBLOCK_NAME = "tileserver:poi";
+    private static final String POIBLOCK_NAME = "tileserver:listener";
 
     @Inject
     public PoiMapBlockListener(EventBus eventBus, DSLContext ctx){
@@ -80,7 +70,7 @@ public class PoiMapBlockListener {
 
         if (mapblock.mapping.containsValue(POIBLOCK_NAME)){
 
-            //Clear mapblock poi's
+            //Clear mapblock listener's
             ctx
                     .deleteFrom(POI)
                     .where(POI.POSX.eq(mapblock.x))

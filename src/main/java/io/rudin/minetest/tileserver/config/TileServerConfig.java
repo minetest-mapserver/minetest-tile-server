@@ -74,6 +74,14 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("false")
 	boolean parserTravelnetEnable();
 
+	@Key("block.parser.smartshop.enable")
+	@DefaultValue("false")
+	boolean parserSmartshopEnable();
+
+	@Key("block.parser.fancyvend.enable")
+	@DefaultValue("false")
+	boolean parserFancyVendEnable();
+
 	/*
 	tile cache stuff
 	 */
