@@ -51,7 +51,7 @@ public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<Block
         }
     }
 
-    public List<BlocksRecord> getTopyDownYStride(int x, int z, int minY, int maxY) {
+    public List<BlocksRecord> getTopDownYStride(int x, int z, int minY, int maxY) {
 
         long start = System.currentTimeMillis();
 
@@ -67,7 +67,7 @@ public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<Block
         long diff = System.currentTimeMillis() - start;
 
         if (diff > 500 && cfg.logQueryPerformance()){
-            logger.warn("getTopyDownYStride took {} ms", diff);
+            logger.warn("getTopDownYStride took {} ms", diff);
         }
 
         for (BlocksRecord record: list){

@@ -55,7 +55,7 @@ public class MapBlockAccessor extends CacheLoader<Coordinate, Optional<MapBlock>
         }
 
         //do prefetch
-        List<BlocksRecord> blocks = recordAccessor.getTopyDownYStride(x, z, minY, maxY);
+        List<BlocksRecord> blocks = recordAccessor.getTopDownYStride(x, z, minY, maxY);
         for (BlocksRecord record: blocks){
             MapBlock mapBlock = MapBlockParser.parse(record);
 
@@ -77,7 +77,7 @@ public class MapBlockAccessor extends CacheLoader<Coordinate, Optional<MapBlock>
 
     @Override
     public Optional<MapBlock> load(Coordinate coordinate) throws Exception {
-        Optional<BlocksRecord> optionalRecord = recordAccessor.load(coordinate);
+        Optional<BlocksRecord> optionalRecord = recordAccessor.get(coordinate);
 
         if (optionalRecord.isPresent()) {
 
