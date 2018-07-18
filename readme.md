@@ -74,6 +74,11 @@ Min y value for blocks to render (in Mapblocks)
 Update interval to check for new tiles (in seconds)
 * Default: **20**
 
+### tilerenderer.initialrendering.enable
+Enable initial rendering, renders/caches all tiles on startup and disables the realtime tile-update until restarted with false again.
+Leaving this to default (false) renders all tiles on-demand
+* Default: **false**
+
 ### player.updateinterval
 Update interval to check for Player movements (in seconds)
 * Default: **2**
