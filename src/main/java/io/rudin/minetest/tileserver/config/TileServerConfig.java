@@ -67,11 +67,11 @@ public interface TileServerConfig extends Config {
 	 */
 
 	@Key("block.parser.poi.enable")
-	@DefaultValue("false")
+	@DefaultValue("true")
 	boolean parserPoiEnable();
 
 	@Key("block.parser.travelnet.enable")
-	@DefaultValue("false")
+	@DefaultValue("true")
 	boolean parserTravelnetEnable();
 
 	@Key("block.parser.smartshop.enable")

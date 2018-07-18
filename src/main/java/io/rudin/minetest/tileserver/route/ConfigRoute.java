@@ -27,6 +27,8 @@ public class ConfigRoute implements Route {
 	public ConfigRoute(TileServerConfig cfg){
 		config.put("matomo.id", cfg.matomoTrackerId());
 		config.put("matomo.url", cfg.matomoTrackerUrl());
+		config.put("parser.poi", cfg.parserPoiEnable());
+		config.put("parser.travelnet", cfg.parserTravelnetEnable());
 	}
 
 	private final Map<String, Object> config = new HashMap<>();

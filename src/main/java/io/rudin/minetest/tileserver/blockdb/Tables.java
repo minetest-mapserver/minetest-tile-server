@@ -66,7 +66,7 @@ public class Tables {
     public static final PlayerMetadata PLAYER_METADATA = io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata.PLAYER_METADATA;
 
     /**
-     * The table <code>listener</code>.
+     * The table <code>poi</code>.
      */
     public static final Poi POI = io.rudin.minetest.tileserver.blockdb.tables.Poi.POI;
 

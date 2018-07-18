@@ -17,7 +17,7 @@ import static io.rudin.minetest.tileserver.blockdb.tables.Poi.POI;
 @Singleton
 public class PoiMapBlockListener {
 
-    private static final String POIBLOCK_NAME = "tileserver:listener";
+    private static final String POIBLOCK_NAME = "tileserver:poi";
 
     @Inject
     public PoiMapBlockListener(EventBus eventBus, DSLContext ctx){

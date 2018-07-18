@@ -55,12 +55,6 @@
       }
     });
 
-    var tileLayer = new RealtimeTileLayer();
-    tileLayer.addTo(map);
-
-    //L.tileLayer('tiles/{z}/{x}/{y}').addTo(map);
-    //L.marker([-207, 7]).bindPopup("Spawn").addTo(map);
-
 
     function updateTile(data){
         var id = getImageId(data.x, data.y, data.zoom);
@@ -72,8 +66,31 @@
         }
     }
 
+
+    var tileLayer = new RealtimeTileLayer();
+    tileLayer.addTo(map);
+
+    var playerLayer = L.layerGroup();
+    var poiLayer = L.layerGroup();
+    var travelnetLayer = L.layerGroup();
+
+    L.control.layers({
+        "Base": tileLayer
+    }, {
+        "Player": playerLayer,
+        "POI": poiLayer,
+        "Travelnet": travelnetLayer
+    }).addTo(map);
+
+    map.addLayer(poiLayer);
+    map.addLayer(travelnetLayer);
+    map.addLayer(playerLayer);
+
     //Export
     tileserver.map = map;
+    tileserver.poiLayer = poiLayer;
+    tileserver.travelnetLayer = travelnetLayer;
+    tileserver.playerLayer = playerLayer;
     tileserver.updateTile = updateTile;
 
 })(window.tileserver);

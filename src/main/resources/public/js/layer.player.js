@@ -1,6 +1,13 @@
 
 (function(tileserver){
 
+    var PlayerIcon = L.icon({
+        iconUrl: 'pics/sam.png',
+
+        iconSize:     [16, 32],
+        iconAnchor:   [8, 16],
+        popupAnchor:  [0, -16]
+    });
 
     var playerMarkers = {}; // name -> L.Marker
 
@@ -30,8 +37,8 @@
 
         if (!marker){
           //Create marker
-          marker = L.marker(latLng);
-          marker.bindPopup(popup).addTo(tileserver.map);
+          marker = L.marker(latLng, {icon: PlayerIcon});
+          marker.bindPopup(popup).addTo(tileserver.playerLayer);
           playerMarkers[player.name] = marker;
 
         } else {

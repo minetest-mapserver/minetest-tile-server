@@ -18,10 +18,7 @@ import io.rudin.minetest.tileserver.module.DBModule;
 import io.rudin.minetest.tileserver.module.ServiceModule;
 import io.rudin.minetest.tileserver.listener.PoiMapBlockListener;
 import io.rudin.minetest.tileserver.listener.TravelNetBlockListener;
-import io.rudin.minetest.tileserver.route.ConfigRoute;
-import io.rudin.minetest.tileserver.route.PlayerRoute;
-import io.rudin.minetest.tileserver.route.PoiRoute;
-import io.rudin.minetest.tileserver.route.TileRoute;
+import io.rudin.minetest.tileserver.route.*;
 import io.rudin.minetest.tileserver.transformer.JsonTransformer;
 import io.rudin.minetest.tileserver.ws.WebSocketHandler;
 import io.rudin.minetest.tileserver.ws.WebSocketUpdater;
@@ -55,7 +52,9 @@ public class TileServer {
 		get("/tiles/:z/:x/:y", injector.getInstance(TileRoute.class));
 		get("/player", injector.getInstance(PlayerRoute.class), json);
 		get("/config", injector.getInstance(ConfigRoute.class), json);
-		get("/listener", injector.getInstance(PoiRoute.class), json);
+
+		get("/travelnet", injector.getInstance(TravelnetRoute.class), json);
+		get("/poi", injector.getInstance(PoiRoute.class), json);
 
 		//Initialize web server
 		init();
