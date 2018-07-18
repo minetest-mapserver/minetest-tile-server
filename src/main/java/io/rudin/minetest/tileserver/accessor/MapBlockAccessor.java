@@ -7,6 +7,7 @@ import io.rudin.minetest.tileserver.MapBlock;
 import io.rudin.minetest.tileserver.MapBlockParser;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
+import io.rudin.minetest.tileserver.service.EventBus;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -20,14 +21,18 @@ import java.util.concurrent.TimeUnit;
 public class MapBlockAccessor extends CacheLoader<Coordinate, Optional<MapBlock>> {
 
     @Inject
-    public MapBlockAccessor(BlocksRecordAccessor recordAccessor){
+    public MapBlockAccessor(BlocksRecordAccessor recordAccessor, EventBus eventBus){
         this.recordAccessor = recordAccessor;
+        this.eventBus = eventBus;
 
+        //TODO: disk based cache, ehcache
         this.cache = CacheBuilder.newBuilder()
-                .maximumSize(5000)
+                .maximumSize(100)
                 .expireAfterAccess(10, TimeUnit.MINUTES)
                 .build(this);
     }
+
+    private final EventBus eventBus;
 
     private final LoadingCache<Coordinate, Optional<MapBlock>> cache;
 
@@ -53,6 +58,11 @@ public class MapBlockAccessor extends CacheLoader<Coordinate, Optional<MapBlock>
         List<BlocksRecord> blocks = recordAccessor.getTopyDownYStride(x, z, minY, maxY);
         for (BlocksRecord record: blocks){
             MapBlock mapBlock = MapBlockParser.parse(record);
+
+            EventBus.MapBlockParsedEvent event = new EventBus.MapBlockParsedEvent();
+            event.mapblock = mapBlock;
+            eventBus.post(event);
+
             update(mapBlock);
         }
     }
@@ -69,9 +79,18 @@ public class MapBlockAccessor extends CacheLoader<Coordinate, Optional<MapBlock>
     public Optional<MapBlock> load(Coordinate coordinate) throws Exception {
         Optional<BlocksRecord> optionalRecord = recordAccessor.load(coordinate);
 
-        if (optionalRecord.isPresent())
-            return Optional.of(MapBlockParser.parse(optionalRecord.get()));
-        else
+        if (optionalRecord.isPresent()) {
+
+            MapBlock mapBlock = MapBlockParser.parse(optionalRecord.get());
+
+            EventBus.MapBlockParsedEvent event = new EventBus.MapBlockParsedEvent();
+            event.mapblock = mapBlock;
+            eventBus.post(event);
+
+            return Optional.of(mapBlock);
+
+        } else {
             return Optional.empty();
+        }
     }
 }

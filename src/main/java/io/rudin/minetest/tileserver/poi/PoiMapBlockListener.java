@@ -2,8 +2,12 @@ package io.rudin.minetest.tileserver.poi;
 
 import com.google.common.eventbus.Subscribe;
 import io.rudin.minetest.tileserver.MapBlock;
+import io.rudin.minetest.tileserver.accessor.BlocksRecordAccessor;
+import io.rudin.minetest.tileserver.accessor.Coordinate;
 import io.rudin.minetest.tileserver.blockdb.tables.Poi;
+import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PoiRecord;
+import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.parser.Metadata;
 import io.rudin.minetest.tileserver.parser.MetadataParser;
 import io.rudin.minetest.tileserver.service.EventBus;
@@ -11,6 +15,8 @@ import org.jooq.DSLContext;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -23,10 +29,16 @@ public class PoiMapBlockListener {
     private static final String POIBLOCK_NAME = "tileserver:poi";
 
     @Inject
-    public PoiMapBlockListener(EventBus eventBus, DSLContext ctx){
+    public PoiMapBlockListener(EventBus eventBus, DSLContext ctx, TileServerConfig cfg, BlocksRecordAccessor recordAccessor){
         this.eventBus = eventBus;
         this.ctx = ctx;
+        this.cfg = cfg;
+        this.recordAccessor = recordAccessor;
     }
+
+    private final BlocksRecordAccessor recordAccessor;
+
+    private final TileServerConfig cfg;
 
     private final DSLContext ctx;
 
@@ -37,7 +49,26 @@ public class PoiMapBlockListener {
     }
 
     private void registerPOI(MapBlock mapBlock, int x, int y, int z){
-        Metadata metadata = MetadataParser.parse(mapBlock.metadata, mapBlock.metadataLength);
+        Metadata metadata;
+
+        try {
+            metadata = MetadataParser.parse(mapBlock.metadata, mapBlock.metadataLength);
+        } catch (Exception e){
+
+            if (cfg.dumpInvalidMapblockData()){
+                try (OutputStream output = new FileOutputStream("mapblock_" + mapBlock.x + "." + mapBlock.y + "." + mapBlock.z + ".raw")) {
+
+                    Optional<BlocksRecord> record = recordAccessor.get(new Coordinate(mapBlock.x, mapBlock.y, mapBlock.z));
+                    output.write(record.get().getData());
+
+                } catch (Exception e2){
+                    e2.printStackTrace();
+                }
+            }
+
+            throw new IllegalArgumentException("parse-error on mapblock: " + mapBlock.x + "/" + mapBlock.y + "/" + mapBlock.z, e);
+
+        }
 
         int position = MapBlock.toPosition(x, y, z);
 
@@ -46,6 +77,9 @@ public class PoiMapBlockListener {
         int posx = (mapBlock.x * 16) + x;
         int posy = (mapBlock.y * 16) + y;
         int posz = (mapBlock.z * 16) + z;
+
+        //TODO: replace new values
+        //TODO: remove old poi
 
         PoiRecord poiRecord = ctx.newRecord(POI);
         poiRecord.setCategory(map.get("category"));
@@ -63,9 +97,6 @@ public class PoiMapBlockListener {
         poiRecord.setZ(posz);
 
         poiRecord.insert();
-
-        System.out.println(map);//XXX
-        //TODO: db stuff
 
     }
 

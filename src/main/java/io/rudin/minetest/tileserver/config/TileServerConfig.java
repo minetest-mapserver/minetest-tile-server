@@ -58,12 +58,16 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("false")
 	boolean logTileUpdateTimings();
 
+	@Key("debug.mapblock.dumpinvalid")
+	@DefaultValue("false")
+	boolean dumpInvalidMapblockData();
+
 	/*
 	POI stuff
 	 */
 
 	@Key("poi.enable")
-	@DefaultValue("true")
+	@DefaultValue("false")
 	boolean poiEnable();
 
 	/*

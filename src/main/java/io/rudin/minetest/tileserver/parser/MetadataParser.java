@@ -3,25 +3,31 @@ package io.rudin.minetest.tileserver.parser;
 import io.rudin.minetest.tileserver.MapBlockParser;
 import org.jooq.Meta;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * https://github.com/minetest/minetest/blob/master/doc/world_format.txt#L330
+ */
 public class MetadataParser {
 
-    private static final String INVENTORY_TEMRINATOR = "EndInventory\n";
+    private static final String INVENTORY_TEMRINATOR = "EndInventory";
 
-    private static boolean isInventoryTerminator(byte[] data, int offset){
-        for (int i=0; i<INVENTORY_TEMRINATOR.length(); i++){
-            if (data[offset+i] != INVENTORY_TEMRINATOR.charAt(i))
-                return false;
-        }
-
-        return true;
-    }
 
     public static Metadata parse(byte[] metadata, int length){
 
         Metadata md = new Metadata();
+
+
+        if (length <= 1){
+            //no data to parse
+            return md;
+        }
+
 
         int offset = 0;
 
@@ -70,14 +76,25 @@ public class MetadataParser {
 
             }
 
-            while (offset < length - INVENTORY_TEMRINATOR.length()){
-                //search end inv marker
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(metadata, offset, length - offset)));
 
-                if (isInventoryTerminator(metadata, offset)){
-                    break;
+            while (true){
+
+                try {
+                    String line = reader.readLine();
+
+                    offset += line.length() + 1;
+
+                    //TODO: parse inventory
+
+                    if (line.equals(INVENTORY_TEMRINATOR)){
+                        break;
+                    }
+
+
+                } catch (IOException e) {
+                    throw new IllegalArgumentException("read-inventory", e);
                 }
-
-                offset++;
             }
 
         }

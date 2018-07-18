@@ -85,26 +85,21 @@ public class MapBlockParser {
 		block.mapData = mapData;
 		
 		dataOffset += inflater.getTotalIn();
-		
+
 		inflater = new Inflater();
 		inflater.setInput(data, dataOffset, data.length - dataOffset);
 
-		byte[] md = new byte[256000]; //TODO: limits?
+		block.metadata = new byte[1024*100]; //100k
 
 		try {
-			int mapMdLength = inflater.inflate(md);
-
-			//TODO: use stripped length
-			block.metadata = md;
-			block.metadataLength = mapMdLength;
-
-			//TODO: parse meta: https://github.com/minetest/minetest/blob/master/doc/world_format.txt#L330
+			//Dummy inflation to get size
+			block.metadataLength = inflater.inflate(block.metadata);
+			dataOffset += inflater.getTotalIn();
 
 		} catch (Exception e){
 			throw new IllegalArgumentException(e);
 		}
 		
-		dataOffset += inflater.getTotalIn();
 
 		// Skip unused static objects
 		
