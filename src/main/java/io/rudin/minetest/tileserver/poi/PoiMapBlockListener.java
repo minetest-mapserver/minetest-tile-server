@@ -12,6 +12,7 @@ import io.rudin.minetest.tileserver.parser.Metadata;
 import io.rudin.minetest.tileserver.parser.MetadataParser;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.DSLContext;
+import org.jooq.Result;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -77,9 +78,6 @@ public class PoiMapBlockListener {
         int posx = (mapBlock.x * 16) + x;
         int posy = (mapBlock.y * 16) + y;
         int posz = (mapBlock.z * 16) + z;
-
-        //TODO: replace new values
-        //TODO: remove old poi
 
         PoiRecord poiRecord = ctx.newRecord(POI);
         poiRecord.setCategory(map.get("category"));
