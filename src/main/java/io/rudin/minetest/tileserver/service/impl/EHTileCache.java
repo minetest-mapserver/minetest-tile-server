@@ -23,7 +23,11 @@ public class EHTileCache implements TileCache {
     @Inject
     public EHTileCache(TileServerConfig cfg){
         this.cfg = cfg;
-        this.timestampMarker = new File(cfg.tileDirectory(), "timestampmarker-ehcache");
+        File tileDir = new File(cfg.tileDirectory());
+        if (!tileDir.isDirectory())
+            tileDir.mkdirs();
+
+        this.timestampMarker = new File(tileDir, "timestampmarker-ehcache");
 
         if (!timestampMarker.isFile()){
             try (OutputStream output = new FileOutputStream(timestampMarker)){
