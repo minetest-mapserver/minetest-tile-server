@@ -87,7 +87,7 @@ public interface TileServerConfig extends Config {
 	 */
 
 	@Key("tile.cache.impl")
-	@DefaultValue("EHCACHE")
+	@DefaultValue("FILE")
 	CacheType tileCacheType();
 
 	enum CacheType {

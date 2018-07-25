@@ -36,10 +36,10 @@ public class FileTileCache implements TileCache {
 
 	private final File timestampMarker;
 	
-	private File getFile(int x, int y, int z) {
+	private File getFile(int x, int y, int z, boolean mkParentDirs) {
 		
 		File dir = new File(baseDirectory, z + "/" + x);
-		if (!dir.isDirectory()) {
+		if (!dir.isDirectory() && mkParentDirs) {
 			dir.mkdirs();
 		}
 		
@@ -48,26 +48,26 @@ public class FileTileCache implements TileCache {
 	
 	@Override
 	public void put(int x, int y, int z, byte[] data) throws IOException {
-		StreamUtil.copyStream(new ByteArrayInputStream(data), new FileOutputStream(getFile(x, y, z)));
+		StreamUtil.copyStream(new ByteArrayInputStream(data), new FileOutputStream(getFile(x, y, z, true)));
 		timestampMarker.setLastModified(System.currentTimeMillis());
 	}
 
 	@Override
 	public byte[] get(int x, int y, int z) throws IOException {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		StreamUtil.copyStream(new FileInputStream(getFile(x, y, z)), output);
+		StreamUtil.copyStream(new FileInputStream(getFile(x, y, z, false)), output);
 		
 		return output.toByteArray();
 	}
 
 	@Override
 	public boolean has(int x, int y, int z) {
-		return getFile(x, y, z).isFile();
+		return getFile(x, y, z, false).isFile();
 	}
 
 	@Override
 	public void remove(int x, int y, int z) {
-		getFile(x, y, z).delete();
+		getFile(x, y, z, false).delete();
 	}
 
 	@Override
