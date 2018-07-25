@@ -84,7 +84,7 @@ public class DatabaseTileCache implements TileCache, Runnable {
         Optional<byte[]> optional = cache.getIfPresent(coordinate);
 
 
-        if (optional.isPresent()){
+        if (optional != null && optional.isPresent()){
             byte[] data = optional.get();
 
             if (data != null)
