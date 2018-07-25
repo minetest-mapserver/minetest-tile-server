@@ -45,10 +45,11 @@ public class TileRoute implements Route {
 		int y = Integer.parseInt(req.params(":y"));
 		int x = Integer.parseInt(req.params(":x"));
 
-		if (cache.has(x,y,z)) {
-			//check db cache
+		//check db cache
+		byte[] tile = cache.get(x, y, z);
+		if (tile != null) {
 			logger.debug("Serving tile from cache @ {}/{} zoom: {}", x,y,z);
-			return cache.get(x,y,z);
+			return tile;
 		}
 
 		logger.debug("Rendering tile @ {}/{} zoom: {}", x,y,z);
