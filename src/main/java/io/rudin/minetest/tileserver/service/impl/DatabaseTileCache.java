@@ -2,6 +2,9 @@ package io.rudin.minetest.tileserver.service.impl;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.LoadingCache;
+import io.rudin.minetest.tileserver.accessor.Coordinate;
+import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.qualifier.TileDB;
 import io.rudin.minetest.tileserver.service.TileCache;
@@ -13,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Optional;
 import java.util.concurrent.*;
 
 import static io.rudin.minetest.tileserver.tiledb.tables.Tiles.TILES;
@@ -32,7 +36,15 @@ public class DatabaseTileCache implements TileCache, Runnable {
             //Initial run
             executor.submit(this);
         }
+
+        this.cache = CacheBuilder.newBuilder()
+                .maximumSize(5000)
+                .expireAfterAccess(10, TimeUnit.MINUTES)
+                .build();
     }
+
+    private final Cache<Coordinate, Optional<byte[]>> cache;
+
 
     private final TileServerConfig cfg;
 
@@ -45,23 +57,12 @@ public class DatabaseTileCache implements TileCache, Runnable {
     @Override
     public void put(int x, int y, int z, byte[] data) {
 
-        TilesRecord record = ctx
-                .selectFrom(TILES)
-                .where(TILES.X.eq(x))
-                .and(TILES.Y.eq(y))
-                .and(TILES.Z.eq(z))
-                .fetchOne();
+        cache.put(new Coordinate(x,y,z), Optional.of(data));
 
-        if (record == null) {
-            //Insert
-            record = ctx.newRecord(TILES);
-            record.setX(x);
-            record.setY(y);
-            record.setZ(z);
-
-        }
-
-        //update
+        TilesRecord record = ctx.newRecord(TILES);
+        record.setX(x);
+        record.setY(y);
+        record.setZ(z);
         record.setTile(data);
         record.setMtime(System.currentTimeMillis());
 
@@ -79,6 +80,17 @@ public class DatabaseTileCache implements TileCache, Runnable {
     @Override
     public byte[] get(int x, int y, int z) {
 
+        Coordinate coordinate = new Coordinate(x,y,z);
+        Optional<byte[]> optional = cache.getIfPresent(coordinate);
+
+
+        if (optional.isPresent()){
+            byte[] data = optional.get();
+
+            if (data != null)
+                return data;
+        }
+
         return ctx
                 .select(TILES.TILE)
                 .from(TILES)
@@ -92,6 +104,12 @@ public class DatabaseTileCache implements TileCache, Runnable {
 
     @Override
     public boolean has(int x, int y, int z) {
+
+        Coordinate coordinate = new Coordinate(x,y,z);
+        Optional<byte[]> optional = cache.getIfPresent(coordinate);
+
+        if (optional != null)
+            return optional.isPresent();
 
         Integer count = ctx
                 .select(DSL.count())
@@ -108,6 +126,8 @@ public class DatabaseTileCache implements TileCache, Runnable {
 
     @Override
     public void remove(int x, int y, int z) {
+
+        cache.put(new Coordinate(x,y,z), Optional.empty());
 
         long start = System.currentTimeMillis();
 
