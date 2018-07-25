@@ -68,17 +68,15 @@ public class PoiMapBlockListener {
 
         MapBlock mapblock = event.mapblock;
 
+        //Clear mapblock listener's
+        ctx
+                .deleteFrom(POI)
+                .where(POI.POSX.eq(mapblock.x))
+                .and(POI.POSY.eq(mapblock.y))
+                .and(POI.POSZ.eq(mapblock.z))
+                .execute();
+
         if (mapblock.mapping.containsValue(POIBLOCK_NAME)){
-
-            //Clear mapblock listener's
-            ctx
-                    .deleteFrom(POI)
-                    .where(POI.POSX.eq(mapblock.x))
-                    .and(POI.POSY.eq(mapblock.y))
-                    .and(POI.POSZ.eq(mapblock.z))
-                    .execute();
-
-
 
             for (int x=0; x<16; x++){
                 for (int y=0; y<16; y++){

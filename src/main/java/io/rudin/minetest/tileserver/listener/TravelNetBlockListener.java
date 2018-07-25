@@ -66,15 +66,15 @@ public class TravelNetBlockListener {
 
         MapBlock mapblock = event.mapblock;
 
-        if (mapblock.mapping.containsValue(BLOCK_NAME)){
+        //Clear entries for this mapblock
+        ctx
+                .deleteFrom(TRAVELNET)
+                .where(TRAVELNET.POSX.eq(mapblock.x))
+                .and(TRAVELNET.POSY.eq(mapblock.y))
+                .and(TRAVELNET.POSZ.eq(mapblock.z))
+                .execute();
 
-            //Clear entries for this mapblock
-            ctx
-                    .deleteFrom(TRAVELNET)
-                    .where(TRAVELNET.POSX.eq(mapblock.x))
-                    .and(TRAVELNET.POSY.eq(mapblock.y))
-                    .and(TRAVELNET.POSZ.eq(mapblock.z))
-                    .execute();
+        if (mapblock.mapping.containsValue(BLOCK_NAME)){
 
             for (int x=0; x<16; x++){
                 for (int y=0; y<16; y++){
