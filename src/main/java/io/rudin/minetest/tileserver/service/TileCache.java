@@ -14,4 +14,6 @@ public interface TileCache {
 
 	long getLatestTimestamp();
 
+	void close();
+
 }

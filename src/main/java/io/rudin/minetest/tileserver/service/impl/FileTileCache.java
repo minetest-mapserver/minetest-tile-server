@@ -37,13 +37,19 @@ public class FileTileCache implements TileCache {
 	private final File timestampMarker;
 	
 	private File getFile(int x, int y, int z, boolean mkParentDirs) {
-		
-		File dir = new File(baseDirectory, z + "/" + x);
+
+		File dir = new File(baseDirectory, "" + z); // zoom 1-13
+
+		dir = new File(dir, "" + x % 1000); // x subdir
+		dir = new File(dir, "" + x); // x actual
+
+		dir = new File(dir, "" + y % 1000); // y subdir
+
 		if (!dir.isDirectory() && mkParentDirs) {
 			dir.mkdirs();
 		}
-		
-		return new File(dir, "" + y);
+
+		return new File(dir, "" + y); // y actual
 	}
 	
 	@Override
@@ -73,6 +79,11 @@ public class FileTileCache implements TileCache {
 	@Override
 	public long getLatestTimestamp() {
 		return timestampMarker.lastModified();
+	}
+
+	@Override
+	public void close() {
+
 	}
 
 }

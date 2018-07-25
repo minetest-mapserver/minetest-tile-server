@@ -149,4 +149,8 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("org.postgresql.Driver")
 	String tileDatabaseDriver();
 
+	@Key("tile.db.async")
+	@DefaultValue("false")
+	boolean tileDatabaseAsync();
+
 }

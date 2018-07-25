@@ -40,7 +40,7 @@ public class EHTileCache implements TileCache {
         }
 
 
-        PersistentCacheManager persistentCacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+        persistentCacheManager = CacheManagerBuilder.newCacheManagerBuilder()
                 .with(CacheManagerBuilder.persistence(new File(cfg.tileDirectory(), "ehcache")))
                 .withCache("cache",
                         CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, byte[].class,
@@ -52,9 +52,9 @@ public class EHTileCache implements TileCache {
                 .build(true);
 
         cache = persistentCacheManager.getCache("cache", String.class, byte[].class);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(persistentCacheManager::close));
     }
+
+    private final PersistentCacheManager persistentCacheManager;
 
     private final File timestampMarker;
 
@@ -63,7 +63,6 @@ public class EHTileCache implements TileCache {
     private final Cache<String, byte[]> cache;
 
     private String getKey(int x, int y, int z){
-        //TODO: long key
         return x + "/" + y + "/" + z;
     }
 
@@ -92,5 +91,10 @@ public class EHTileCache implements TileCache {
     @Override
     public long getLatestTimestamp() {
         return timestampMarker.lastModified();
+    }
+
+    @Override
+    public void close() {
+        persistentCacheManager.close();
     }
 }

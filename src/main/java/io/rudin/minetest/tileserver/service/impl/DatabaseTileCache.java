@@ -2,6 +2,7 @@ package io.rudin.minetest.tileserver.service.impl;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.qualifier.TileDB;
 import io.rudin.minetest.tileserver.service.TileCache;
 import io.rudin.minetest.tileserver.tiledb.tables.records.TilesRecord;
@@ -22,30 +23,22 @@ public class DatabaseTileCache implements TileCache, Runnable {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseTileCache.class);
 
     @Inject
-    public DatabaseTileCache(@TileDB DSLContext ctx, ScheduledExecutorService executor){
+    public DatabaseTileCache(@TileDB DSLContext ctx, ScheduledExecutorService executor, TileServerConfig cfg){
         this.ctx = ctx;
         this.executor = executor;
+        this.cfg = cfg;
 
-        //Initial run
-        executor.submit(this);
-
-        this.cache = CacheBuilder
-                .newBuilder()
-                .expireAfterWrite(10, TimeUnit.SECONDS)
-                .weakValues()
-                .maximumSize(500)
-                .build();
+        if (cfg.tileDatabaseAsync()) {
+            //Initial run
+            executor.submit(this);
+        }
     }
+
+    private final TileServerConfig cfg;
 
     private final ScheduledExecutorService executor;
 
-    private final Cache<String, byte[]> cache;
-
     private final DSLContext ctx;
-
-    private String getKey(int x, int y, int z){
-        return x + "/" + y + "/" + z;
-    }
 
     private LinkedBlockingQueue<TilesRecord> tileInsertQueue = new LinkedBlockingQueue<>();
 
@@ -72,19 +65,19 @@ public class DatabaseTileCache implements TileCache, Runnable {
         record.setTile(data);
         record.setMtime(System.currentTimeMillis());
 
-        tileInsertQueue.add(record);
+        if (cfg.tileDatabaseAsync()) {
+            tileInsertQueue.add(record);
+
+        } else {
+            insertOrupdate(record);
+
+        }
     }
 
 
 
     @Override
     public byte[] get(int x, int y, int z) {
-
-        String key = getKey(x, y, z);
-        byte[] data = cache.getIfPresent(key);
-
-        if (data != null)
-            return data;
 
         return ctx
                 .select(TILES.TILE)
@@ -97,15 +90,8 @@ public class DatabaseTileCache implements TileCache, Runnable {
     }
 
 
-    public boolean has(int x, int y, int z, boolean useCache) {
-
-        if (useCache) {
-            String key = getKey(x, y, z);
-            byte[] data = cache.getIfPresent(key);
-
-            if (data != null)
-                return true;
-        }
+    @Override
+    public boolean has(int x, int y, int z) {
 
         Integer count = ctx
                 .select(DSL.count())
@@ -119,16 +105,9 @@ public class DatabaseTileCache implements TileCache, Runnable {
     }
 
 
-    @Override
-    public boolean has(int x, int y, int z) {
-        return has(x,y,z,true);
-    }
 
     @Override
     public void remove(int x, int y, int z) {
-
-        String key = getKey(x, y, z);
-        cache.invalidate(key);
 
         long start = System.currentTimeMillis();
 
@@ -153,23 +132,30 @@ public class DatabaseTileCache implements TileCache, Runnable {
     }
 
     @Override
+    public void close() {
+
+    }
+
+    private void insertOrupdate(TilesRecord record){
+        ctx
+                .insertInto(TILES, record.fields())
+                .values(record.intoArray())
+                .onDuplicateKeyUpdate()
+                .set(TILES.X, record.getX())
+                .set(TILES.Y, record.getY())
+                .set(TILES.Z, record.getZ())
+                .set(TILES.MTIME, record.getMtime())
+                .set(TILES.TILE, record.getTile())
+                .execute();
+    }
+
+    @Override
     public void run() {
 
         try {
             while (true) {
-                //TODO: batch insert
                 TilesRecord record = tileInsertQueue.take();
-
-                ctx
-                        .insertInto(TILES, record.fields())
-                        .values(record.intoArray())
-                        .onDuplicateKeyUpdate()
-                        .set(TILES.X, record.getX())
-                        .set(TILES.Y, record.getY())
-                        .set(TILES.Z, record.getZ())
-                        .set(TILES.MTIME, record.getMtime())
-                        .set(TILES.TILE, record.getTile())
-                        .execute();
+                insertOrupdate(record);
             }
 
         } catch (InterruptedException e) {
