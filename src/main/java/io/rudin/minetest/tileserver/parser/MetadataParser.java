@@ -15,8 +15,10 @@ import java.util.Map;
  */
 public class MetadataParser {
 
-    private static final String INVENTORY_TEMRINATOR = "EndInventory";
+    private static final String INVENTORY_TERMINATOR = "EndInventory";
 
+    private static final String INVENTORY_END = "EndInventoryList";
+    private static final String INVENTORY_START = "List";
 
     public static Metadata parse(byte[] metadata, int length){
 
@@ -78,6 +80,15 @@ public class MetadataParser {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(metadata, offset, length - offset)));
 
+            Map<String, Inventory> inventoryMap = md.inventories.get(position);
+            if (inventoryMap == null){
+                inventoryMap = new HashMap<>();
+                md.inventories.put(position, inventoryMap);
+            }
+
+            String currentInventoryName = null;
+            Inventory currentInventory = null;
+
             while (true){
 
                 try {
@@ -85,11 +96,55 @@ public class MetadataParser {
 
                     offset += line.length() + 1;
 
-                    //TODO: parse inventory
+                    if (line.startsWith(INVENTORY_START)){
+                        String[] parts = line.split("[ ]");
 
-                    if (line.equals(INVENTORY_TEMRINATOR)){
-                        break;
+                        currentInventoryName = parts[1];
+                        currentInventory = new Inventory();
+
+                        inventoryMap.put(currentInventoryName, currentInventory);
+
+                        if (parts.length >= 3){
+                            currentInventory.size = Integer.parseInt(parts[2]);
+                        }
+
+                    } else if (line.equals(INVENTORY_END)){
+                        currentInventory = null;
+                        currentInventoryName = null;
+                    } else if (currentInventory != null) {
+                        //content
+
+                        Item item = new Item();
+                        currentInventory.items.add(item);
+
+                        if (line.startsWith("Item")) {
+                            String[] parts = line.split("[ ]");
+
+                            if (parts.length >= 2)
+                                item.name = parts[1];
+
+                            if (parts.length >= 3)
+                                item.count = Integer.parseInt(parts[2]);
+
+                            if (parts.length >= 4)
+                                item.wear = Integer.parseInt(parts[3]);
+                        }
+                    } else if (line.equals(INVENTORY_TERMINATOR)){
+                            break;
+
+                    } else {
+                        throw new IllegalArgumentException("malformed inventory: " + line);
+
                     }
+                    /*
+                    List foo 4
+                    Item default:sapling
+                    Item default:sword_stone 1 10647
+                    Item default:dirt 99
+                    Empty
+                    EndInventoryList
+                     */
+
 
 
                 } catch (IOException e) {

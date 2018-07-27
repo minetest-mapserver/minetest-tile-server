@@ -61,7 +61,11 @@ public class FileTileCache implements TileCache {
 	@Override
 	public byte[] get(int x, int y, int z) throws IOException {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		StreamUtil.copyStream(new FileInputStream(getFile(x, y, z, false)), output);
+		File file = getFile(x, y, z, false);
+		if (!file.isFile())
+			return null;
+
+		StreamUtil.copyStream(new FileInputStream(file), output);
 		
 		return output.toByteArray();
 	}

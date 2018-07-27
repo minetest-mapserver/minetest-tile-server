@@ -35,13 +35,13 @@ public class SmartShopBlockListener {
 
         int position = MapBlock.toPosition(x, y, z);
 
-        Map<String, String> map = metadata.map.get(position);
-
         int posx = (mapBlock.x * 16) + x;
         int posy = (mapBlock.y * 16) + y;
         int posz = (mapBlock.z * 16) + z;
 
-        System.out.println(map);//XXX
+
+
+        //System.out.println(metadata);//XXX
         //{owner=BuckarooBanzai, infotext=(Smartshop by BuckarooBanzai) Purchases left:
         //, ghost=1, state=0, type=1}
     }
