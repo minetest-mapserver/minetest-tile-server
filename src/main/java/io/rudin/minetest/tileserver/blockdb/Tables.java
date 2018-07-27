@@ -13,6 +13,7 @@ import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventories;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
 import io.rudin.minetest.tileserver.blockdb.tables.Poi;
+import io.rudin.minetest.tileserver.blockdb.tables.Protector;
 import io.rudin.minetest.tileserver.blockdb.tables.Travelnet;
 
 import javax.annotation.Generated;
@@ -75,6 +76,11 @@ public class Tables {
      * The table <code>poi</code>.
      */
     public static final Poi POI = io.rudin.minetest.tileserver.blockdb.tables.Poi.POI;
+
+    /**
+     * The table <code>protector</code>.
+     */
+    public static final Protector PROTECTOR = io.rudin.minetest.tileserver.blockdb.tables.Protector.PROTECTOR;
 
     /**
      * The table <code>travelnet</code>.

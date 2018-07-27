@@ -54,6 +54,7 @@ public class TileServer {
 		get("/travelnet", injector.getInstance(TravelnetRoute.class), json);
 		get("/missions", injector.getInstance(MissionsRoute.class), json);
 		get("/poi", injector.getInstance(PoiRoute.class), json);
+		get("/protector/:x/:y/:z", injector.getInstance(ProtectorRoute.class), json);
 
 		//Initialize web server
 		init();
@@ -80,6 +81,10 @@ public class TileServer {
 
 		if (cfg.parserFancyVendEnable()){
 			injector.getInstance(FancyVendAdminBlockListener.class).setup();
+		}
+
+		if (cfg.parserProtectorEnable()){
+			injector.getInstance(ProtectorMapBlockListener.class).setup();
 		}
 
 		ScheduledExecutorService executor = injector.getInstance(ScheduledExecutorService.class);

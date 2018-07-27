@@ -86,6 +86,10 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("false")
 	boolean parserFancyVendEnable();
 
+	@Key("block.parser.protector.enable")
+	@DefaultValue("true")
+	boolean parserProtectorEnable();
+
 	/*
 	tile cache stuff
 	 */

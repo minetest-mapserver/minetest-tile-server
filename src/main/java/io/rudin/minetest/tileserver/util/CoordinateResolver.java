@@ -49,6 +49,16 @@ public class CoordinateResolver {
 	public static class MapBlockCoordinateInfo {
 		public int x, z;
 		public double width, height; //in map-blocks
+
+		@Override
+		public String toString() {
+			return "MapBlockCoordinateInfo{" +
+					"x=" + x +
+					", z=" + z +
+					", width=" + width +
+					", height=" + height +
+					'}';
+		}
 	}
 	
 	/*
