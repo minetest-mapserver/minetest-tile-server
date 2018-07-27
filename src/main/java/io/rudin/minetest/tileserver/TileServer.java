@@ -7,17 +7,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
+import io.rudin.minetest.tileserver.blockdb.tables.records.MissionsRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.job.InitialTileRendererJob;
 import io.rudin.minetest.tileserver.job.UpdateChangedTilesJob;
 import io.rudin.minetest.tileserver.job.UpdatePlayerJob;
-import io.rudin.minetest.tileserver.listener.FancyVendAdminBlockListener;
-import io.rudin.minetest.tileserver.listener.SmartShopBlockListener;
+import io.rudin.minetest.tileserver.listener.*;
 import io.rudin.minetest.tileserver.module.ConfigModule;
 import io.rudin.minetest.tileserver.module.DBModule;
 import io.rudin.minetest.tileserver.module.ServiceModule;
-import io.rudin.minetest.tileserver.listener.PoiMapBlockListener;
-import io.rudin.minetest.tileserver.listener.TravelNetBlockListener;
 import io.rudin.minetest.tileserver.route.*;
 import io.rudin.minetest.tileserver.transformer.JsonTransformer;
 import io.rudin.minetest.tileserver.ws.WebSocketHandler;
@@ -54,6 +52,7 @@ public class TileServer {
 		get("/config", injector.getInstance(ConfigRoute.class), json);
 
 		get("/travelnet", injector.getInstance(TravelnetRoute.class), json);
+		get("/missions", injector.getInstance(MissionsRoute.class), json);
 		get("/poi", injector.getInstance(PoiRoute.class), json);
 
 		//Initialize web server
@@ -65,6 +64,10 @@ public class TileServer {
 		//Register listener mapblock listener
 		if (cfg.parserPoiEnable()) {
 			injector.getInstance(PoiMapBlockListener.class).setup();
+		}
+
+		if (cfg.parserMissionsEnable()){
+			injector.getInstance(MissionBlockListener.class).setup();
 		}
 
 		if (cfg.parserTravelnetEnable()){

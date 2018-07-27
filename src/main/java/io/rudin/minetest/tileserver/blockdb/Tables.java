@@ -7,6 +7,7 @@ package io.rudin.minetest.tileserver.blockdb;
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
 import io.rudin.minetest.tileserver.blockdb.tables.Chat;
 import io.rudin.minetest.tileserver.blockdb.tables.FlywaySchemaHistory;
+import io.rudin.minetest.tileserver.blockdb.tables.Missions;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventories;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
@@ -44,6 +45,11 @@ public class Tables {
      * The table <code>flyway_schema_history</code>.
      */
     public static final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = io.rudin.minetest.tileserver.blockdb.tables.FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
+
+    /**
+     * The table <code>missions</code>.
+     */
+    public static final Missions MISSIONS = io.rudin.minetest.tileserver.blockdb.tables.Missions.MISSIONS;
 
     /**
      * The table <code>player</code>.

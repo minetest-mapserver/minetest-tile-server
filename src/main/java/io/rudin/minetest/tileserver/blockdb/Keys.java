@@ -6,6 +6,7 @@ package io.rudin.minetest.tileserver.blockdb;
 
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
 import io.rudin.minetest.tileserver.blockdb.tables.FlywaySchemaHistory;
+import io.rudin.minetest.tileserver.blockdb.tables.Missions;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventories;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
@@ -14,6 +15,7 @@ import io.rudin.minetest.tileserver.blockdb.tables.Poi;
 import io.rudin.minetest.tileserver.blockdb.tables.Travelnet;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.FlywaySchemaHistoryRecord;
+import io.rudin.minetest.tileserver.blockdb.tables.records.MissionsRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerInventoriesRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerInventoryItemsRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerMetadataRecord;
@@ -47,6 +49,7 @@ public class Keys {
     // IDENTITY definitions
     // -------------------------------------------------------------------------
 
+    public static final Identity<MissionsRecord, Integer> IDENTITY_MISSIONS = Identities0.IDENTITY_MISSIONS;
     public static final Identity<PoiRecord, Integer> IDENTITY_POI = Identities0.IDENTITY_POI;
     public static final Identity<TravelnetRecord, Integer> IDENTITY_TRAVELNET = Identities0.IDENTITY_TRAVELNET;
 
@@ -74,6 +77,7 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     private static class Identities0 {
+        public static Identity<MissionsRecord, Integer> IDENTITY_MISSIONS = Internal.createIdentity(Missions.MISSIONS, Missions.MISSIONS.ID);
         public static Identity<PoiRecord, Integer> IDENTITY_POI = Internal.createIdentity(Poi.POI, Poi.POI.ID);
         public static Identity<TravelnetRecord, Integer> IDENTITY_TRAVELNET = Internal.createIdentity(Travelnet.TRAVELNET, Travelnet.TRAVELNET.ID);
     }

@@ -24,6 +24,11 @@ import org.jooq.impl.SequenceImpl;
 public class Sequences {
 
     /**
+     * The sequence <code>missions_id_seq</code>
+     */
+    public static final Sequence<Integer> MISSIONS_ID_SEQ = new SequenceImpl<Integer>("missions_id_seq", DefaultSchema.DEFAULT_SCHEMA, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
+
+    /**
      * The sequence <code>poi_id_seq</code>
      */
     public static final Sequence<Integer> POI_ID_SEQ = new SequenceImpl<Integer>("poi_id_seq", DefaultSchema.DEFAULT_SCHEMA, org.jooq.impl.SQLDataType.INTEGER.nullable(false));

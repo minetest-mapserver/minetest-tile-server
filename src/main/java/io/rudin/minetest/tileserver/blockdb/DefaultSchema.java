@@ -7,6 +7,7 @@ package io.rudin.minetest.tileserver.blockdb;
 import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
 import io.rudin.minetest.tileserver.blockdb.tables.Chat;
 import io.rudin.minetest.tileserver.blockdb.tables.FlywaySchemaHistory;
+import io.rudin.minetest.tileserver.blockdb.tables.Missions;
 import io.rudin.minetest.tileserver.blockdb.tables.Player;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventories;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
@@ -39,7 +40,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = 616453005;
+    private static final long serialVersionUID = -1367897755;
 
     /**
      * The reference instance of <code></code>
@@ -60,6 +61,11 @@ public class DefaultSchema extends SchemaImpl {
      * The table <code>flyway_schema_history</code>.
      */
     public final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = io.rudin.minetest.tileserver.blockdb.tables.FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
+
+    /**
+     * The table <code>missions</code>.
+     */
+    public final Missions MISSIONS = io.rudin.minetest.tileserver.blockdb.tables.Missions.MISSIONS;
 
     /**
      * The table <code>player</code>.
@@ -116,6 +122,7 @@ public class DefaultSchema extends SchemaImpl {
 
     private final List<Sequence<?>> getSequences0() {
         return Arrays.<Sequence<?>>asList(
+            Sequences.MISSIONS_ID_SEQ,
             Sequences.POI_ID_SEQ,
             Sequences.TRAVELNET_ID_SEQ);
     }
@@ -132,6 +139,7 @@ public class DefaultSchema extends SchemaImpl {
             Blocks.BLOCKS,
             Chat.CHAT,
             FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,
+            Missions.MISSIONS,
             Player.PLAYER,
             PlayerInventories.PLAYER_INVENTORIES,
             PlayerInventoryItems.PLAYER_INVENTORY_ITEMS,

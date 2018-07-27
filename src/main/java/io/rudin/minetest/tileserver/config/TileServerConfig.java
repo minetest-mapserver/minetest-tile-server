@@ -74,6 +74,10 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("true")
 	boolean parserTravelnetEnable();
 
+	@Key("block.parser.missions.enable")
+	@DefaultValue("true")
+	boolean parserMissionsEnable();
+
 	@Key("block.parser.smartshop.enable")
 	@DefaultValue("false")
 	boolean parserSmartshopEnable();
