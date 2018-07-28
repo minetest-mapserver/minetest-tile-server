@@ -44,10 +44,17 @@ public class TravelNetBlockListener {
         int posy = (mapBlock.y * 16) + y;
         int posz = (mapBlock.z * 16) + z;
 
+        String station = map.get("station_name");
+        String network = map.get("station_network");
+
+        if (station == null || network == null)
+            //unconfigured
+            return;
+
         TravelnetRecord record = ctx.newRecord(TRAVELNET);
-        record.setName(map.get("station_name"));
+        record.setName(station);
         record.setOwner(map.get("owner"));
-        record.setNetwork(map.get("station_network"));
+        record.setNetwork(network);
         record.setMtime(System.currentTimeMillis());
 
         record.setPosx(mapBlock.x);
