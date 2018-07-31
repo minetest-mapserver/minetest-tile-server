@@ -121,7 +121,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 			long diff = start - System.currentTimeMillis();
 
-			if (diff > 1000 && cfg.logQueryPerformance()){
+			if (diff > 500 && cfg.logQueryPerformance()){
 				logger.warn("updated-tiles-query took {} ms", diff);
 			}
 

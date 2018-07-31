@@ -5,9 +5,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import io.rudin.minetest.tileserver.config.TileServerConfig;
-import io.rudin.minetest.tileserver.module.LoggingExecuteListener;
 import org.jooq.DSLContext;
-import org.jooq.ExecuteListener;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
@@ -28,12 +26,7 @@ public class DSLContextProvider implements Provider<DSLContext> {
 	
 	@Override
 	public DSLContext get() {
-		DSLContext ctx = DSL.using(ds, SQLDialect.POSTGRES);
-
-		if (cfg.logQueryPerformance())
-			ctx.configuration().set(new LoggingExecuteListener());
-
-		return ctx;
+		return DSL.using(ds, SQLDialect.POSTGRES);
 	}
 
 }

@@ -1,6 +1,8 @@
 package io.rudin.minetest.tileserver;
 
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
 import java.util.Map;
@@ -8,6 +10,8 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 public class MapBlockParser {
+
+	private static final Logger logger = LoggerFactory.getLogger(MapBlockParser.class);
 
 	public static int readU16(byte[] data, int offset) {
 		return ((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff);
@@ -95,6 +99,11 @@ public class MapBlockParser {
 			//Dummy inflation to get size
 			block.metadataLength = inflater.inflate(block.metadata);
 			dataOffset += inflater.getTotalIn();
+
+
+			logger.debug("MapBlock length: {} Decompressed metadata size: {}",
+						data.length, block.metadataLength
+			);
 
 		} catch (Exception e){
 			throw new IllegalArgumentException(e);
