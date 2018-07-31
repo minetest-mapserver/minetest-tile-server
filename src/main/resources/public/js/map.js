@@ -73,18 +73,21 @@
     var playerLayer = L.layerGroup();
     var poiLayer = L.layerGroup();
     var travelnetLayer = L.layerGroup();
+    var missionLayer = L.layerGroup();
 
     L.control.layers({
         "Base": tileLayer
     }, {
         "Player": playerLayer,
         "POI": poiLayer,
-        "Travelnet": travelnetLayer
+        "Travelnet": travelnetLayer,
+        "Missions": missionLayer
     }).addTo(map);
 
     map.addLayer(poiLayer);
     map.addLayer(travelnetLayer);
     map.addLayer(playerLayer);
+    map.addLayer(missionLayer);
 
     //Export
     tileserver.map = map;
@@ -92,5 +95,6 @@
     tileserver.travelnetLayer = travelnetLayer;
     tileserver.playerLayer = playerLayer;
     tileserver.updateTile = updateTile;
+    tileserver.missionLayer = missionLayer;
 
 })(window.tileserver);
