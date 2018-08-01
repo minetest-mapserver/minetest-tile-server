@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.google.common.util.concurrent.Striped;
+import io.rudin.minetest.tileserver.accessor.Coordinate;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -45,14 +46,14 @@ public class TileRenderer {
 		this.cfg = cfg;
 
 		this.yCondition = BLOCKS.POSY.between(cfg.tilesMinY(), cfg.tilesMaxY());
-		this.lock = Striped.lazyWeakReadWriteLock(50);
+		this.lock = Striped.lazyWeakReadWriteLock(20);
 
 		ImageIO.setUseCache(false);
 	}
 
 
-	private String getKey(int x, int y, int z){
-		return x + "/" + y + "/" + z;
+	private Coordinate getKey(int x, int y, int z){
+		return new Coordinate(x,y,z);
 	}
 
 	private final Striped<ReadWriteLock> lock;
@@ -155,6 +156,7 @@ public class TileRenderer {
 	 */
 	public BufferedImage renderImage(int tileX, int tileY, int zoom) throws IllegalArgumentException, DataFormatException, IOException, ExecutionException {
 
+
 		//Check if binary cached, use cached version for rendering
 		if (cache.has(tileX, tileY, zoom)) {
 			byte[] data = cache.get(tileX, tileY, zoom);
@@ -164,21 +166,18 @@ public class TileRenderer {
 				return ImageIO.read(new ByteArrayInputStream(data));
 		}
 
-		/*
-		ReadWriteLock lock = getLock(tileX, tileY, zoom);
-		Lock writeLock = lock.writeLock();
-		writeLock.lock();
-		*/
+        ReadWriteLock lock = getLock(tileX, tileY, zoom);
 
 		try {
 
+			logger.debug("Locking {}/{}/{}", tileX, tileY, zoom);
+			//lock.writeLock().lock();
+
 			//re-check in critical section
-			/*
-			if (cache.has(tileX, tileY, zoom)) {
-				byte[] data = cache.get(tileX, tileY, zoom);
-				return ImageIO.read(new ByteArrayInputStream(data));
-			}
-			*/
+			//if (cache.has(tileX, tileY, zoom)) {
+			//	byte[] data = cache.get(tileX, tileY, zoom);
+			//	return ImageIO.read(new ByteArrayInputStream(data));
+			//}
 
 			final int HALF_TILE_PIXEL_SIZE = CoordinateResolver.TILE_PIXEL_SIZE / 2;
 
@@ -346,7 +345,8 @@ public class TileRenderer {
 			return image;
 
 		} finally {
-			//writeLock.unlock();
+            logger.debug("Unlocking {}/{}/{}", tileX, tileY, zoom);
+			//lock.writeLock().unlock();
 
 		}
 

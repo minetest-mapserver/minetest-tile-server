@@ -27,7 +27,7 @@ public class MapBlockAccessor extends CacheLoader<Coordinate, Optional<MapBlock>
 
         //TODO: disk based cache, ehcache
         this.cache = CacheBuilder.newBuilder()
-                .maximumSize(100)
+                .maximumSize(500)
                 .expireAfterAccess(10, TimeUnit.MINUTES)
                 .build(this);
     }
