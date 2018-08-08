@@ -6,6 +6,7 @@ import static io.rudin.minetest.tileserver.tiledb.tables.Tiles.TILES;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.rudin.minetest.tileserver.TileRenderer;
 import io.rudin.minetest.tileserver.accessor.BlocksRecordAccessor;
 import io.rudin.minetest.tileserver.accessor.Coordinate;
 import io.rudin.minetest.tileserver.accessor.MapBlockAccessor;
@@ -33,10 +34,13 @@ public class UpdateChangedTilesJob implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(UpdateChangedTilesJob.class);
 
 	@Inject
-	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg, MapBlockAccessor mapBlockAccessor, BlocksRecordAccessor blocksRecordAccessor) {
+	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg,
+								 MapBlockAccessor mapBlockAccessor, BlocksRecordAccessor blocksRecordAccessor,
+								 TileRenderer tileRenderer) {
 		this.ctx = ctx;
 		this.tileCache = tileCache;
 		this.eventBus = eventBus;
+		this.tileRenderer = tileRenderer;
 
 		this.yCondition = BLOCKS.POSY.between(cfg.tilesMinY(), cfg.tilesMaxY());
 		this.cfg = cfg;
@@ -44,6 +48,8 @@ public class UpdateChangedTilesJob implements Runnable {
 		this.mapBlockAccessor = mapBlockAccessor;
 		this.blocksRecordAccessor = blocksRecordAccessor;
 	}
+
+	private final TileRenderer tileRenderer;
 
 	private final MapBlockAccessor mapBlockAccessor;
 
@@ -157,6 +163,33 @@ public class UpdateChangedTilesJob implements Runnable {
 						invalidatedTiles++;
 						tileCache.remove(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
 
+						updatedTileKeys.add(tileKey);
+					}
+
+				}
+			}
+
+			updatedTileKeys.clear();
+
+			//Second run with rendering
+			for (BlocksRecord record : blocks) {
+
+				Integer x = record.getPosx();
+				Integer z = record.getPosz();
+
+				TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
+
+				for (int i = CoordinateResolver.MAX_ZOOM; i >= CoordinateResolver.MIN_ZOOM; i--) {
+					TileInfo zoomedTile = tileInfo.toZoom(i);
+					String tileKey = getTileKey(zoomedTile);
+
+					if (!updatedTileKeys.contains(tileKey)) {
+
+						if (cfg.tileRenderingStartegy() == TileServerConfig.TileRenderingStrategy.ASAP){
+							//Generate tiles now
+							tileRenderer.render(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
+						}
+
 						EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
 						event.x = zoomedTile.x;
 						event.y = zoomedTile.y;
@@ -169,7 +202,6 @@ public class UpdateChangedTilesJob implements Runnable {
 					}
 
 				}
-
 
 			}
 

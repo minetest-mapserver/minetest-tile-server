@@ -91,6 +91,22 @@ public interface TileServerConfig extends Config {
 	boolean parserProtectorEnable();
 
 	/*
+	Tile rendering strategy
+	 */
+
+	@Key("tile.rendering.strategy")
+	@DefaultValue("ON_DEMAND")
+	TileRenderingStrategy tileRenderingStartegy();
+
+	enum TileRenderingStrategy {
+		//When tiles are viewed in browser
+		ON_DEMAND,
+
+		//When tiles change
+		ASAP
+	}
+
+	/*
 	tile cache stuff
 	 */
 
