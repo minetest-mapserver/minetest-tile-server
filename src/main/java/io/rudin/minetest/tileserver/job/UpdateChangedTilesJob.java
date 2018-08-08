@@ -127,12 +127,19 @@ public class UpdateChangedTilesJob implements Runnable {
 
 			long diff = start - System.currentTimeMillis();
 
+			boolean renderImmediately = cfg.tileRenderingStartegy() == TileServerConfig.TileRenderingStrategy.ASAP;
+
 			if (diff > 500 && cfg.logQueryPerformance()){
 				logger.warn("updated-tiles-query took {} ms", diff);
 			}
 
 			if (blocks.size() == LIMIT) {
 				logger.warn("Got max-blocks ({}) from update-queue", LIMIT);
+
+				if (renderImmediately){
+					logger.warn("Disabling immediate rendering strategy for current run!");
+					renderImmediately = false;
+				}
 			}
 
 			logger.debug("Got {} updated blocks", blocks.size());
@@ -185,7 +192,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 					if (!updatedTileKeys.contains(tileKey)) {
 
-						if (cfg.tileRenderingStartegy() == TileServerConfig.TileRenderingStrategy.ASAP){
+						if (renderImmediately){
 							//Generate tiles now
 							tileRenderer.render(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
 						}
