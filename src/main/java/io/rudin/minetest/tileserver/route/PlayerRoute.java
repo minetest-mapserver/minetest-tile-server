@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.rudin.minetest.tileserver.accessor.BlocksRecordAccessor;
+import io.rudin.minetest.tileserver.accessor.PlayerInfoAccessor;
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.PlayerMetadata;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.entity.PlayerInfo;
@@ -29,14 +30,14 @@ public class PlayerRoute implements Route {
 	private static final Logger logger = LoggerFactory.getLogger(PlayerRoute.class);
 
 	@Inject
-	public PlayerRoute(DSLContext ctx, TileServerConfig cfg) {
-		this.ctx = ctx;
+	public PlayerRoute(PlayerInfoAccessor playerInfoAccessor, TileServerConfig cfg) {
+		this.playerInfoAccessor = playerInfoAccessor;
 		this.cfg = cfg;
 	}
 
 	private final TileServerConfig cfg;
 
-	private final DSLContext ctx;
+	private final PlayerInfoAccessor playerInfoAccessor;
 	
 	@Override
 	public Object handle(Request request, Response response) throws Exception {
@@ -46,31 +47,7 @@ public class PlayerRoute implements Route {
 
 		Timestamp ts = new Timestamp(System.currentTimeMillis() - (3600L*1000L));
 
-		List<Player> players = ctx
-				.selectFrom(PLAYER)
-				.where(PLAYER.MODIFICATION_DATE.ge(ts))
-				.fetch()
-				.into(Player.class);
-
-		List<PlayerInfo> list = new ArrayList<>();
-
-		for (Player player: players) {
-
-			List<PlayerMetadata> metadata = ctx
-					.selectFrom(PLAYER_METADATA)
-					.where(PLAYER_METADATA.PLAYER.eq(player.getName()))
-					.fetchInto(PlayerMetadata.class);
-
-			list.add(new PlayerInfo(player, metadata));
-		}
-
-		long diff = System.currentTimeMillis() - start;
-
-		if (diff > 250 && cfg.logQueryPerformance()){
-			logger.warn("getTopyDownYStride took {} ms", diff);
-		}
-
-		return list;
+		return playerInfoAccessor.getPlayersSince(ts);
 	}
 
 }

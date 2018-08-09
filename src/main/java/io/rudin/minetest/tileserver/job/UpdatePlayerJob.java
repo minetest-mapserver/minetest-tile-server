@@ -1,5 +1,6 @@
 package io.rudin.minetest.tileserver.job;
 
+import io.rudin.minetest.tileserver.accessor.PlayerInfoAccessor;
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Player;
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.PlayerMetadata;
 import io.rudin.minetest.tileserver.entity.PlayerInfo;
@@ -27,14 +28,17 @@ public class UpdatePlayerJob implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(UpdatePlayerJob.class);
 
     @Inject
-    public UpdatePlayerJob(DSLContext ctx, EventBus eventBus){
+    public UpdatePlayerJob(DSLContext ctx, EventBus eventBus, PlayerInfoAccessor playerInfoAccessor){
         this.ctx = ctx;
         this.eventBus = eventBus;
+        this.playerInfoAccessor = playerInfoAccessor;
     }
 
     private final DSLContext ctx;
 
     private final EventBus eventBus;
+
+    private final PlayerInfoAccessor playerInfoAccessor;
 
     private Timestamp timestamp = null;
 
@@ -58,31 +62,19 @@ public class UpdatePlayerJob implements Runnable {
                 logger.debug("Fetched last timestamp: {}", timestamp);
             }
 
-            List<Player> players = ctx
-                    .selectFrom(PLAYER)
-                    .where(PLAYER.MODIFICATION_DATE.gt(timestamp))
-                    .fetch()
-                    .into(Player.class);
+            List<PlayerInfo> players = playerInfoAccessor.getPlayersSince(timestamp);
 
+            for (PlayerInfo player : players) {
 
-            for (Player player : players) {
-
-                Timestamp modificationDate = player.getModificationDate();
+                Timestamp modificationDate = player.getPlayer().getModificationDate();
 
                 if (modificationDate.after(timestamp)) {
                     //Rember newest modification date
                     this.timestamp = modificationDate;
                 }
 
-                List<PlayerMetadata> metadata = ctx
-                        .selectFrom(PLAYER_METADATA)
-                        .where(PLAYER_METADATA.PLAYER.eq(player.getName()))
-                        .fetchInto(PlayerMetadata.class);
-
-                PlayerInfo info = new PlayerInfo(player, metadata);
-
                 EventBus.PlayerMovedEvent event = new EventBus.PlayerMovedEvent();
-                event.info = info;
+                event.info = player;
                 eventBus.post(event);
             }
 
