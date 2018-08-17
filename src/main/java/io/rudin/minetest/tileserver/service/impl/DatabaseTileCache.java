@@ -22,7 +22,7 @@ import java.util.concurrent.*;
 import static io.rudin.minetest.tileserver.tiledb.tables.Tiles.TILES;
 
 @Singleton
-public class DatabaseTileCache implements TileCache, Runnable {
+public class DatabaseTileCache implements TileCache {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseTileCache.class);
 
@@ -32,19 +32,7 @@ public class DatabaseTileCache implements TileCache, Runnable {
         this.executor = executor;
         this.cfg = cfg;
 
-        if (cfg.tileDatabaseAsync()) {
-            //Initial run
-            executor.submit(this);
-        }
-
-        this.cache = CacheBuilder.newBuilder()
-                .maximumSize(5000)
-                .expireAfterAccess(10, TimeUnit.MINUTES)
-                .build();
     }
-
-    private final Cache<Coordinate, Optional<byte[]>> cache;
-
 
     private final TileServerConfig cfg;
 
@@ -52,44 +40,24 @@ public class DatabaseTileCache implements TileCache, Runnable {
 
     private final DSLContext ctx;
 
-    private LinkedBlockingQueue<TilesRecord> tileInsertQueue = new LinkedBlockingQueue<>();
-
     @Override
-    public void put(int x, int y, int z, byte[] data) {
-
-        cache.put(new Coordinate(x,y,z), Optional.of(data));
+    public void put(int layerId, int x, int y, int z, byte[] data) {
 
         TilesRecord record = ctx.newRecord(TILES);
+        record.setLayerid(layerId);
         record.setX(x);
         record.setY(y);
         record.setZ(z);
         record.setTile(data);
         record.setMtime(System.currentTimeMillis());
 
-        if (cfg.tileDatabaseAsync()) {
-            tileInsertQueue.add(record);
-
-        } else {
-            insertOrupdate(record);
-
-        }
+        insertOrupdate(record);
     }
 
 
 
     @Override
-    public byte[] get(int x, int y, int z) {
-
-        Coordinate coordinate = new Coordinate(x,y,z);
-        Optional<byte[]> optional = cache.getIfPresent(coordinate);
-
-
-        if (optional != null && optional.isPresent()){
-            byte[] data = optional.get();
-
-            if (data != null)
-                return data;
-        }
+    public byte[] get(int layerId, int x, int y, int z) {
 
         return ctx
                 .select(TILES.TILE)
@@ -97,19 +65,14 @@ public class DatabaseTileCache implements TileCache, Runnable {
                 .where(TILES.X.eq(x))
                 .and(TILES.Y.eq(y))
                 .and(TILES.Z.eq(z))
+                .and(TILES.LAYERID.eq(layerId))
                 .fetchOne(TILES.TILE);
 
     }
 
 
     @Override
-    public boolean has(int x, int y, int z) {
-
-        Coordinate coordinate = new Coordinate(x,y,z);
-        Optional<byte[]> optional = cache.getIfPresent(coordinate);
-
-        if (optional != null)
-            return optional.isPresent();
+    public boolean has(int layerId, int x, int y, int z) {
 
         Integer count = ctx
                 .select(DSL.count())
@@ -117,6 +80,7 @@ public class DatabaseTileCache implements TileCache, Runnable {
                 .where(TILES.X.eq(x))
                 .and(TILES.Y.eq(y))
                 .and(TILES.Z.eq(z))
+                .and(TILES.LAYERID.eq(layerId))
                 .fetchOne(DSL.count());
 
         return count > 0;
@@ -125,9 +89,8 @@ public class DatabaseTileCache implements TileCache, Runnable {
 
 
     @Override
-    public void remove(int x, int y, int z) {
+    public void remove(int layerId, int x, int y, int z) {
 
-        cache.put(new Coordinate(x,y,z), Optional.empty());
 
         long start = System.currentTimeMillis();
 
@@ -135,6 +98,7 @@ public class DatabaseTileCache implements TileCache, Runnable {
                 .where(TILES.X.eq(x))
                 .and(TILES.Y.eq(y))
                 .and(TILES.Z.eq(z))
+                .and(TILES.LAYERID.eq(layerId))
                 .execute();
 
         long diff = System.currentTimeMillis() - start;
@@ -164,28 +128,10 @@ public class DatabaseTileCache implements TileCache, Runnable {
                 .set(TILES.X, record.getX())
                 .set(TILES.Y, record.getY())
                 .set(TILES.Z, record.getZ())
+                .set(TILES.LAYERID, record.getLayerid())
                 .set(TILES.MTIME, record.getMtime())
                 .set(TILES.TILE, record.getTile())
                 .execute();
     }
 
-    @Override
-    public void run() {
-
-        try {
-            while (true) {
-                TilesRecord record = tileInsertQueue.take();
-                insertOrupdate(record);
-            }
-
-        } catch (InterruptedException e) {
-            logger.error("run", e);
-
-        } catch (RuntimeException e){
-            logger.error("run", e);
-
-            //re-schedule
-            executor.schedule(this, 500, TimeUnit.MILLISECONDS);
-        }
-    }
 }

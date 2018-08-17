@@ -4,6 +4,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.rudin.minetest.tileserver.TileRenderer;
+import io.rudin.minetest.tileserver.config.Layer;
+import io.rudin.minetest.tileserver.config.LayerConfig;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.service.TileCache;
 import org.slf4j.Logger;
@@ -12,6 +14,8 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -23,11 +27,16 @@ public class TileRoute implements Route {
 	private static final Logger logger = LoggerFactory.getLogger(TileRoute.class);
 
 	@Inject
-	public TileRoute(TileRenderer renderer, TileServerConfig cfg, TileCache cache) {
+	public TileRoute(TileRenderer renderer, TileServerConfig cfg, TileCache cache, LayerConfig layerConfig) {
 		this.renderer = renderer;
 		this.cache = cache;
 		this.cfg = cfg;
+
+		for (Layer layer: layerConfig.layers)
+			layerMap.put(layer.id, layer);
 	}
+
+	private final Map<Integer, Layer> layerMap = new HashMap<>();
 
 	private final TileRenderer renderer;
 
@@ -44,9 +53,15 @@ public class TileRoute implements Route {
 		int z = Integer.parseInt(req.params(":z"));
 		int y = Integer.parseInt(req.params(":y"));
 		int x = Integer.parseInt(req.params(":x"));
+		int layerid = Integer.parseInt(req.params(":layerid"));
+
+		Layer layer = layerMap.get(layerid);
+
+		if (layer == null)
+			throw new IllegalArgumentException("layer not found: " + layerid);
 
 		//check db cache
-		byte[] tile = cache.get(x, y, z);
+		byte[] tile = cache.get(layerid, x, y, z);
 		if (tile != null) {
 			logger.debug("Serving tile from cache @ {}/{} zoom: {}", x,y,z);
 			return tile;
@@ -60,7 +75,7 @@ public class TileRoute implements Route {
 			}
 
 			entryCount.incrementAndGet();
-			return renderer.render(x, y, z);
+			return renderer.render(layer,x, y, z);
 
 		} finally {
 			entryCount.decrementAndGet();

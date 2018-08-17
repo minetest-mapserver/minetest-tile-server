@@ -20,6 +20,7 @@ public interface EventBus {
     class TileChangedEvent {
         public int x,y,zoom;
         public int mapblockX, mapblockZ;
+        public int layerId;
     }
 
     class PlayerMovedEvent {

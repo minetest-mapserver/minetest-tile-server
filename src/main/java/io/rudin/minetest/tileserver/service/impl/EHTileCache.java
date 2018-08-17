@@ -62,30 +62,30 @@ public class EHTileCache implements TileCache {
 
     private final Cache<String, byte[]> cache;
 
-    private String getKey(int x, int y, int z){
-        return x + "/" + y + "/" + z;
+    private String getKey(int layerId, int x, int y, int z){
+        return layerId + "/" + x + "/" + y + "/" + z;
     }
 
 
     @Override
-    public void put(int x, int y, int z, byte[] data) throws IOException {
-        cache.put(getKey(x,y,z), data);
+    public void put(int layerId, int x, int y, int z, byte[] data) throws IOException {
+        cache.put(getKey(layerId, x,y,z), data);
         timestampMarker.setLastModified(System.currentTimeMillis());
     }
 
     @Override
-    public byte[] get(int x, int y, int z) throws IOException {
-        return cache.get(getKey(x,y,z));
+    public byte[] get(int layerId, int x, int y, int z) throws IOException {
+        return cache.get(getKey(layerId,x,y,z));
     }
 
     @Override
-    public boolean has(int x, int y, int z) {
-        return cache.containsKey(getKey(x,y,z));
+    public boolean has(int layerId, int x, int y, int z) {
+        return cache.containsKey(getKey(layerId, x,y,z));
     }
 
     @Override
-    public void remove(int x, int y, int z) {
-        cache.remove(getKey(x,y,z));
+    public void remove(int layerId, int x, int y, int z) {
+        cache.remove(getKey(layerId,x,y,z));
     }
 
     @Override

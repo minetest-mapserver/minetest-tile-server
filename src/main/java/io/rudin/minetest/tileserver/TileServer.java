@@ -47,7 +47,7 @@ public class TileServer {
 		JsonTransformer json = injector.getInstance(JsonTransformer.class);
 
 		webSocket("/ws", WebSocketHandler.class);
-		get("/tiles/:z/:x/:y", injector.getInstance(TileRoute.class));
+		get("/tiles/:layerid/:z/:x/:y", injector.getInstance(TileRoute.class));
 		get("/player", injector.getInstance(PlayerRoute.class), json);
 		get("/config", injector.getInstance(ConfigRoute.class), json);
 

@@ -2,6 +2,7 @@ package io.rudin.minetest.tileserver;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import io.rudin.minetest.tileserver.config.LayerConfig;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.module.ConfigModule;
 import io.rudin.minetest.tileserver.module.DBModule;
@@ -29,11 +30,13 @@ public class PerformanceTest {
 
         TileRenderer renderer = injector.getInstance(TileRenderer.class);
 
+        LayerConfig layerConfig = injector.getInstance(LayerConfig.class);
+
         final int x = 0, y = 0, zoom = 10;
 
 
         long start = System.currentTimeMillis();
-        byte[] tile = renderer.render(x,y,zoom);
+        byte[] tile = renderer.render(layerConfig.layers.get(0),x,y,zoom);
 
         long diff = System.currentTimeMillis() - start;
 

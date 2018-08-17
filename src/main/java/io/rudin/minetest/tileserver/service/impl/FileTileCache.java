@@ -36,10 +36,11 @@ public class FileTileCache implements TileCache {
 
 	private final File timestampMarker;
 	
-	private File getFile(int x, int y, int z, boolean mkParentDirs) {
+	private File getFile(int layerId, int x, int y, int z, boolean mkParentDirs) {
 
 		File dir = new File(baseDirectory, "" + z); // zoom 1-13
 
+		dir = new File(dir, "" + layerId); // layerID subdir
 		dir = new File(dir, "" + x % 1000); // x subdir
 		dir = new File(dir, "" + x); // x actual
 
@@ -53,15 +54,15 @@ public class FileTileCache implements TileCache {
 	}
 	
 	@Override
-	public void put(int x, int y, int z, byte[] data) throws IOException {
-		StreamUtil.copyStream(new ByteArrayInputStream(data), new FileOutputStream(getFile(x, y, z, true)));
+	public void put(int layerId, int x, int y, int z, byte[] data) throws IOException {
+		StreamUtil.copyStream(new ByteArrayInputStream(data), new FileOutputStream(getFile(layerId, x, y, z, true)));
 		timestampMarker.setLastModified(System.currentTimeMillis());
 	}
 
 	@Override
-	public byte[] get(int x, int y, int z) throws IOException {
+	public byte[] get(int layerId, int x, int y, int z) throws IOException {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		File file = getFile(x, y, z, false);
+		File file = getFile(layerId, x, y, z, false);
 		if (!file.isFile())
 			return null;
 
@@ -71,13 +72,13 @@ public class FileTileCache implements TileCache {
 	}
 
 	@Override
-	public boolean has(int x, int y, int z) {
-		return getFile(x, y, z, false).isFile();
+	public boolean has(int layerId, int x, int y, int z) {
+		return getFile(layerId, x, y, z, false).isFile();
 	}
 
 	@Override
-	public void remove(int x, int y, int z) {
-		getFile(x, y, z, false).delete();
+	public void remove(int layerId, int x, int y, int z) {
+		getFile(layerId, x, y, z, false).delete();
 	}
 
 	@Override

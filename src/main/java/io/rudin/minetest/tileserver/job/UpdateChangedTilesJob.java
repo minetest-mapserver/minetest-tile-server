@@ -207,6 +207,7 @@ public class UpdateChangedTilesJob implements Runnable {
 							}
 
 							EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
+							event.layerId = layer.id;
 							event.x = zoomedTile.x;
 							event.y = zoomedTile.y;
 							event.zoom = zoomedTile.zoom;
