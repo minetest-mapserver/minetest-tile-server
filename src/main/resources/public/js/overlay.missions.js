@@ -26,6 +26,11 @@
 
     }
 
+    tileserver.filterHeightCallbacks.push(function(from, to){
+        console.log(from ,to);//XXX
+        //TODO: filter missions
+    });
+
     function update(){
       m.request({ url: "missions" })
       .then(function(list){

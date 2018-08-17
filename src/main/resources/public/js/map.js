@@ -89,6 +89,17 @@ tileserver.start = function(cfg, layerConfig){
 
     L.control.layers(layers, tileserver.overlays).addTo(map);
 
+    map.on("baselayerchange", function(e){
+        var layer;
+        layerConfig.layers.forEach(function(l){ if (l.name == e.name) layer = l; })
+
+        console.log(layer);
+
+        tileserver.filterHeightCallbacks.forEach(function(cb){
+            cb(layer.from, layer.to)
+        });
+
+    });
 
     tileserver.defaultOverlays.forEach(function(overlay){
         map.addLayer(overlay);
