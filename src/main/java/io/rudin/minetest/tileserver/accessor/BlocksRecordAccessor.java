@@ -3,11 +3,8 @@ package io.rudin.minetest.tileserver.accessor;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import io.rudin.minetest.tileserver.MapBlock;
-import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
-import jdk.nashorn.internal.ir.Block;
 import org.jooq.DSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 

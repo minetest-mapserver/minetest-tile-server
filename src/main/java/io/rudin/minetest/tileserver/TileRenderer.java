@@ -113,7 +113,11 @@ public class TileRenderer {
 				logger.debug("Fail-fast, got zero mapblock count for x={}-{} z={}-{}", x1,x2, z1,z2);
 
 				byte[] data = WhiteTile.getPNG();
-				cache.put(layer.id, tileX, tileY, zoom, data);
+
+				if (zoom < 11) {
+					//Only cache white space in upper zoom levels
+					cache.put(layer.id, tileX, tileY, zoom, data);
+				}
 
 				return data;
 			}
