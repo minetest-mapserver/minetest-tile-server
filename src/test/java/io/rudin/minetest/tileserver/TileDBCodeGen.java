@@ -38,6 +38,7 @@ public class TileDBCodeGen {
 		Flyway flyway = new Flyway();
 		flyway.setSqlMigrationPrefix("TILEV");
 		flyway.setDataSource(jdbc.getUrl(), jdbc.getUsername(), jdbc.getPassword());
+		flyway.clean();
 		flyway.migrate();
 
 		GenerationTool.generate(cfg);

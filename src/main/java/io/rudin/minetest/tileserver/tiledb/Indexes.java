@@ -43,7 +43,7 @@ public class Indexes {
     private static class Indexes0 {
         public static Index FLYWAY_SCHEMA_HISTORY_PK = Internal.createIndex("flyway_schema_history_pk", FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, new OrderField[] { FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK }, true);
         public static Index FLYWAY_SCHEMA_HISTORY_S_IDX = Internal.createIndex("flyway_schema_history_s_idx", FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, new OrderField[] { FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.SUCCESS }, false);
-        public static Index TILES_PKEY = Internal.createIndex("tiles_pkey", Tiles.TILES, new OrderField[] { Tiles.TILES.X, Tiles.TILES.Y, Tiles.TILES.Z }, true);
+        public static Index TILES_PKEY = Internal.createIndex("tiles_pkey", Tiles.TILES, new OrderField[] { Tiles.TILES.X, Tiles.TILES.Y, Tiles.TILES.Z, Tiles.TILES.LAYERID }, true);
         public static Index TILES_TIME = Internal.createIndex("tiles_time", Tiles.TILES, new OrderField[] { Tiles.TILES.MTIME }, false);
     }
 }

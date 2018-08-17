@@ -52,6 +52,6 @@ public class Keys {
 
     private static class UniqueKeys0 {
         public static final UniqueKey<FlywaySchemaHistoryRecord> FLYWAY_SCHEMA_HISTORY_PK = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, "flyway_schema_history_pk", FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK);
-        public static final UniqueKey<TilesRecord> TILES_PKEY = Internal.createUniqueKey(Tiles.TILES, "tiles_pkey", Tiles.TILES.X, Tiles.TILES.Y, Tiles.TILES.Z);
+        public static final UniqueKey<TilesRecord> TILES_PKEY = Internal.createUniqueKey(Tiles.TILES, "tiles_pkey", Tiles.TILES.X, Tiles.TILES.Y, Tiles.TILES.Z, Tiles.TILES.LAYERID);
     }
 }

@@ -22,13 +22,14 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tiles implements Serializable {
 
-    private static final long serialVersionUID = -898920208;
+    private static final long serialVersionUID = 1841745208;
 
     private Integer x;
     private Integer y;
     private Integer z;
     private Long    mtime;
     private byte[]  tile;
+    private Integer layerid;
 
     public Tiles() {}
 
@@ -38,6 +39,7 @@ public class Tiles implements Serializable {
         this.z = value.z;
         this.mtime = value.mtime;
         this.tile = value.tile;
+        this.layerid = value.layerid;
     }
 
     public Tiles(
@@ -45,13 +47,15 @@ public class Tiles implements Serializable {
         Integer y,
         Integer z,
         Long    mtime,
-        byte[]  tile
+        byte[]  tile,
+        Integer layerid
     ) {
         this.x = x;
         this.y = y;
         this.z = z;
         this.mtime = mtime;
         this.tile = tile;
+        this.layerid = layerid;
     }
 
     public Integer getX() {
@@ -94,6 +98,14 @@ public class Tiles implements Serializable {
         this.tile = tile;
     }
 
+    public Integer getLayerid() {
+        return this.layerid;
+    }
+
+    public void setLayerid(Integer layerid) {
+        this.layerid = layerid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Tiles (");
@@ -103,6 +115,7 @@ public class Tiles implements Serializable {
         sb.append(", ").append(z);
         sb.append(", ").append(mtime);
         sb.append(", ").append("[binary...]");
+        sb.append(", ").append(layerid);
 
         sb.append(")");
         return sb.toString();

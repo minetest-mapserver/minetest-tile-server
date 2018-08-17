@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tiles extends TableImpl<TilesRecord> {
 
-    private static final long serialVersionUID = 330058274;
+    private static final long serialVersionUID = -1626029800;
 
     /**
      * The reference instance of <code>tiles</code>
@@ -77,6 +77,11 @@ public class Tiles extends TableImpl<TilesRecord> {
      * The column <code>tiles.tile</code>.
      */
     public final TableField<TilesRecord, byte[]> TILE = createField("tile", org.jooq.impl.SQLDataType.BLOB, this, "");
+
+    /**
+     * The column <code>tiles.layerid</code>.
+     */
+    public final TableField<TilesRecord, Integer> LAYERID = createField("layerid", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
      * Create a <code>tiles</code> table reference
