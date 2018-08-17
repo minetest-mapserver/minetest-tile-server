@@ -13,7 +13,9 @@ import javax.inject.Singleton;
 
 import io.rudin.minetest.tileserver.accessor.Coordinate;
 import io.rudin.minetest.tileserver.accessor.MapBlockAccessor;
+import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
+import io.rudin.minetest.tileserver.query.YQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,11 +40,11 @@ public class MapBlockRenderer {
 
 	private final ColorTable colorTable;
 
-	public void render(int x, int z, Graphics graphics) throws IllegalArgumentException, DataFormatException, ExecutionException {
-		render(x, z, graphics, 1);
+	public void render(Layer layer, int x, int z, Graphics graphics) throws IllegalArgumentException, DataFormatException, ExecutionException {
+		render(layer, x, z, graphics, 1);
 	}
 
-	public void render(int mapBlockX, int mapBlockZ, Graphics graphics, int scale) throws IllegalArgumentException, DataFormatException, ExecutionException {
+	public void render(Layer layer, int mapBlockX, int mapBlockZ, Graphics graphics, int scale) throws IllegalArgumentException, DataFormatException, ExecutionException {
 
 		logger.debug("Rendering block: x={} z={}", mapBlockX, mapBlockZ);
 
@@ -51,9 +53,12 @@ public class MapBlockRenderer {
 
 		boolean[][] xz_coords = new boolean[16][16];
 
-		mapBlockAccessor.prefetchTopDownYStride(mapBlockX, mapBlockZ, cfg.tilesMinY(), cfg.tilesMaxY());
+		int fromY = YQueryBuilder.coordinateToMapBlock(layer.from);
+		int toY = YQueryBuilder.coordinateToMapBlock(layer.to);
 
-		for (int blocky = cfg.tilesMaxY(); blocky>=cfg.tilesMinY(); blocky--){
+		mapBlockAccessor.prefetchTopDownYStride(mapBlockX, mapBlockZ, fromY, toY);
+
+		for (int blocky = toY; blocky>=fromY; blocky--){
 			Optional<MapBlock> optional = mapBlockAccessor.get(new Coordinate(mapBlockX, blocky, mapBlockZ));
 
 			if (!optional.isPresent())

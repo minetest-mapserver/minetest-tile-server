@@ -2,7 +2,10 @@ package io.rudin.minetest.tileserver;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
+import io.rudin.minetest.tileserver.config.Layer;
+import io.rudin.minetest.tileserver.config.LayerConfig;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
+import io.rudin.minetest.tileserver.query.YQueryBuilder;
 import org.aeonbits.owner.ConfigFactory;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -34,7 +37,11 @@ public class StaticTileGen {
 		DSLContext ctx = injector.getInstance(DSLContext.class);
 		TileRenderer tileRenderer = injector.getInstance(TileRenderer.class);
 
-		Condition yCondition = BLOCKS.POSY.between(cfg.tilesMinY(), cfg.tilesMaxY());
+		YQueryBuilder yQueryBuilder = injector.getInstance(YQueryBuilder.class);
+		LayerConfig layerConfig = injector.getInstance(LayerConfig.class);
+
+		Layer layer = layerConfig.layers.get(0);
+		Condition yCondition = yQueryBuilder.getCondition(layer);
 
 		Record2<Integer, Integer> result = ctx
 				.select(DSL.max(BLOCKS.POSX), DSL.min(BLOCKS.POSX))
@@ -75,7 +82,7 @@ public class StaticTileGen {
 
 
 					long start = System.currentTimeMillis();
-					tileRenderer.render(tileInfo.x, tileInfo.y, tileInfo.zoom);
+					tileRenderer.render(layer, tileInfo.x, tileInfo.y, tileInfo.zoom);
 					long diff = System.currentTimeMillis() - start;
 
 					System.out.println("Tile: " + tileInfo.x + "/" + tileInfo.y + " @ " + tileInfo.zoom + " took " + diff + " ms");

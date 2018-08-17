@@ -12,15 +12,6 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("8080")
 	int httPort();
 
-	//in map blocks
-	@Key("tiles.maxy")
-	@DefaultValue("10")
-	int tilesMaxY();
-
-	@Key("tiles.miny")
-	@DefaultValue("-1")
-	int tilesMinY();
-
 	/*
 	Tile renderer stuff
 	 */

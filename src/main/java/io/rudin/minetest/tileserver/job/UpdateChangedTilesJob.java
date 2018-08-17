@@ -11,8 +11,11 @@ import io.rudin.minetest.tileserver.accessor.BlocksRecordAccessor;
 import io.rudin.minetest.tileserver.accessor.Coordinate;
 import io.rudin.minetest.tileserver.accessor.MapBlockAccessor;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
+import io.rudin.minetest.tileserver.config.Layer;
+import io.rudin.minetest.tileserver.config.LayerConfig;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.qualifier.TileDB;
+import io.rudin.minetest.tileserver.query.YQueryBuilder;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.*;
 
@@ -36,18 +39,23 @@ public class UpdateChangedTilesJob implements Runnable {
 	@Inject
 	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg,
 								 MapBlockAccessor mapBlockAccessor, BlocksRecordAccessor blocksRecordAccessor,
-								 TileRenderer tileRenderer) {
+								 TileRenderer tileRenderer, YQueryBuilder yQueryBuilder, LayerConfig layerCfg) {
 		this.ctx = ctx;
 		this.tileCache = tileCache;
 		this.eventBus = eventBus;
 		this.tileRenderer = tileRenderer;
 
-		this.yCondition = BLOCKS.POSY.between(cfg.tilesMinY(), cfg.tilesMaxY());
+		this.yQueryBuilder = yQueryBuilder;
+		this.layerCfg = layerCfg;
 		this.cfg = cfg;
 
 		this.mapBlockAccessor = mapBlockAccessor;
 		this.blocksRecordAccessor = blocksRecordAccessor;
 	}
+
+	private final YQueryBuilder yQueryBuilder;
+
+	private final LayerConfig layerCfg;
 
 	private final TileRenderer tileRenderer;
 
@@ -66,8 +74,6 @@ public class UpdateChangedTilesJob implements Runnable {
 	private boolean running = false;
 
 	private Long latestTimestamp = null;
-
-	private final Condition yCondition;
 
 	private String getTileKey(TileInfo tile){
 		return "Tile:" + tile.x + "/" + tile.y + "/" + tile.zoom;
@@ -110,119 +116,123 @@ public class UpdateChangedTilesJob implements Runnable {
 
 			long start = System.currentTimeMillis();
 
-
 			running = true;
 			final int LIMIT = cfg.tilerendererUpdateMaxBlocks();
 
-			Result<BlocksRecord> blocks = ctx
-					.selectFrom(BLOCKS)
-					.where(BLOCKS.MTIME.gt(latestTimestamp))
-					.and(yCondition)
-					.orderBy(BLOCKS.MTIME.asc()) //oldest first
-					.limit(LIMIT)
-					.fetch();
+			for (Layer layer: layerCfg.layers) {
 
-			int count = blocks.size();
-			int invalidatedTiles = 0;
+				Condition yCondition = yQueryBuilder.getCondition(layer);
 
-			long diff = start - System.currentTimeMillis();
+				Result<BlocksRecord> blocks = ctx
+						.selectFrom(BLOCKS)
+						.where(BLOCKS.MTIME.gt(latestTimestamp))
+						.and(yCondition)
+						.orderBy(BLOCKS.MTIME.asc()) //oldest first
+						.limit(LIMIT)
+						.fetch();
 
-			boolean renderImmediately = cfg.tileRenderingStartegy() == TileServerConfig.TileRenderingStrategy.ASAP;
+				int count = blocks.size();
+				int invalidatedTiles = 0;
 
-			if (diff > 500 && cfg.logQueryPerformance()){
-				logger.warn("updated-tiles-query took {} ms", diff);
-			}
+				long diff = start - System.currentTimeMillis();
 
-			if (blocks.size() == LIMIT) {
-				logger.warn("Got max-blocks ({}) from update-queue", LIMIT);
+				boolean renderImmediately = cfg.tileRenderingStartegy() == TileServerConfig.TileRenderingStrategy.ASAP;
 
-				if (renderImmediately){
-					logger.warn("Disabling immediate rendering strategy for current run!");
-					renderImmediately = false;
-				}
-			}
-
-			logger.debug("Got {} updated blocks", blocks.size());
-
-			List<String> updatedTileKeys = new ArrayList<>();
-
-			for (BlocksRecord record : blocks) {
-
-				blocksRecordAccessor.update(record);
-				mapBlockAccessor.invalidate(new Coordinate(record));
-
-				Integer x = record.getPosx();
-				Integer z = record.getPosz();
-
-				if (record.getMtime() > latestTimestamp) {
-					//Update timestamp
-					latestTimestamp = record.getMtime();
+				if (diff > 500 && cfg.logQueryPerformance()) {
+					logger.warn("updated-tiles-query took {} ms", diff);
 				}
 
-				TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
+				if (blocks.size() == LIMIT) {
+					logger.warn("Got max-blocks ({}) from update-queue", LIMIT);
 
-				//remove all tiles in every zoom
-				for (int i = CoordinateResolver.MAX_ZOOM; i >= CoordinateResolver.MIN_ZOOM; i--) {
-					TileInfo zoomedTile = tileInfo.toZoom(i);
-					String tileKey = getTileKey(zoomedTile);
+					if (renderImmediately) {
+						logger.warn("Disabling immediate rendering strategy for current run!");
+						renderImmediately = false;
+					}
+				}
 
-					if (!updatedTileKeys.contains(tileKey)) {
-						invalidatedTiles++;
-						tileCache.remove(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
+				logger.debug("Got {} updated blocks", blocks.size());
 
-						updatedTileKeys.add(tileKey);
+				List<String> updatedTileKeys = new ArrayList<>();
+
+				for (BlocksRecord record : blocks) {
+
+					blocksRecordAccessor.update(record);
+					mapBlockAccessor.invalidate(new Coordinate(record));
+
+					Integer x = record.getPosx();
+					Integer z = record.getPosz();
+
+					if (record.getMtime() > latestTimestamp) {
+						//Update timestamp
+						latestTimestamp = record.getMtime();
 					}
 
-				}
-			}
+					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
 
-			updatedTileKeys.clear();
+					//remove all tiles in every zoom
+					for (int i = CoordinateResolver.MAX_ZOOM; i >= CoordinateResolver.MIN_ZOOM; i--) {
+						TileInfo zoomedTile = tileInfo.toZoom(i);
+						String tileKey = getTileKey(zoomedTile);
 
-			//Second run with rendering
-			for (BlocksRecord record : blocks) {
+						if (!updatedTileKeys.contains(tileKey)) {
+							invalidatedTiles++;
+							tileCache.remove(layer.id, zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
 
-				Integer x = record.getPosx();
-				Integer z = record.getPosz();
-
-				TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
-
-				for (int i = CoordinateResolver.MAX_ZOOM; i >= CoordinateResolver.MIN_ZOOM; i--) {
-					TileInfo zoomedTile = tileInfo.toZoom(i);
-					String tileKey = getTileKey(zoomedTile);
-
-					if (!updatedTileKeys.contains(tileKey)) {
-
-						if (renderImmediately){
-							//Generate tiles now
-							tileRenderer.render(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
+							updatedTileKeys.add(tileKey);
 						}
 
-						EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
-						event.x = zoomedTile.x;
-						event.y = zoomedTile.y;
-						event.zoom = zoomedTile.zoom;
-						event.mapblockX = x;
-						event.mapblockZ = z;
-						eventBus.post(event);
+					}
+				}
 
-						updatedTileKeys.add(tileKey);
+				updatedTileKeys.clear();
+
+				//Second run with rendering
+				for (BlocksRecord record : blocks) {
+
+					Integer x = record.getPosx();
+					Integer z = record.getPosz();
+
+					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
+
+					for (int i = CoordinateResolver.MAX_ZOOM; i >= CoordinateResolver.MIN_ZOOM; i--) {
+						TileInfo zoomedTile = tileInfo.toZoom(i);
+						String tileKey = getTileKey(zoomedTile);
+
+						if (!updatedTileKeys.contains(tileKey)) {
+
+							if (renderImmediately) {
+								//Generate tiles now
+								tileRenderer.render(layer, zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
+							}
+
+							EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
+							event.x = zoomedTile.x;
+							event.y = zoomedTile.y;
+							event.zoom = zoomedTile.zoom;
+							event.mapblockX = x;
+							event.mapblockZ = z;
+							eventBus.post(event);
+
+							updatedTileKeys.add(tileKey);
+						}
+
 					}
 
 				}
 
+				final String msg = "Tile update job took {} ms for {} blocks (invalidated {} tiles)";
+				final Object[] params = new Object[]{
+						System.currentTimeMillis() - start,
+						count,
+						invalidatedTiles
+				};
+
+				if (cfg.logTileUpdateTimings())
+					logger.info(msg, params);
+				else
+					logger.debug(msg, params);
 			}
-
-			final String msg = "Tile update job took {} ms for {} blocks (invalidated {} tiles)";
-			final Object[] params = new Object[]{
-					System.currentTimeMillis()-start,
-					count,
-					invalidatedTiles
-			};
-
-			if (cfg.logTileUpdateTimings())
-				logger.info(msg, params);
-			else
-				logger.debug(msg, params);
 
 		} catch(Exception e){
 			logger.error("tile-updater", e);

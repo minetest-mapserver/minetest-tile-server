@@ -4,13 +4,13 @@ import java.io.IOException;
 
 public interface TileCache {
 
-	void put(int x, int y, int z, byte[] data) throws IOException;
+	void put(int layerId, int x, int y, int z, byte[] data) throws IOException;
 	
-	byte[] get(int x, int y, int z) throws IOException;
+	byte[] get(int layerId, int x, int y, int z) throws IOException;
 
-	boolean has(int x, int y, int z);
+	boolean has(int layerId, int x, int y, int z);
 	
-	void remove(int x, int y, int z);
+	void remove(int layerId, int x, int y, int z);
 
 	long getLatestTimestamp();
 
