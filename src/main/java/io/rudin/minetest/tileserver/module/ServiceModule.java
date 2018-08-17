@@ -6,9 +6,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import com.google.inject.AbstractModule;
 
 import io.rudin.minetest.tileserver.ColorTable;
+import io.rudin.minetest.tileserver.config.LayerConfig;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.provider.ColorTableProvider;
 import io.rudin.minetest.tileserver.provider.ExecutorProvider;
+import io.rudin.minetest.tileserver.provider.LayerConfigProvider;
 import io.rudin.minetest.tileserver.service.EventBus;
 import io.rudin.minetest.tileserver.service.TileCache;
 import io.rudin.minetest.tileserver.service.impl.DatabaseTileCache;
@@ -42,5 +44,6 @@ public class ServiceModule extends AbstractModule {
 		bind(ColorTable.class).toProvider(ColorTableProvider.class);
 		bind(ExecutorService.class).toProvider(ExecutorProvider.class);
 		bind(ScheduledExecutorService.class).toProvider(ExecutorProvider.class);
+		bind(LayerConfig.class).toProvider(LayerConfigProvider.class);
 	}
 }
