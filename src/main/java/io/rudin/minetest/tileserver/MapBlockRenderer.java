@@ -68,7 +68,7 @@ public class MapBlockRenderer {
 
 			logger.trace("Checking blocky: {}", mapBlock.y);
 
-			if (mapBlock.isEmpty())
+			if (mapBlock.isEmpty() || (mapBlock.mapping.size() == 1 && mapBlock.mapping.containsValue("vacuum:vacuum")))
 				continue;
 
 			for (int x=0; x<16; x++) {
