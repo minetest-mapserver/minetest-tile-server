@@ -39,7 +39,7 @@
     updateHash();
 
     function getTileSource(x,y,zoom,cacheBust){
-        return "tiles/" + zoom + "/" + x + "/" + y + (cacheBust ? "?_=" + Date.now() : "");
+        return "tiles/0/" + zoom + "/" + x + "/" + y + (cacheBust ? "?_=" + Date.now() : "");
     }
 
     function getImageId(x,y,zoom){

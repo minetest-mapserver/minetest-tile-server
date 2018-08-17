@@ -6,6 +6,7 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
@@ -13,6 +14,7 @@ import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 @Singleton
 public class YQueryBuilder {
 
+    @Inject
     public YQueryBuilder(DSLContext ctx, LayerConfig cfg){
         this.cfg = cfg;
         this.ctx = ctx;
