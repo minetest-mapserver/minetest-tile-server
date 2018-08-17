@@ -1,6 +1,7 @@
 
 (function(tileserver){
 
+    var poiLayer = L.layerGroup();
 
     var playerMarkers = {}; // name -> L.Marker
 
@@ -17,8 +18,7 @@
           "<b>Category: </b> " + poi.category + "<br>" +
           "<b>Owner: </b> " + poi.owner + "<br>";
 
-        marker.bindPopup(popup).addTo(tileserver.poiLayer);
-
+        marker.bindPopup(popup).addTo(poiLayer);
     }
 
     function update(){
@@ -30,5 +30,8 @@
 
     //initial update
     update();
+
+    tileserver.overlays["POI"] = poiLayer;
+    tileserver.defaultOverlays.push(poiLayer);
 
 })(window.tileserver);

@@ -1,6 +1,5 @@
 
-(function(tileserver){
-
+tileserver.start = function(cfg, layerConfig){
 
     var crs = L.Util.extend({}, L.CRS.Simple, {
         //transformation: L.transformation(0.001, 0, -0.001, 0),
@@ -38,63 +37,64 @@
     map.on('moveend', updateHash)
     updateHash();
 
-    function getTileSource(x,y,zoom,cacheBust){
-        return "tiles/0/" + zoom + "/" + x + "/" + y + (cacheBust ? "?_=" + Date.now() : "");
+    function getTileSource(layerId, x,y,zoom,cacheBust){
+        return "tiles/" + layerId + "/" + zoom + "/" + x + "/" + y + (cacheBust ? "?_=" + Date.now() : "");
     }
 
-    function getImageId(x,y,zoom){
-        return "tile-" + x + "/" + y + "/" + zoom;
+    function getImageId(layerId, x, y, zoom){
+        return "tile-" + layerId + "/" + x + "/" + y + "/" + zoom;
     }
 
-    var RealtimeTileLayer = L.TileLayer.extend({
-      createTile: function(coords){
-        var tile = document.createElement('img');
-        tile.src = getTileSource(coords.x, coords.y, coords.z);
-        tile.id = getImageId(coords.x, coords.y, coords.z);
-        return tile;
-      }
-    });
-
+    function createTileLayer(layerId){
+        return L.TileLayer.extend({
+          createTile: function(coords){
+            var tile = document.createElement('img');
+            tile.src = getTileSource(layerId, coords.x, coords.y, coords.z);
+            tile.id = getImageId(layerId, coords.x, coords.y, coords.z);
+            return tile;
+          }
+        });
+    }
 
     function updateTile(data){
-        var id = getImageId(data.x, data.y, data.zoom);
+        var id = getImageId(data.layerId, data.x, data.y, data.zoom);
         var el = document.getElementById(id);
 
         if (el){
             //Update src attribute if img found
-            el.src = getTileSource(data.x, data.y, data.zoom, true);
+            el.src = getTileSource(data.layerId, data.x, data.y, data.zoom, true);
         }
     }
 
 
-    var tileLayer = new RealtimeTileLayer();
-    tileLayer.addTo(map);
+    tileserver.websocketCallbacks.push(function(event){
+        if (event.type === "tile-update"){
+            updateTile(event.data);
+        }
+    });
 
-    var playerLayer = L.layerGroup();
-    var poiLayer = L.layerGroup();
-    var travelnetLayer = L.layerGroup();
-    var missionLayer = L.layerGroup();
+    var layers = {};
+    var defaultLayer = true;
 
-    L.control.layers({
-        "Base": tileLayer
-    }, {
-        "Player": playerLayer,
-        "POI": poiLayer,
-        "Travelnet": travelnetLayer,
-        "Missions": missionLayer
-    }).addTo(map);
+    layerConfig.layers.forEach(function(layerDef){
+        var Layer = createTileLayer(layerDef.id);
+        var tileLayer = new Layer();
+        layers[layerDef.name] = tileLayer;
 
-    map.addLayer(poiLayer);
-    map.addLayer(travelnetLayer);
-    map.addLayer(playerLayer);
-    map.addLayer(missionLayer);
+        if (defaultLayer){
+            tileLayer.addTo(map);
+            defaultLayer = false;
+        }
+    });
+
+    L.control.layers(layers, tileserver.overlays).addTo(map);
+
+
+    tileserver.defaultOverlays.forEach(function(overlay){
+        map.addLayer(overlay);
+    });
 
     //Export
     tileserver.map = map;
-    tileserver.poiLayer = poiLayer;
-    tileserver.travelnetLayer = travelnetLayer;
-    tileserver.playerLayer = playerLayer;
-    tileserver.updateTile = updateTile;
-    tileserver.missionLayer = missionLayer;
 
-})(window.tileserver);
+}

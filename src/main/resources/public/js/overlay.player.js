@@ -9,6 +9,8 @@
         popupAnchor:  [0, -16]
     });
 
+    var playerLayer = L.layerGroup();
+
     var playerMarkers = {}; // name -> L.Marker
 
     function updatePlayer(info) {
@@ -38,7 +40,7 @@
         if (!marker){
           //Create marker
           marker = L.marker(latLng, {icon: PlayerIcon});
-          marker.bindPopup(popup).addTo(tileserver.playerLayer);
+          marker.bindPopup(popup).addTo(playerLayer);
           playerMarkers[player.name] = marker;
 
         } else {
@@ -60,7 +62,13 @@
     //initial player update
     updatePlayers();
 
-    //Export
-    tileserver.updatePlayer = updatePlayer;
+    tileserver.overlays["Player"] = playerLayer;
+    tileserver.defaultOverlays.push(playerLayer);
+
+    tileserver.websocketCallbacks.push(function(event){
+        if (event.type === "player-move"){
+            updatePlayer(event.data.info);
+        }
+    });
 
 })(window.tileserver);

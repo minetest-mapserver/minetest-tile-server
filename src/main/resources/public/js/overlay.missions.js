@@ -1,6 +1,7 @@
 
 (function(tileserver){
 
+    var missionLayer = L.layerGroup();
 
     var MissionIcon = L.icon({
         iconUrl: 'pics/mission_32px.png',
@@ -21,7 +22,7 @@
           "<b>Y: </b> " + mission.y + "<br>" +
           "<b>Z: </b> " + mission.z + "<br>";
 
-        marker.bindPopup(popup).addTo(tileserver.missionLayer);
+        marker.bindPopup(popup).addTo(missionLayer);
 
     }
 
@@ -31,6 +32,9 @@
         list.forEach(updateMission);
       });
     }
+
+    tileserver.overlays["Missions"] = missionLayer;
+    tileserver.defaultOverlays.push(missionLayer);
 
     //initial update
     update();

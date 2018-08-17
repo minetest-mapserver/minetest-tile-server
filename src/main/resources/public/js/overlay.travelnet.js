@@ -1,6 +1,7 @@
 
 (function(tileserver){
 
+    var travelnetLayer = L.layerGroup();
 
     var TravelnetIcon = L.icon({
         iconUrl: 'pics/travelnet_inv.png',
@@ -20,7 +21,7 @@
           "<b>Network: </b> " + travelnet.network + "<br>" +
           "<b>Owner: </b> " + travelnet.owner + "<br>";
 
-        marker.bindPopup(popup).addTo(tileserver.travelnetLayer);
+        marker.bindPopup(popup).addTo(travelnetLayer);
 
     }
 
@@ -30,6 +31,10 @@
         list.forEach(updateTravelnet);
       });
     }
+
+    tileserver.overlays["Travelnet"] = travelnetLayer;
+    tileserver.defaultOverlays.push(travelnetLayer);
+
 
     //initial update
     update();
