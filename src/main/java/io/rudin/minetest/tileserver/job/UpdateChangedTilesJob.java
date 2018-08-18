@@ -118,6 +118,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 			running = true;
 			final int LIMIT = cfg.tilerendererUpdateMaxBlocks();
+			long newTimestamp = latestTimestamp;
 
 			for (Layer layer: layerCfg.layers) {
 
@@ -163,9 +164,9 @@ public class UpdateChangedTilesJob implements Runnable {
 					Integer x = record.getPosx();
 					Integer z = record.getPosz();
 
-					if (record.getMtime() > latestTimestamp) {
+					if (record.getMtime() > newTimestamp) {
 						//Update timestamp
-						latestTimestamp = record.getMtime();
+						newTimestamp = record.getMtime();
 					}
 
 					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
@@ -184,6 +185,9 @@ public class UpdateChangedTilesJob implements Runnable {
 
 					}
 				}
+
+				//assign new timestamp
+				latestTimestamp = newTimestamp;
 
 				updatedTileKeys.clear();
 
