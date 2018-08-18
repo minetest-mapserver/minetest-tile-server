@@ -136,16 +136,16 @@ public class MapBlockRenderer {
 							int graphicX = x;
 							int graphicY = 15 - z;
 
-							if (leftAbove.isPresent())
+							if (isViewBlocking(leftAbove))
 								rgb.addComponent(-5);
 
-							if (topAbove.isPresent())
+							if (isViewBlocking(topAbove))
 								rgb.addComponent(-5);
 
-							if (!left.isPresent())
+							if (!isViewBlocking(left))
 								rgb.addComponent(5);
 
-							if (!top.isPresent())
+							if (!isViewBlocking(top))
 								rgb.addComponent(5);
 
 							graphics.setColor(rgb.toColor());
@@ -174,6 +174,17 @@ public class MapBlockRenderer {
 		if (foundBlocks != expectedBlocks) {
 			logger.debug("Only found {} blocks", foundBlocks);
 		}
+	}
+
+	private boolean isViewBlocking(Optional<String> optional){
+		if (!optional.isPresent())
+			return false;
+
+		if (optional.get().equals("vacuum:vacuum"))
+			return false;
+
+		//no vacuum, no air
+		return true;
 	}
 
 }
