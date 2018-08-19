@@ -6,6 +6,8 @@ import static io.rudin.minetest.tileserver.tiledb.tables.Tiles.TILES;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.prometheus.client.Counter;
+import io.prometheus.client.Histogram;
 import io.rudin.minetest.tileserver.TileRenderer;
 import io.rudin.minetest.tileserver.accessor.BlocksRecordAccessor;
 import io.rudin.minetest.tileserver.accessor.Coordinate;
@@ -35,6 +37,9 @@ import java.util.Map;
 public class UpdateChangedTilesJob implements Runnable {
 
 	private static final Logger logger = LoggerFactory.getLogger(UpdateChangedTilesJob.class);
+
+	static final Counter changedTileCounter = Counter.build()
+			.name("changed_tiles").help("Total changed tiles.").register();
 
 	@Inject
 	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg,
@@ -79,6 +84,10 @@ public class UpdateChangedTilesJob implements Runnable {
 		return "Tile:" + tile.x + "/" + tile.y + "/" + tile.zoom;
 	}
 
+	static final Histogram changedTilesTime = Histogram.build()
+			.name("update_changed_tiles_time_seconds").help("Tile update job time in seconds.").register();
+
+
 	@Override
 	public void run() {
 
@@ -112,6 +121,8 @@ public class UpdateChangedTilesJob implements Runnable {
 
 		}
 
+		Histogram.Timer timer = changedTilesTime.startTimer();
+
 		try {
 
 			long start = System.currentTimeMillis();
@@ -135,9 +146,11 @@ public class UpdateChangedTilesJob implements Runnable {
 				int count = blocks.size();
 				int invalidatedTiles = 0;
 
+				changedTileCounter.inc(count);
+
 				long diff = start - System.currentTimeMillis();
 
-				boolean renderImmediately = cfg.tileRenderingStartegy() == TileServerConfig.TileRenderingStrategy.ASAP;
+				boolean renderImmediately = cfg.tileRenderingStrategy() == TileServerConfig.TileRenderingStrategy.ASAP;
 
 				if (diff > 500 && cfg.logQueryPerformance()) {
 					logger.warn("updated-tiles-query took {} ms", diff);
@@ -245,7 +258,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 		} finally {
 			running = false;
-
+			timer.observeDuration();
 		}
 
 	}

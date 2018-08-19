@@ -16,6 +16,14 @@ public interface TileServerConfig extends Config {
 	Tile renderer stuff
 	 */
 
+	@Key("prometheus.enable")
+	@DefaultValue("false")
+	boolean prometheusEnable();
+
+	@Key("prometheus.port")
+	@DefaultValue("8081")
+	int prometheusPort();
+
 	//This should only be enabled once after a fresh install
 	@Key("tilerenderer.initialrendering.enable")
 	@DefaultValue("false")
@@ -87,7 +95,7 @@ public interface TileServerConfig extends Config {
 
 	@Key("tile.rendering.strategy")
 	@DefaultValue("ON_DEMAND")
-	TileRenderingStrategy tileRenderingStartegy();
+	TileRenderingStrategy tileRenderingStrategy();
 
 	enum TileRenderingStrategy {
 		//When tiles are viewed in browser
