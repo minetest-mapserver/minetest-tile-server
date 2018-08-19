@@ -8,6 +8,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import io.prometheus.client.exporter.HTTPServer;
+import io.prometheus.client.hotspot.DefaultExports;
 import io.rudin.minetest.tileserver.blockdb.tables.records.MissionsRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.job.InitialTileRendererJob;
@@ -48,6 +49,7 @@ public class TileServer {
 		HTTPServer promServer = null;
 		if (cfg.prometheusEnable()) {
 			promServer = new HTTPServer(cfg.prometheusPort());
+			DefaultExports.initialize();
 		}
 
 		JsonTransformer json = injector.getInstance(JsonTransformer.class);
