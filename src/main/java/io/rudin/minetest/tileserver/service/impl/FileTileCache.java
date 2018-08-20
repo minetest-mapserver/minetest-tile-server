@@ -38,9 +38,9 @@ public class FileTileCache implements TileCache {
 	
 	private File getFile(int layerId, int x, int y, int z, boolean mkParentDirs) {
 
-		File dir = new File(baseDirectory, "" + z); // zoom 1-13
+		File dir = new File(baseDirectory, "" + layerId); // layer id
 
-		dir = new File(dir, "" + layerId); // layerID subdir
+		dir = new File(dir, "" + z); // zoom 1-13
 		dir = new File(dir, "" + x % 1000); // x subdir
 		dir = new File(dir, "" + x); // x actual
 
