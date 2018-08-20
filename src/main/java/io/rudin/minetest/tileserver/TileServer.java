@@ -23,11 +23,14 @@ import io.rudin.minetest.tileserver.transformer.JsonTransformer;
 import io.rudin.minetest.tileserver.ws.WebSocketHandler;
 import io.rudin.minetest.tileserver.ws.WebSocketUpdater;
 import org.aeonbits.owner.ConfigFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static spark.Spark.*;
 
 public class TileServer {
 
+	private static final Logger logger = LoggerFactory.getLogger(TileServer.class);
 	
 	public static void main(String[] args) throws Exception {
 
@@ -42,12 +45,23 @@ public class TileServer {
 		
 		DBMigration dbMigration = injector.getInstance(DBMigration.class);
 		dbMigration.migrate();
-		
-		staticFileLocation("/public");
+
+		if (cfg.staticFilesLocation().isEmpty()) {
+			//Prod
+			staticFileLocation("/public");
+
+		} else {
+			//Static files specified, DEV mode
+			logger.warn("Using external static file location: '{}'", cfg.staticFilesLocation());
+			externalStaticFileLocation(cfg.staticFilesLocation());
+
+		}
+
 		port(cfg.httPort());
 
 		HTTPServer promServer = null;
 		if (cfg.prometheusEnable()) {
+			logger.info("Starting prometheus metrics server at port {}", cfg.prometheusPort());
 			promServer = new HTTPServer(cfg.prometheusPort());
 			DefaultExports.initialize();
 		}
