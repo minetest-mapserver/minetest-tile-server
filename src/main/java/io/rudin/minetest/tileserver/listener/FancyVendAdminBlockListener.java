@@ -30,6 +30,23 @@ public class FancyVendAdminBlockListener {
         eventBus.register(this);
     }
 
+    /*
+    {
+owner=admin,
+configured=true,
+settings=
+ return {["admin_vendor"] = true, ["depositor"] = false, ["split_incoming_stacks"] = false,
+ ["output_item"] = "currency:minegeld", ["quit"] = true, ["accept_worn_input"] = true, ["digiline_channel"] = "", ["output_item_qty"] = 1,
+ ["auto_sort"] = false, ["input_item"] = "default:coal_lump", ["currency_eject"] = false, ["accept_output_only"] = false, ["co_sellers"] = "",
+ ["accept_worn_output"] = true, ["banned_buyers"] = "", ["input_item_qty"] = 1, ["inactive_force"] = false},
+item=currency:minegeld,
+infotext=Admin Vendor trading 1 Coal Lump for 1 1 MineGeld Note (owned by admin),
+log=return {"Vendor placed by admin", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player ilai purchased 1 lots from this vendor.", "Player didi1 purchased 1 lots from this vendor.", "Player didi1 purchased 1 lots from this vendor.", "Player LalTilism purchased 1 lots from this vendor."},
+message=You have insufficient funds
+}
+
+     */
+
     private void register(MapBlock mapBlock, int x, int y, int z){
         Metadata metadata = mapBlock.getMetadata();
 
