@@ -73,6 +73,15 @@ tileserver.start = function(cfg, layerConfig){
         }
     });
 
+    function filterHeight(fromY, toY){
+        tileserver.currentHeight.from = fromY;
+        tileserver.currentHeight.to = toY;
+
+        tileserver.heightChangedCallbacks.forEach(function(cb){
+            cb(fromY, toY)
+        });
+    }
+
     var layers = {};
     var defaultLayer = true;
 
@@ -84,6 +93,7 @@ tileserver.start = function(cfg, layerConfig){
         if (defaultLayer){
             tileLayer.addTo(map);
             defaultLayer = false;
+            filterHeight(layerDef.from, layerDef.to);
         }
     });
 
@@ -93,12 +103,7 @@ tileserver.start = function(cfg, layerConfig){
         var layer;
         layerConfig.layers.forEach(function(l){ if (l.name == e.name) layer = l; })
 
-        console.log(layer);
-
-        tileserver.filterHeightCallbacks.forEach(function(cb){
-            cb(layer.from, layer.to)
-        });
-
+        filterHeight(layer.from, layer.to);
     });
 
     tileserver.defaultOverlays.forEach(function(overlay){

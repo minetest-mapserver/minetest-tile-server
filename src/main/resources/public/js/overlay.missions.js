@@ -12,6 +12,11 @@
     });
 
     function updateMission(mission) {
+
+        if (mission.y < tileserver.currentHeight.from || mission.y > tileserver.currentHeight.to)
+            //ignore block from different height
+            return;
+
         var marker = L.marker([mission.z - 16, mission.x], {icon: MissionIcon});
 
         var popup = "<h4>" + mission.name + "</h4><hr>" +
@@ -26,17 +31,17 @@
 
     }
 
-    tileserver.filterHeightCallbacks.push(function(from, to){
-        //console.log(from ,to);//XXX
-        //TODO: filter missions
-    });
-
     function update(){
       m.request({ url: "missions" })
       .then(function(list){
+        missionLayer.clearLayers();
         list.forEach(updateMission);
       });
     }
+
+    //update on height change
+    tileserver.heightChangedCallbacks.push(update);
+
 
     tileserver.overlays["Missions"] = missionLayer;
     tileserver.defaultOverlays.push(missionLayer);

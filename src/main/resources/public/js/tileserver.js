@@ -5,7 +5,11 @@ window.tileserver = {
 
     websocketCallbacks: [], //[fn(event),...]
 
-    filterHeightCallbacks: [], //[fn(fromY, toY), ... ]
+    heightChangedCallbacks: [], //[fn(fromY, toY), ... ]
+    currentHeight: {
+        from: 0,
+        to: 100
+    },
 
     overlays: {}, //name: Layer
     defaultOverlays: [], //Layer

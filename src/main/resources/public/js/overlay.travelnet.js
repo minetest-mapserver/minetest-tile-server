@@ -12,6 +12,12 @@
     });
 
     function updateTravelnet(travelnet) {
+
+
+        if (travelnet.y < tileserver.currentHeight.from || travelnet.y > tileserver.currentHeight.to)
+            //ignore block from different height
+            return;
+
         var marker = L.marker([travelnet.z - 16, travelnet.x], {icon: TravelnetIcon});
 
         var popup = "<h4>" + travelnet.name + "</h4><hr>" +
@@ -28,9 +34,14 @@
     function update(){
       m.request({ url: "travelnet" })
       .then(function(list){
+        travelnetLayer.clearLayers();
         list.forEach(updateTravelnet);
       });
     }
+
+    //update on height change
+    tileserver.heightChangedCallbacks.push(update);
+
 
     tileserver.overlays["Travelnet"] = travelnetLayer;
     tileserver.defaultOverlays.push(travelnetLayer);
