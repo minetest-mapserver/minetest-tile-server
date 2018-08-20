@@ -108,16 +108,17 @@ public class MetadataParser {
                             currentInventory.size = Integer.parseInt(parts[2]);
                         }
 
-                    } else if (line.equals(INVENTORY_END)){
+                    } else if (line.equals(INVENTORY_END)) {
                         currentInventory = null;
                         currentInventoryName = null;
+
                     } else if (currentInventory != null) {
                         //content
 
-                        Item item = new Item();
-                        currentInventory.items.add(item);
-
                         if (line.startsWith("Item")) {
+                            Item item = new Item();
+                            currentInventory.items.add(item);
+
                             String[] parts = line.split("[ ]");
 
                             if (parts.length >= 2)
