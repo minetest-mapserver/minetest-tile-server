@@ -74,6 +74,7 @@ public class TileServer {
 		get("/config", injector.getInstance(ConfigRoute.class), json);
 		get("/layers", injector.getInstance(LayerConfigRoute.class), json);
 
+		get("/shop", injector.getInstance(ShopRoute.class), json);
 		get("/travelnet", injector.getInstance(TravelnetRoute.class), json);
 		get("/missions", injector.getInstance(MissionsRoute.class), json);
 		get("/poi", injector.getInstance(PoiRoute.class), json);
