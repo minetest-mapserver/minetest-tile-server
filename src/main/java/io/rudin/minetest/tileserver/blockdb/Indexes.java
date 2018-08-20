@@ -70,7 +70,7 @@ public class Indexes {
         public static Index PLAYER_METADATA_PKEY = Internal.createIndex("player_metadata_pkey", PlayerMetadata.PLAYER_METADATA, new OrderField[] { PlayerMetadata.PLAYER_METADATA.PLAYER, PlayerMetadata.PLAYER_METADATA.ATTR }, true);
         public static Index POI_MAPBLOCK = Internal.createIndex("poi_mapblock", Poi.POI, new OrderField[] { Poi.POI.POSX, Poi.POI.POSY, Poi.POI.POSZ }, false);
         public static Index PROTECTOR_MAPBLOCK = Internal.createIndex("protector_mapblock", Protector.PROTECTOR, new OrderField[] { Protector.PROTECTOR.POSX, Protector.PROTECTOR.POSY, Protector.PROTECTOR.POSZ }, false);
-        public static Index SHOP_MAPBLOCK = Internal.createIndex("shop_mapblock", Shop.SHOP, new OrderField[] { Shop.SHOP.POSX, Shop.SHOP.POSY, Shop.SHOP.POSZ }, false);
+        public static Index SHOP_MAPBLOCK = Internal.createIndex("shop_mapblock", Shop.SHOP, new OrderField[] { Shop.SHOP.POSX, Shop.SHOP.POSY, Shop.SHOP.POSZ, Shop.SHOP.TYPE }, false);
         public static Index TRAVELNET_MAPBLOCK = Internal.createIndex("travelnet_mapblock", Travelnet.TRAVELNET, new OrderField[] { Travelnet.TRAVELNET.POSX, Travelnet.TRAVELNET.POSY, Travelnet.TRAVELNET.POSZ }, false);
     }
 }

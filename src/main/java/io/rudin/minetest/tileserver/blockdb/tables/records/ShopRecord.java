@@ -27,7 +27,7 @@ import org.jooq.impl.TableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ShopRecord extends TableRecordImpl<ShopRecord> implements Record16<Integer, String, String, String, Integer, String, Integer, Integer, Boolean, Integer, Integer, Integer, Integer, Integer, Integer, Long> {
 
-    private static final long serialVersionUID = -1377588995;
+    private static final long serialVersionUID = -397578401;
 
     /**
      * Setter for <code>shop.id</code>.
@@ -44,16 +44,16 @@ public class ShopRecord extends TableRecordImpl<ShopRecord> implements Record16<
     }
 
     /**
-     * Setter for <code>shop.name</code>.
+     * Setter for <code>shop.type</code>.
      */
-    public void setName(String value) {
+    public void setType(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>shop.name</code>.
+     * Getter for <code>shop.type</code>.
      */
-    public String getName() {
+    public String getType() {
         return (String) get(1);
     }
 
@@ -286,7 +286,7 @@ public class ShopRecord extends TableRecordImpl<ShopRecord> implements Record16<
      */
     @Override
     public Field<String> field2() {
-        return Shop.SHOP.NAME;
+        return Shop.SHOP.TYPE;
     }
 
     /**
@@ -414,7 +414,7 @@ public class ShopRecord extends TableRecordImpl<ShopRecord> implements Record16<
      */
     @Override
     public String component2() {
-        return getName();
+        return getType();
     }
 
     /**
@@ -542,7 +542,7 @@ public class ShopRecord extends TableRecordImpl<ShopRecord> implements Record16<
      */
     @Override
     public String value2() {
-        return getName();
+        return getType();
     }
 
     /**
@@ -671,7 +671,7 @@ public class ShopRecord extends TableRecordImpl<ShopRecord> implements Record16<
      */
     @Override
     public ShopRecord value2(String value) {
-        setName(value);
+        setType(value);
         return this;
     }
 
@@ -839,11 +839,11 @@ public class ShopRecord extends TableRecordImpl<ShopRecord> implements Record16<
     /**
      * Create a detached, initialised ShopRecord
      */
-    public ShopRecord(Integer id, String name, String owner, String inItem, Integer inCount, String outItem, Integer outCount, Integer outStock, Boolean active, Integer x, Integer y, Integer z, Integer posx, Integer posy, Integer posz, Long mtime) {
+    public ShopRecord(Integer id, String type, String owner, String inItem, Integer inCount, String outItem, Integer outCount, Integer outStock, Boolean active, Integer x, Integer y, Integer z, Integer posx, Integer posy, Integer posz, Long mtime) {
         super(Shop.SHOP);
 
         set(0, id);
-        set(1, name);
+        set(1, type);
         set(2, owner);
         set(3, inItem);
         set(4, inCount);

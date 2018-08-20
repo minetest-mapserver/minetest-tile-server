@@ -22,10 +22,10 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Shop implements Serializable {
 
-    private static final long serialVersionUID = -573164694;
+    private static final long serialVersionUID = 1974012631;
 
     private Integer id;
-    private String  name;
+    private String  type;
     private String  owner;
     private String  inItem;
     private Integer inCount;
@@ -45,7 +45,7 @@ public class Shop implements Serializable {
 
     public Shop(Shop value) {
         this.id = value.id;
-        this.name = value.name;
+        this.type = value.type;
         this.owner = value.owner;
         this.inItem = value.inItem;
         this.inCount = value.inCount;
@@ -64,7 +64,7 @@ public class Shop implements Serializable {
 
     public Shop(
         Integer id,
-        String  name,
+        String  type,
         String  owner,
         String  inItem,
         Integer inCount,
@@ -81,7 +81,7 @@ public class Shop implements Serializable {
         Long    mtime
     ) {
         this.id = id;
-        this.name = name;
+        this.type = type;
         this.owner = owner;
         this.inItem = inItem;
         this.inCount = inCount;
@@ -106,12 +106,12 @@ public class Shop implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return this.name;
+    public String getType() {
+        return this.type;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getOwner() {
@@ -231,7 +231,7 @@ public class Shop implements Serializable {
         StringBuilder sb = new StringBuilder("Shop (");
 
         sb.append(id);
-        sb.append(", ").append(name);
+        sb.append(", ").append(type);
         sb.append(", ").append(owner);
         sb.append(", ").append(inItem);
         sb.append(", ").append(inCount);

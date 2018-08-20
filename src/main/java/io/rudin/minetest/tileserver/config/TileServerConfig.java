@@ -70,7 +70,7 @@ public interface TileServerConfig extends Config {
 	boolean parserMissionsEnable();
 
 	@Key("block.parser.smartshop.enable")
-	@DefaultValue("false")
+	@DefaultValue("true")
 	boolean parserSmartshopEnable();
 
 	@Key("block.parser.fancyvend.enable")

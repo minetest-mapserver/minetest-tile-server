@@ -2,7 +2,7 @@
 create table shop(
     id serial not null,
 
-    name varchar not null default '',
+    type varchar not null default '',
     owner varchar not null,
 
     in_item varchar not null,
@@ -29,4 +29,4 @@ create table shop(
 
 );
 
-create index SHOP_MAPBLOCK on shop(posx, posy, posz);
+create index SHOP_MAPBLOCK on shop(posx, posy, posz, type);
