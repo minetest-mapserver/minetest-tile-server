@@ -27,7 +27,7 @@
     }
 
     tileserver.filterHeightCallbacks.push(function(from, to){
-        console.log(from ,to);//XXX
+        //console.log(from ,to);//XXX
         //TODO: filter missions
     });
 

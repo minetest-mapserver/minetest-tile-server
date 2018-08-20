@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.google.common.util.concurrent.Striped;
+import io.prometheus.client.Histogram;
 import io.rudin.minetest.tileserver.accessor.Coordinate;
 import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
@@ -60,6 +61,9 @@ public class TileRenderer {
 	private final DSLContext ctx;
 
 	private final MapBlockRenderer blockRenderer;
+
+	static final Histogram renderTime = Histogram.build()
+			.name("render_time_seconds").help("Render time in seconds.").register();
 
 	public BufferedImage createTile() {
 		return new BufferedImage(CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE, BufferedImage.TYPE_INT_RGB);
@@ -113,7 +117,11 @@ public class TileRenderer {
 				logger.debug("Fail-fast, got zero mapblock count for x={}-{} z={}-{}", x1,x2, z1,z2);
 
 				byte[] data = WhiteTile.getPNG();
-				cache.put(layer.id, tileX, tileY, zoom, data);
+
+				if (zoom < 11) {
+					//Only cache white space in upper zoom levels
+					cache.put(layer.id, tileX, tileY, zoom, data);
+				}
 
 				return data;
 			}
@@ -145,7 +153,6 @@ public class TileRenderer {
 	 */
 	public BufferedImage renderImage(Layer layer, int tileX, int tileY, int zoom) throws IllegalArgumentException, DataFormatException, IOException, ExecutionException {
 
-
 		//Check if binary cached, use cached version for rendering
 		if (cache.has(layer.id, tileX, tileY, zoom)) {
 			byte[] data = cache.get(layer.id, tileX, tileY, zoom);
@@ -155,173 +162,179 @@ public class TileRenderer {
 				return ImageIO.read(new ByteArrayInputStream(data));
 		}
 
+		Histogram.Timer timer = renderTime.startTimer();
+
+		try {
+
+			final int HALF_TILE_PIXEL_SIZE = CoordinateResolver.TILE_PIXEL_SIZE / 2;
 
 
-		final int HALF_TILE_PIXEL_SIZE = CoordinateResolver.TILE_PIXEL_SIZE / 2;
+			if (zoom > DEFAULT_BLOCK_ZOOM) {
+				//TODO: needed anymore?
+				//Zoom in
+
+				int nextZoom = zoom - 1;
+				int offsetNextZoomX = Math.abs(tileX % 2);
+				int offsetNextZoomY = Math.abs(tileY % 2);
+
+				int nextZoomX = (tileX - offsetNextZoomX) / 2;
+				int nextZoomY = (tileY - offsetNextZoomY) / 2;
+
+				BufferedImage tile = createTile();
+				Graphics2D graphics = tile.createGraphics();
+
+				//Get all quadrants
+				BufferedImage image = renderImage(layer, nextZoomX, nextZoomY, nextZoom);
+
+				BufferedImage quadrant = image.getSubimage(
+						HALF_TILE_PIXEL_SIZE * offsetNextZoomX,
+						HALF_TILE_PIXEL_SIZE * offsetNextZoomY,
+						HALF_TILE_PIXEL_SIZE,
+						HALF_TILE_PIXEL_SIZE
+				);
+
+				Image scaledInstance = quadrant.getScaledInstance(
+						CoordinateResolver.TILE_PIXEL_SIZE,
+						CoordinateResolver.TILE_PIXEL_SIZE,
+						Image.SCALE_FAST
+				);
+
+				graphics.drawImage(scaledInstance, 0, 0, CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE, null);
+
+				ByteArrayOutputStream output = new ByteArrayOutputStream(12000);
+				ImageIO.write(tile, "png", output);
+
+				byte[] data = output.toByteArray();
+
+				cache.put(layer.id, tileX, tileY, zoom, data);
 
 
-		if (zoom > DEFAULT_BLOCK_ZOOM) {
-			//TODO: needed anymore?
-			//Zoom in
-
-			int nextZoom = zoom - 1;
-			int offsetNextZoomX = Math.abs(tileX % 2);
-			int offsetNextZoomY = Math.abs(tileY % 2);
-
-			int nextZoomX = (tileX - offsetNextZoomX) / 2;
-			int nextZoomY = (tileY - offsetNextZoomY) / 2;
-
-			BufferedImage tile = createTile();
-			Graphics2D graphics = tile.createGraphics();
-
-			//Get all quadrants
-			BufferedImage image = renderImage(layer, nextZoomX, nextZoomY, nextZoom);
-
-			BufferedImage quadrant = image.getSubimage(
-					HALF_TILE_PIXEL_SIZE * offsetNextZoomX,
-					HALF_TILE_PIXEL_SIZE * offsetNextZoomY,
-					HALF_TILE_PIXEL_SIZE,
-					HALF_TILE_PIXEL_SIZE
-			);
-
-			Image scaledInstance = quadrant.getScaledInstance(
-					CoordinateResolver.TILE_PIXEL_SIZE,
-					CoordinateResolver.TILE_PIXEL_SIZE,
-					Image.SCALE_FAST
-			);
-
-			graphics.drawImage(scaledInstance, 0, 0, CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE, null);
-
-			ByteArrayOutputStream output = new ByteArrayOutputStream(12000);
-			ImageIO.write(tile, "png", output);
-
-			byte[] data = output.toByteArray();
-
-			cache.put(layer.id, tileX, tileY, zoom, data);
+				return tile;
 
 
-			return tile;
+			} else if (zoom < DEFAULT_BLOCK_ZOOM) {
+				//Zoom out
 
 
-		} else if (zoom < DEFAULT_BLOCK_ZOOM) {
-			//Zoom out
+				BufferedImage tile = createTile();
+				//Pack 4 tiles from higher zoom into 1 tile
+
+				int nextZoom = zoom + 1;
+				int nextZoomX = tileX * 2;
+				int nextZoomY = tileY * 2;
+
+				BufferedImage upperLeft = renderImage(layer, nextZoomX, nextZoomY, nextZoom);
+				BufferedImage upperRightImage = renderImage(layer, nextZoomX + 1, nextZoomY, nextZoom);
+				BufferedImage lowerLeftImage = renderImage(layer, nextZoomX, nextZoomY + 1, nextZoom);
+				BufferedImage lowerRightImage = renderImage(layer, nextZoomX + 1, nextZoomY + 1, nextZoom);
+
+				long start = System.currentTimeMillis();
+
+				Graphics2D graphics = tile.createGraphics();
+
+				Image upperLeftScaledInstance = upperLeft.getScaledInstance(HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, Image.SCALE_FAST);
+				graphics.drawImage(upperLeftScaledInstance, 0, 0, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, null);
+
+				Image upperRightScaledInstance = upperRightImage.getScaledInstance(HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, Image.SCALE_FAST);
+				graphics.drawImage(upperRightScaledInstance, HALF_TILE_PIXEL_SIZE, 0, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, null);
+
+				Image lowerLeftScaledInstance = lowerLeftImage.getScaledInstance(HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, Image.SCALE_FAST);
+				graphics.drawImage(lowerLeftScaledInstance, 0, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, null);
+
+				Image lowerRightScaledInstance = lowerRightImage.getScaledInstance(HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, Image.SCALE_FAST);
+				graphics.drawImage(lowerRightScaledInstance, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, null);
+
+				ByteArrayOutputStream output = new ByteArrayOutputStream(12000);
+				ImageIO.write(tile, "png", output);
+
+				byte[] data = output.toByteArray();
+
+				long diff = System.currentTimeMillis() - start;
+
+				logger.debug("Timings of cross-stitched tile X={} Y={} Zoom={}: render={} ms", tileX, tileY, zoom, diff);
+
+				cache.put(layer.id, tileX, tileY, zoom, data);
 
 
-			BufferedImage tile = createTile();
-			//Pack 4 tiles from higher zoom into 1 tile
+				return tile;
 
-			int nextZoom = zoom + 1;
-			int nextZoomX = tileX * 2;
-			int nextZoomY = tileY * 2;
+			}
 
-			BufferedImage upperLeft = renderImage(layer, nextZoomX, nextZoomY, nextZoom);
-			BufferedImage upperRightImage = renderImage(layer, nextZoomX + 1, nextZoomY, nextZoom);
-			BufferedImage lowerLeftImage = renderImage(layer, nextZoomX, nextZoomY + 1, nextZoom);
-			BufferedImage lowerRightImage = renderImage(layer, nextZoomX + 1, nextZoomY + 1, nextZoom);
-
+			//Default zoom (13 == 1 mapblock with 16px wide blocks)
 			long start = System.currentTimeMillis();
 
-			Graphics2D graphics = tile.createGraphics();
+			MapBlockCoordinateInfo coordinateInfo = CoordinateResolver.fromTile(tileX, tileY, zoom);
 
-			Image upperLeftScaledInstance = upperLeft.getScaledInstance(HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, Image.SCALE_FAST);
-			graphics.drawImage(upperLeftScaledInstance, 0, 0, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, null);
+			//16x16 mapblocks on a tile
+			BufferedImage image = createTile();
+			Graphics2D graphics = image.createGraphics();
 
-			Image upperRightScaledInstance = upperRightImage.getScaledInstance(HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, Image.SCALE_FAST);
-			graphics.drawImage(upperRightScaledInstance, HALF_TILE_PIXEL_SIZE, 0, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, null);
+			graphics.setColor(Color.WHITE);
+			graphics.fillRect(0, 0, CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE);
 
-			Image lowerLeftScaledInstance = lowerLeftImage.getScaledInstance(HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, Image.SCALE_FAST);
-			graphics.drawImage(lowerLeftScaledInstance, 0, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, null);
 
-			Image lowerRightScaledInstance = lowerRightImage.getScaledInstance(HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, Image.SCALE_FAST);
-			graphics.drawImage(lowerRightScaledInstance, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, HALF_TILE_PIXEL_SIZE, null);
+			int mapblockX = coordinateInfo.x;
+			int mapblockZ = coordinateInfo.z;
+
+			long now = System.currentTimeMillis();
+			long timingImageSetup = now - start;
+			start = now;
+
+
+			Result<BlocksRecord> countList = ctx
+					.selectFrom(BLOCKS)
+					.where(
+							BLOCKS.POSX.eq(mapblockX)
+									.and(BLOCKS.POSZ.eq(mapblockZ))
+									.and(yQueryBuilder.getCondition(layer))
+					)
+					.limit(1)
+					.fetch();
+
+			now = System.currentTimeMillis();
+			long timingZeroCountCheck = now - start;
+
+			if (timingZeroCountCheck > 250 && cfg.logQueryPerformance()) {
+				logger.warn("count-zero-check took {} ms", timingZeroCountCheck);
+			}
+
+			start = now;
+
+			long timingRender = 0;
+
+			if (!countList.isEmpty()) {
+
+
+				blockRenderer.render(layer, mapblockX, mapblockZ, graphics, 16);
+
+				now = System.currentTimeMillis();
+				timingRender = now - start;
+				start = now;
+			}
 
 			ByteArrayOutputStream output = new ByteArrayOutputStream(12000);
-			ImageIO.write(tile, "png", output);
+			ImageIO.write(image, "png", output);
 
 			byte[] data = output.toByteArray();
 
-			long diff = System.currentTimeMillis() - start;
+			now = System.currentTimeMillis();
+			long timingBufferOutput = now - start;
 
-			logger.debug("Timings of cross-stitched tile X={} Y={} Zoom={}: render={} ms", tileX, tileY, zoom, diff);
+
+			logger.debug("Timings of tile X={} Y={} Zoom={}: setup={} ms, zeroCheck={} ms, render={} ms, output={} ms",
+					tileX, tileY, zoom,
+					timingImageSetup, timingZeroCountCheck, timingRender, timingBufferOutput
+			);
 
 			cache.put(layer.id, tileX, tileY, zoom, data);
 
 
-			return tile;
+			return image;
+
+		} finally {
+			timer.observeDuration();
 
 		}
-
-		//Default zoom (13 == 1 mapblock with 16px wide blocks)
-		long start = System.currentTimeMillis();
-
-		MapBlockCoordinateInfo coordinateInfo = CoordinateResolver.fromTile(tileX, tileY, zoom);
-
-		//16x16 mapblocks on a tile
-		BufferedImage image = createTile();
-		Graphics2D graphics = image.createGraphics();
-
-		graphics.setColor(Color.WHITE);
-		graphics.fillRect(0, 0, CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE);
-
-
-		int mapblockX = coordinateInfo.x;
-		int mapblockZ = coordinateInfo.z;
-
-		long now = System.currentTimeMillis();
-		long timingImageSetup = now - start;
-		start = now;
-
-
-		Result<BlocksRecord> countList = ctx
-				.selectFrom(BLOCKS)
-				.where(
-						BLOCKS.POSX.eq(mapblockX)
-								.and(BLOCKS.POSZ.eq(mapblockZ))
-								.and(yQueryBuilder.getCondition(layer))
-				)
-				.limit(1)
-				.fetch();
-
-		now = System.currentTimeMillis();
-		long timingZeroCountCheck = now - start;
-
-		if (timingZeroCountCheck > 250 && cfg.logQueryPerformance()){
-			logger.warn("count-zero-check took {} ms", timingZeroCountCheck);
-		}
-
-		start = now;
-
-		long timingRender = 0;
-
-		if (!countList.isEmpty()) {
-
-
-			blockRenderer.render(layer, mapblockX, mapblockZ, graphics, 16);
-
-			now = System.currentTimeMillis();
-			timingRender = now - start;
-			start = now;
-		}
-
-		ByteArrayOutputStream output = new ByteArrayOutputStream(12000);
-		ImageIO.write(image, "png", output);
-
-		byte[] data = output.toByteArray();
-
-		now = System.currentTimeMillis();
-		long timingBufferOutput = now - start;
-
-
-		logger.debug("Timings of tile X={} Y={} Zoom={}: setup={} ms, zeroCheck={} ms, render={} ms, output={} ms",
-				tileX, tileY, zoom,
-				timingImageSetup, timingZeroCountCheck, timingRender, timingBufferOutput
-		);
-
-		cache.put(layer.id, tileX, tileY, zoom, data);
-
-
-		return image;
-
 	}
 
 }

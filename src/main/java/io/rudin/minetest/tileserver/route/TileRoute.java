@@ -3,6 +3,8 @@ package io.rudin.minetest.tileserver.route;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.prometheus.client.Gauge;
+import io.prometheus.client.Histogram;
 import io.rudin.minetest.tileserver.TileRenderer;
 import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.LayerConfig;
@@ -44,6 +46,14 @@ public class TileRoute implements Route {
 
 	private final TileServerConfig cfg;
 
+	static final Histogram requestLatency = Histogram.build()
+			.name("requests_latency_seconds").help("Request latency in seconds.").register();
+
+	static final Gauge activeEntries = Gauge.build()
+			.name("tile_route_entries")
+			.help("Active tile route entries.")
+			.register();
+
 	//TODO: proper rate limit
 	private final AtomicInteger entryCount = new AtomicInteger();
 
@@ -69,15 +79,21 @@ public class TileRoute implements Route {
 
 		logger.debug("Rendering tile @ {}/{} zoom: {}", x,y,z);
 
+		Histogram.Timer requestTimer = requestLatency.startTimer();
+
 		try {
+
 			while (entryCount.get() > cfg.tileRouteReentryCount()){
 				Thread.sleep(50);
 			}
 
+			activeEntries.inc();
 			entryCount.incrementAndGet();
 			return renderer.render(layer,x, y, z);
 
 		} finally {
+			requestTimer.observeDuration();
+			activeEntries.dec();
 			entryCount.decrementAndGet();
 		}
 	}
