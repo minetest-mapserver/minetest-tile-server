@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
 import io.prometheus.client.Histogram;
 import io.rudin.minetest.tileserver.TileRenderer;
 import io.rudin.minetest.tileserver.accessor.BlocksRecordAccessor;
@@ -39,7 +40,13 @@ public class UpdateChangedTilesJob implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(UpdateChangedTilesJob.class);
 
 	static final Counter changedTileCounter = Counter.build()
-			.name("changed_tiles").help("Total changed tiles.").register();
+			.name("tileserver_changed_tiles_total").help("Total changed tiles.").register();
+
+	static final Gauge changedBlocks = Gauge.build()
+			.name("tileserver_changed_blocks")
+			.help("Changed blocks in update job")
+			.register();
+
 
 	@Inject
 	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg,
@@ -146,6 +153,7 @@ public class UpdateChangedTilesJob implements Runnable {
 				int count = blocks.size();
 				int invalidatedTiles = 0;
 
+				changedBlocks.labels(layer.name).set(count);
 				changedTileCounter.inc(count);
 
 				long diff = start - System.currentTimeMillis();

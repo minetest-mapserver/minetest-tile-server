@@ -63,7 +63,7 @@ public class TileRenderer {
 	private final MapBlockRenderer blockRenderer;
 
 	static final Histogram renderTime = Histogram.build()
-			.name("render_time_seconds").help("Render time in seconds.").register();
+			.name("tileserver_render_time_seconds").help("Render time in seconds.").register();
 
 	public BufferedImage createTile() {
 		return new BufferedImage(CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE, BufferedImage.TYPE_INT_RGB);
