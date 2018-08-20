@@ -33,6 +33,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Singleton
 public class UpdateChangedTilesJob implements Runnable {
@@ -45,7 +46,12 @@ public class UpdateChangedTilesJob implements Runnable {
 	static final Gauge changedBlocks = Gauge.build()
 			.name("tileserver_changed_blocks")
 			.help("Changed blocks in update job")
-			.register();
+			.register();;
+
+	static final Gauge changedTiles = Gauge.build()
+			.name("tileserver_changed_tiles")
+			.help("Changed tiles in update job")
+			.register();;
 
 
 	@Inject
@@ -92,7 +98,7 @@ public class UpdateChangedTilesJob implements Runnable {
 	}
 
 	static final Histogram changedTilesTime = Histogram.build()
-			.name("update_changed_tiles_time_seconds").help("Tile update job time in seconds.").register();
+			.name("tileserver_update_changed_tiles_time_seconds").help("Tile update job time in seconds.").register();
 
 
 	@Override
@@ -129,6 +135,7 @@ public class UpdateChangedTilesJob implements Runnable {
 		}
 
 		Histogram.Timer timer = changedTilesTime.startTimer();
+		long tileCount = 0, blockCount = 0;
 
 		try {
 
@@ -153,8 +160,7 @@ public class UpdateChangedTilesJob implements Runnable {
 				int count = blocks.size();
 				int invalidatedTiles = 0;
 
-				changedBlocks.labels(layer.name).set(count);
-				changedTileCounter.inc(count);
+				blockCount += count;
 
 				long diff = start - System.currentTimeMillis();
 
@@ -200,6 +206,7 @@ public class UpdateChangedTilesJob implements Runnable {
 						if (!updatedTileKeys.contains(tileKey)) {
 							invalidatedTiles++;
 							tileCache.remove(layer.id, zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
+							tileCount++;
 
 							updatedTileKeys.add(tileKey);
 						}
@@ -265,6 +272,9 @@ public class UpdateChangedTilesJob implements Runnable {
 			logger.error("tile-updater", e);
 
 		} finally {
+			changedTiles.set(tileCount);
+			changedBlocks.set(blockCount);
+
 			running = false;
 			timer.observeDuration();
 		}
