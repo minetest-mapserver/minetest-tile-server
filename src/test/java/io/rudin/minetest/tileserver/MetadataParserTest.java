@@ -47,6 +47,8 @@ public class MetadataParserTest {
 			}
 		}
 
+		System.out.println(md);
+
 
 	}
 	

@@ -41,6 +41,8 @@ public class MapBlockParserTest {
 		for (int i=0; i<16; i++) {
 			System.out.println("x="+i+": " + block.getNode(i, 0, 0));
 		}
+
+		System.out.println(block.getMetadata());
 	}
 	
 }
