@@ -23,6 +23,8 @@
           "<b>Description: </b> " + mission.description + "<br>" +
           "<b>Time: </b> " + mission.time + " seconds<br>" +
           "<b>Owner: </b> " + mission.owner + "<br>" +
+          "<b>Success-count: </b> " + mission.successcount + "<br>" +
+          "<b>Fail-count: </b> " + mission.failcount + "<br>" +
           "<b>X: </b> " + mission.x + "<br>" +
           "<b>Y: </b> " + mission.y + "<br>" +
           "<b>Z: </b> " + mission.z + "<br>";

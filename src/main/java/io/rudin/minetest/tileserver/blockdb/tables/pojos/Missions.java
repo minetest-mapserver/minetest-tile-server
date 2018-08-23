@@ -22,7 +22,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Missions implements Serializable {
 
-    private static final long serialVersionUID = -942932051;
+    private static final long serialVersionUID = -523622844;
 
     private Integer id;
     private String  name;
@@ -36,6 +36,8 @@ public class Missions implements Serializable {
     private Integer posy;
     private Integer posz;
     private Long    mtime;
+    private Integer successcount;
+    private Integer failcount;
 
     public Missions() {}
 
@@ -52,6 +54,8 @@ public class Missions implements Serializable {
         this.posy = value.posy;
         this.posz = value.posz;
         this.mtime = value.mtime;
+        this.successcount = value.successcount;
+        this.failcount = value.failcount;
     }
 
     public Missions(
@@ -66,7 +70,9 @@ public class Missions implements Serializable {
         Integer posx,
         Integer posy,
         Integer posz,
-        Long    mtime
+        Long    mtime,
+        Integer successcount,
+        Integer failcount
     ) {
         this.id = id;
         this.name = name;
@@ -80,6 +86,8 @@ public class Missions implements Serializable {
         this.posy = posy;
         this.posz = posz;
         this.mtime = mtime;
+        this.successcount = successcount;
+        this.failcount = failcount;
     }
 
     public Integer getId() {
@@ -178,6 +186,22 @@ public class Missions implements Serializable {
         this.mtime = mtime;
     }
 
+    public Integer getSuccesscount() {
+        return this.successcount;
+    }
+
+    public void setSuccesscount(Integer successcount) {
+        this.successcount = successcount;
+    }
+
+    public Integer getFailcount() {
+        return this.failcount;
+    }
+
+    public void setFailcount(Integer failcount) {
+        this.failcount = failcount;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Missions (");
@@ -194,6 +218,8 @@ public class Missions implements Serializable {
         sb.append(", ").append(posy);
         sb.append(", ").append(posz);
         sb.append(", ").append(mtime);
+        sb.append(", ").append(successcount);
+        sb.append(", ").append(failcount);
 
         sb.append(")");
         return sb.toString();

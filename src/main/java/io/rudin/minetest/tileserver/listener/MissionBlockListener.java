@@ -52,6 +52,12 @@ public class MissionBlockListener {
         record.setOwner(map.get("owner"));
         record.setMtime(System.currentTimeMillis());
 
+        if (map.get("successcount") != null)
+            record.setSuccesscount(Integer.parseInt(map.get("successcount")));
+
+        if (map.get("failcount") != null)
+            record.setFailcount(Integer.parseInt(map.get("failcount")));
+
         record.setPosx(mapBlock.x);
         record.setPosy(mapBlock.y);
         record.setPosz(mapBlock.z);
