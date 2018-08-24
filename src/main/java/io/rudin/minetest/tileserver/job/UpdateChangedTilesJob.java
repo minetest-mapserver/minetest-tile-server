@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,16 +44,12 @@ public class UpdateChangedTilesJob implements Runnable {
 	static final Counter changedTileCounter = Counter.build()
 			.name("tileserver_changed_tiles_total").help("Total changed tiles.").register();
 
-	static final Gauge changedBlocks = Gauge.build()
-			.name("tileserver_changed_blocks")
-			.help("Changed blocks in update job")
-			.register();;
-
 	static final Gauge changedTiles = Gauge.build()
 			.name("tileserver_changed_tiles")
 			.help("Changed tiles in update job")
-			.register();;
+			.register();
 
+	static final Map<Integer, Gauge> layerBlockChangeGaugeMap = new HashMap<>();
 
 	@Inject
 	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg,
@@ -69,6 +66,14 @@ public class UpdateChangedTilesJob implements Runnable {
 
 		this.mapBlockAccessor = mapBlockAccessor;
 		this.blocksRecordAccessor = blocksRecordAccessor;
+
+		for (Layer layer: layerCfg.layers){
+			layerBlockChangeGaugeMap.put(layer.id, Gauge.build()
+				.name("tileserver_changed_blocks_layer_" + layer.id)
+				.help("Changed blocks in update job for layer " + layer.name)
+				.register()
+			);
+		}
 	}
 
 	private final YQueryBuilder yQueryBuilder;
@@ -135,7 +140,7 @@ public class UpdateChangedTilesJob implements Runnable {
 		}
 
 		Histogram.Timer timer = changedTilesTime.startTimer();
-		long tileCount = 0, blockCount = 0;
+		long tileCount = 0;
 
 		try {
 
@@ -160,7 +165,7 @@ public class UpdateChangedTilesJob implements Runnable {
 				int count = blocks.size();
 				int invalidatedTiles = 0;
 
-				blockCount += count;
+				layerBlockChangeGaugeMap.get(layer.id).set(count);
 
 				long diff = start - System.currentTimeMillis();
 
@@ -273,7 +278,6 @@ public class UpdateChangedTilesJob implements Runnable {
 
 		} finally {
 			changedTiles.set(tileCount);
-			changedBlocks.set(blockCount);
 
 			running = false;
 			timer.observeDuration();
