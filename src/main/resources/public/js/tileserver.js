@@ -11,7 +11,11 @@ window.tileserver = {
         to: 100
     },
 
+    layers: [], //LayerConfig.layer
+
     mapElements: [], //custom elements added with el.addTo(map)
+
+    mapLoadedCallbacks: [], //invoked with fn(map)
 
     overlays: {}, //name: Layer
     defaultOverlays: [], //Layer

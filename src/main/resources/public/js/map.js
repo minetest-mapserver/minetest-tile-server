@@ -114,6 +114,10 @@ tileserver.start = function(cfg, layerConfig){
 	el.addTo(map);
     });
 
+    tileserver.mapLoadedCallbacks.forEach(function(cb){
+	cb(map);
+    });
+
     //Export
     tileserver.map = map;
 
