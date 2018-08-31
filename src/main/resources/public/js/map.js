@@ -110,6 +110,10 @@ tileserver.start = function(cfg, layerConfig){
         map.addLayer(overlay);
     });
 
+    tileserver.mapElements.forEach(function(el){
+	el.addTo(map);
+    });
+
     //Export
     tileserver.map = map;
 
