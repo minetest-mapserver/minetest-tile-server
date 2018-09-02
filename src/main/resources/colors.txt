@@ -1,3 +1,19 @@
+# baked clay
+bakedclay:white 255 255 255
+bakedclay:black 0 0 0
+bakedclay:red 165 39 39
+bakedclay:yellow 229 222 29
+bakedclay:green 33 229 29
+bakedclay:cyan 0 209 209
+bakedclay:blue 9 27 163
+bakedclay:magenta 229 39 213
+bakedclay:orange 229 169 39
+bakedclay:violet 193 0 247
+bakedclay:brown 99 55 53
+bakedclay:pink 239 16 176
+bakedclay:dark_grey 135 135 135
+bakedclay:dark_green 15 102 15
+
 # protector
 protector:protect 91 88 87
 
