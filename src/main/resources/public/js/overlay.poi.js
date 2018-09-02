@@ -9,6 +9,10 @@
         if (!poi.active)
             return;
 
+       if (poi.y < tileserver.currentHeight.from || poi.y > tileserver.currentHeight.to)
+            //ignore block from different height
+            return;
+
         var marker = L.marker([poi.z - 15, poi.x]);
 
         var popup = "<h4>" + poi.name + "</h4><hr>" +
@@ -24,12 +28,17 @@
     function update(){
       m.request({ url: "poi" })
       .then(function(list){
+        poiLayer.clearLayers();
         list.forEach(updatePoi);
       });
     }
 
     //initial update
     update();
+
+    //update on height change
+    tileserver.heightChangedCallbacks.push(update);
+
 
     tileserver.overlays["POI"] = poiLayer;
     tileserver.defaultOverlays.push(poiLayer);

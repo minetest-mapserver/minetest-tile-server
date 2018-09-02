@@ -78,7 +78,7 @@ public interface TileServerConfig extends Config {
 	boolean parserMissionsEnable();
 
 	@Key("block.parser.smartshop.enable")
-	@DefaultValue("false")
+	@DefaultValue("true")
 	boolean parserSmartshopEnable();
 
 	@Key("block.parser.fancyvend.enable")
@@ -88,6 +88,14 @@ public interface TileServerConfig extends Config {
 	@Key("block.parser.protector.enable")
 	@DefaultValue("true")
 	boolean parserProtectorEnable();
+
+	/*
+	Static web files
+	 */
+
+	@Key("static.files.location")
+	@DefaultValue("")
+	String staticFilesLocation();
 
 	/*
 	Tile rendering strategy
@@ -137,7 +145,7 @@ public interface TileServerConfig extends Config {
 	 */
 
 	@Key("minetest.db.url")
-	@DefaultValue("jdbc:postgresql://127.0.0.1:5432/postgres")
+	@DefaultValue("jdbc:postgresql://127.0.0.1:5432/minetest")
 	String minetestDatabaseUrl();
 
 	@Key("minetest.db.username")

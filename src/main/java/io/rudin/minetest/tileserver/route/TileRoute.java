@@ -47,10 +47,10 @@ public class TileRoute implements Route {
 	private final TileServerConfig cfg;
 
 	static final Histogram requestLatency = Histogram.build()
-			.name("requests_latency_seconds").help("Request latency in seconds.").register();
+			.name("tileserver_requests_latency_seconds").help("Request latency in seconds.").register();
 
 	static final Gauge activeEntries = Gauge.build()
-			.name("tile_route_entries")
+			.name("tileserver_tile_route_entries")
 			.help("Active tile route entries.")
 			.register();
 

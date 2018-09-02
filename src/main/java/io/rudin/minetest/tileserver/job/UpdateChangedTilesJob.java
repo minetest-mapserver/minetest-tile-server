@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
 import io.prometheus.client.Histogram;
 import io.rudin.minetest.tileserver.TileRenderer;
 import io.rudin.minetest.tileserver.accessor.BlocksRecordAccessor;
@@ -30,8 +31,10 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Singleton
 public class UpdateChangedTilesJob implements Runnable {
@@ -39,7 +42,14 @@ public class UpdateChangedTilesJob implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(UpdateChangedTilesJob.class);
 
 	static final Counter changedTileCounter = Counter.build()
-			.name("changed_tiles").help("Total changed tiles.").register();
+			.name("tileserver_changed_tiles_total").help("Total changed tiles.").register();
+
+	static final Gauge changedTiles = Gauge.build()
+			.name("tileserver_changed_tiles")
+			.help("Changed tiles in update job")
+			.register();
+
+	static final Map<Integer, Gauge> layerBlockChangeGaugeMap = new HashMap<>();
 
 	@Inject
 	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg,
@@ -56,6 +66,14 @@ public class UpdateChangedTilesJob implements Runnable {
 
 		this.mapBlockAccessor = mapBlockAccessor;
 		this.blocksRecordAccessor = blocksRecordAccessor;
+
+		for (Layer layer: layerCfg.layers){
+			layerBlockChangeGaugeMap.put(layer.id, Gauge.build()
+				.name("tileserver_changed_blocks_layer_" + layer.id)
+				.help("Changed blocks in update job for layer " + layer.name)
+				.register()
+			);
+		}
 	}
 
 	private final YQueryBuilder yQueryBuilder;
@@ -85,7 +103,7 @@ public class UpdateChangedTilesJob implements Runnable {
 	}
 
 	static final Histogram changedTilesTime = Histogram.build()
-			.name("update_changed_tiles_time_seconds").help("Tile update job time in seconds.").register();
+			.name("tileserver_update_changed_tiles_time_seconds").help("Tile update job time in seconds.").register();
 
 
 	@Override
@@ -122,6 +140,7 @@ public class UpdateChangedTilesJob implements Runnable {
 		}
 
 		Histogram.Timer timer = changedTilesTime.startTimer();
+		long tileCount = 0;
 
 		try {
 
@@ -146,7 +165,7 @@ public class UpdateChangedTilesJob implements Runnable {
 				int count = blocks.size();
 				int invalidatedTiles = 0;
 
-				changedTileCounter.inc(count);
+				layerBlockChangeGaugeMap.get(layer.id).set(count);
 
 				long diff = start - System.currentTimeMillis();
 
@@ -192,6 +211,7 @@ public class UpdateChangedTilesJob implements Runnable {
 						if (!updatedTileKeys.contains(tileKey)) {
 							invalidatedTiles++;
 							tileCache.remove(layer.id, zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
+							tileCount++;
 
 							updatedTileKeys.add(tileKey);
 						}
@@ -257,6 +277,8 @@ public class UpdateChangedTilesJob implements Runnable {
 			logger.error("tile-updater", e);
 
 		} finally {
+			changedTiles.set(tileCount);
+
 			running = false;
 			timer.observeDuration();
 		}

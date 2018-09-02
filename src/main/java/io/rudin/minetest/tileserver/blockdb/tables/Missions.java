@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Missions extends TableImpl<MissionsRecord> {
 
-    private static final long serialVersionUID = 552958151;
+    private static final long serialVersionUID = -233513598;
 
     /**
      * The reference instance of <code>missions</code>
@@ -112,6 +112,16 @@ public class Missions extends TableImpl<MissionsRecord> {
      * The column <code>missions.mtime</code>.
      */
     public final TableField<MissionsRecord, Long> MTIME = createField("mtime", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+    /**
+     * The column <code>missions.successcount</code>.
+     */
+    public final TableField<MissionsRecord, Integer> SUCCESSCOUNT = createField("successcount", org.jooq.impl.SQLDataType.INTEGER.defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.INTEGER)), this, "");
+
+    /**
+     * The column <code>missions.failcount</code>.
+     */
+    public final TableField<MissionsRecord, Integer> FAILCOUNT = createField("failcount", org.jooq.impl.SQLDataType.INTEGER.defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
      * Create a <code>missions</code> table reference

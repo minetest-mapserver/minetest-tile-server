@@ -14,6 +14,7 @@ import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
 import io.rudin.minetest.tileserver.blockdb.tables.Poi;
 import io.rudin.minetest.tileserver.blockdb.tables.Protector;
+import io.rudin.minetest.tileserver.blockdb.tables.Shop;
 import io.rudin.minetest.tileserver.blockdb.tables.Travelnet;
 
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = 1006057856;
+    private static final long serialVersionUID = 1193842979;
 
     /**
      * The reference instance of <code></code>
@@ -99,6 +100,11 @@ public class DefaultSchema extends SchemaImpl {
     public final Protector PROTECTOR = io.rudin.minetest.tileserver.blockdb.tables.Protector.PROTECTOR;
 
     /**
+     * The table <code>shop</code>.
+     */
+    public final Shop SHOP = io.rudin.minetest.tileserver.blockdb.tables.Shop.SHOP;
+
+    /**
      * The table <code>travelnet</code>.
      */
     public final Travelnet TRAVELNET = io.rudin.minetest.tileserver.blockdb.tables.Travelnet.TRAVELNET;
@@ -131,6 +137,7 @@ public class DefaultSchema extends SchemaImpl {
             Sequences.MISSIONS_ID_SEQ,
             Sequences.POI_ID_SEQ,
             Sequences.PROTECTOR_ID_SEQ,
+            Sequences.SHOP_ID_SEQ,
             Sequences.TRAVELNET_ID_SEQ);
     }
 
@@ -153,6 +160,7 @@ public class DefaultSchema extends SchemaImpl {
             PlayerMetadata.PLAYER_METADATA,
             Poi.POI,
             Protector.PROTECTOR,
+            Shop.SHOP,
             Travelnet.TRAVELNET);
     }
 }

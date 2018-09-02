@@ -23,11 +23,14 @@ import io.rudin.minetest.tileserver.transformer.JsonTransformer;
 import io.rudin.minetest.tileserver.ws.WebSocketHandler;
 import io.rudin.minetest.tileserver.ws.WebSocketUpdater;
 import org.aeonbits.owner.ConfigFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static spark.Spark.*;
 
 public class TileServer {
 
+	private static final Logger logger = LoggerFactory.getLogger(TileServer.class);
 	
 	public static void main(String[] args) throws Exception {
 
@@ -42,12 +45,23 @@ public class TileServer {
 		
 		DBMigration dbMigration = injector.getInstance(DBMigration.class);
 		dbMigration.migrate();
-		
-		staticFileLocation("/public");
+
+		if (cfg.staticFilesLocation().isEmpty()) {
+			//Prod
+			staticFileLocation("/public");
+
+		} else {
+			//Static files specified, DEV mode
+			logger.warn("Using external static file location: '{}'", cfg.staticFilesLocation());
+			externalStaticFileLocation(cfg.staticFilesLocation());
+
+		}
+
 		port(cfg.httPort());
 
 		HTTPServer promServer = null;
 		if (cfg.prometheusEnable()) {
+			logger.info("Starting prometheus metrics server at port {}", cfg.prometheusPort());
 			promServer = new HTTPServer(cfg.prometheusPort());
 			DefaultExports.initialize();
 		}
@@ -60,10 +74,11 @@ public class TileServer {
 		get("/config", injector.getInstance(ConfigRoute.class), json);
 		get("/layers", injector.getInstance(LayerConfigRoute.class), json);
 
+		get("/shop", injector.getInstance(ShopRoute.class), json);
 		get("/travelnet", injector.getInstance(TravelnetRoute.class), json);
 		get("/missions", injector.getInstance(MissionsRoute.class), json);
 		get("/poi", injector.getInstance(PoiRoute.class), json);
-		get("/protector/:x/:y/:z", injector.getInstance(ProtectorRoute.class), json);
+		get("/protector/:layerId/:x/:z", injector.getInstance(ProtectorRoute.class), json);
 
 		//Initialize web server
 		init();
