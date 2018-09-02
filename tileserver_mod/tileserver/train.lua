@@ -11,6 +11,8 @@ local update_formspec = function(meta)
 
 	local line = meta:get_string("line")
 	local station = meta:get_string("station")
+	local index = meta:get_string("index")
+
 	meta:set_string("infotext", "Train: Line=" .. line .. ", Station=" .. station .. " (" .. state .. ")")
 
 	meta:set_string("formspec", "size[8,3;]" ..
@@ -20,7 +22,10 @@ local update_formspec = function(meta)
 
 		-- col 2
 		"field[0,2.5;4,1;station;Station;" .. station .. "]" ..
-		"button_exit[4,2;4,1;toggle;Toggle]" ..
+		"field[4,2.5;4,1;index;Index;" .. index .. "]" ..
+
+		-- col 3
+		"button_exit[4,3;4,1;toggle;Toggle]" ..
 		"")
 
 end
@@ -57,6 +62,7 @@ minetest.register_node("tileserver:train", {
 		meta:set_string("station", "")
 		meta:set_string("line", "")
 		meta:set_int("active", 0)
+		meta:set_int("index", 0)
 
 		update_formspec(meta)
 	end,
@@ -70,6 +76,10 @@ minetest.register_node("tileserver:train", {
 			if fields.save then
 				meta:set_string("line", fields.name)
 				meta:set_string("station", fields.station)
+				local index = tonumber(fields.index)
+				if index ~= nil then
+					meta:set_int("index", index)
+				end
 			end
 
 			if fields.toggle then
