@@ -9,13 +9,15 @@
 	function updateProtectors(map){
 		var latlng = map.getCenter();
 		var zoom = map.getZoom();
-		layerGroup.clearLayers();
 
-        if (zoom < 12)
+        if (zoom < 12){
+    		layerGroup.clearLayers();
             return; //too much info
+        }
 
 		m.request("protector/" + layerId + "/" + parseInt(latlng.lng) + "/" + parseInt(latlng.lat))
 		.then(function(list){
+    		layerGroup.clearLayers();
 
 			geoJsonLayer = L.geoJSON([], {
 			    onEachFeature: function(feature, layer){
