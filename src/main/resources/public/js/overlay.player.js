@@ -16,8 +16,7 @@
     function updatePlayer(info) {
         var player = info.player;
         var marker = playerMarkers[player.name];
-        var zOffset = 15;
-        var latLng = [(player.posz/10)-zOffset, player.posx/10];
+        var latLng = [(player.posz/10), player.posx/10];
 
         var age = Date.now() - player.modificationDate;
 

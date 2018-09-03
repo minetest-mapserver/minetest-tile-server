@@ -17,7 +17,7 @@
             //ignore block from different height
             return;
 
-        var marker = L.marker([mission.z - 16, mission.x], {icon: MissionIcon});
+        var marker = L.marker([mission.z, mission.x], {icon: MissionIcon});
 
         var popup = "<h4>" + mission.name + "</h4><hr>" +
           "<b>Description: </b> " + mission.description + "<br>" +

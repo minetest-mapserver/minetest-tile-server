@@ -18,7 +18,7 @@
             //ignore block from different height
             return;
 
-        var marker = L.marker([travelnet.z - 16, travelnet.x], {icon: TravelnetIcon});
+        var marker = L.marker([travelnet.z, travelnet.x], {icon: TravelnetIcon});
 
         var popup = "<h4>" + travelnet.name + "</h4><hr>" +
           "<b>X: </b> " + travelnet.x + "<br>" +

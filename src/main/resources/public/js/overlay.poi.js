@@ -13,7 +13,7 @@
             //ignore block from different height
             return;
 
-        var marker = L.marker([poi.z - 15, poi.x]);
+        var marker = L.marker([poi.z, poi.x]);
 
         var popup = "<h4>" + poi.name + "</h4><hr>" +
           "<b>X: </b> " + poi.x + "<br>" +

@@ -17,7 +17,7 @@
             //ignore block from different height
             return;
 
-        var marker = L.marker([shop.z - 16, shop.x], {icon: ShopIcon});
+        var marker = L.marker([shop.z, shop.x], {icon: ShopIcon});
 
         var popup = "<h4>" + shop.type + "</h4><hr>" +
           "<b>Owner: </b> " + shop.owner + "<br>" +

@@ -5,7 +5,7 @@
 		var div = L.DomUtil.create('div', 'leaflet-bar leaflet-custom-display');
 		function update(ev){
 			var latlng = ev.latlng;
-			div.innerHTML = "X:" + latlng.lng + " Z:" + latlng.lat;
+			div.innerHTML = "X:" + parseInt(latlng.lng) + " Z:" + parseInt(latlng.lat);
 		}
 
 		map.on('mousemove', update);

@@ -39,7 +39,7 @@ public class CoordinateResolver {
 		info.zoom = ONE_TO_ONE_ZOOM;
 
 		info.x = x;
-		info.y = z * -1;
+		info.y = (z * -1) + 1;
 		info.height = 1;
 		info.width = 1;
 
@@ -96,7 +96,7 @@ public class CoordinateResolver {
 		
 		// tile with 1:1 map resolution
 		info.x = (int)(x * factor);
-		info.z = (int)(y * factor * -1);
+		info.z = (int)(y * factor * -1) - 1; //offset hack
 		info.height = factor;
 		info.width = factor;
 
