@@ -169,7 +169,10 @@ public class MapBlockRenderer {
 
 							} else {
 								logger.debug("Color for name '{}' @ {}/{}/{} not found!", name, x, y, z);
-								//TODO: color not found
+
+								if (cfg.logUnknownBlocks()){
+									logger.warn("Unknown block: '{}'", name);
+								}
 							}
 
 						}

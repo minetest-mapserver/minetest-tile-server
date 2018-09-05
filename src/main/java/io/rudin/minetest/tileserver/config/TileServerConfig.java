@@ -57,9 +57,9 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("false")
 	boolean logTileUpdateTimings();
 
-	@Key("debug.mapblock.dumpinvalid")
+	@Key("log.unknown.blocks")
 	@DefaultValue("false")
-	boolean dumpInvalidMapblockData();
+	boolean logUnknownBlocks();
 
 	/*
 	block parsing stuff
