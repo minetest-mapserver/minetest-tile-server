@@ -1,4 +1,7 @@
 
+local last_index = 0
+local last_line = ""
+
 local update_formspec = function(meta)
 	local inv = meta:get_inventory()
 
@@ -59,10 +62,12 @@ minetest.register_node("tileserver:train", {
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
 
+		last_index = last_index + 5
+
 		meta:set_string("station", "")
-		meta:set_string("line", "")
-		meta:set_int("active", 0)
-		meta:set_int("index", 0)
+		meta:set_string("line", last_line)
+		meta:set_int("active", 1)
+		meta:set_int("index", last_index)
 
 		update_formspec(meta)
 	end,
@@ -74,10 +79,12 @@ minetest.register_node("tileserver:train", {
 		if playername == meta:get_string("owner") then
 			-- owner
 			if fields.save then
-				meta:set_string("line", fields.name)
+				last_line = fields.line
+				meta:set_string("line", fields.line)
 				meta:set_string("station", fields.station)
 				local index = tonumber(fields.index)
 				if index ~= nil then
+					last_index = index
 					meta:set_int("index", index)
 				end
 			end
