@@ -17,6 +17,7 @@ import io.rudin.minetest.tileserver.accessor.MapBlockAccessor;
 import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.query.YQueryBuilder;
+import io.rudin.minetest.tileserver.util.UnknownBlockCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,15 +30,18 @@ public class MapBlockRenderer {
 	private static final int BLOCK_SIZE = 16;
 	
 	@Inject
-	public MapBlockRenderer(ColorTable colorTable, MapBlockAccessor mapBlockAccessor, TileServerConfig cfg) {
+	public MapBlockRenderer(ColorTable colorTable, MapBlockAccessor mapBlockAccessor, TileServerConfig cfg, UnknownBlockCollector unknownBlockCollector) {
 		this.colorTable = colorTable;
 		this.mapBlockAccessor = mapBlockAccessor;
+		this.unknownBlockCollector = unknownBlockCollector;
 		this.cfg = cfg;
 	}
 
 
 	static final Histogram renderTime = Histogram.build()
 			.name("tileserver_mapblock_render_time_seconds").help("MapBlock Render time in seconds.").register();
+
+	private final UnknownBlockCollector unknownBlockCollector;
 
 	private final TileServerConfig cfg;
 
@@ -169,10 +173,7 @@ public class MapBlockRenderer {
 
 							} else {
 								logger.debug("Color for name '{}' @ {}/{}/{} not found!", name, x, y, z);
-
-								if (cfg.logUnknownBlocks()){
-									logger.warn("Unknown block: '{}'", name);
-								}
+								unknownBlockCollector.add(name);
 							}
 
 						}

@@ -41,10 +41,6 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("2")
 	int playerUpdateInterval();
 
-	@Key("tile.route.reentrycount")
-	@DefaultValue("5000")
-	int tileRouteReentryCount();
-
 	/*
 	Logging stuff
 	 */
@@ -56,10 +52,6 @@ public interface TileServerConfig extends Config {
 	@Key("log.tile.updatetimings")
 	@DefaultValue("false")
 	boolean logTileUpdateTimings();
-
-	@Key("log.unknown.blocks")
-	@DefaultValue("false")
-	boolean logUnknownBlocks();
 
 	/*
 	block parsing stuff
