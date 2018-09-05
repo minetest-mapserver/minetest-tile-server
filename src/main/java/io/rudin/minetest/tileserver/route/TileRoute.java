@@ -29,10 +29,9 @@ public class TileRoute implements Route {
 	private static final Logger logger = LoggerFactory.getLogger(TileRoute.class);
 
 	@Inject
-	public TileRoute(TileRenderer renderer, TileServerConfig cfg, TileCache cache, LayerConfig layerConfig) {
+	public TileRoute(TileRenderer renderer, TileCache cache, LayerConfig layerConfig) {
 		this.renderer = renderer;
 		this.cache = cache;
-		this.cfg = cfg;
 
 		for (Layer layer: layerConfig.layers)
 			layerMap.put(layer.id, layer);
@@ -44,8 +43,6 @@ public class TileRoute implements Route {
 
 	private final TileCache cache;
 
-	private final TileServerConfig cfg;
-
 	static final Histogram requestLatency = Histogram.build()
 			.name("tileserver_requests_latency_seconds").help("Request latency in seconds.").register();
 
@@ -53,9 +50,6 @@ public class TileRoute implements Route {
 			.name("tileserver_tile_route_entries")
 			.help("Active tile route entries.")
 			.register();
-
-	//TODO: proper rate limit
-	private final AtomicInteger entryCount = new AtomicInteger();
 
 	@Override
 	public Object handle(Request req, Response res) throws Exception {
@@ -82,19 +76,12 @@ public class TileRoute implements Route {
 		Histogram.Timer requestTimer = requestLatency.startTimer();
 
 		try {
-
-			while (entryCount.get() > cfg.tileRouteReentryCount()){
-				Thread.sleep(50);
-			}
-
 			activeEntries.inc();
-			entryCount.incrementAndGet();
 			return renderer.render(layer,x, y, z);
 
 		} finally {
 			requestTimer.observeDuration();
 			activeEntries.dec();
-			entryCount.decrementAndGet();
 		}
 	}
 
