@@ -136,10 +136,12 @@ public class UpdateChangedTilesJob implements Runnable {
 
 		}
 
-		Histogram.Timer timer = changedTilesTime.startTimer();
+		Histogram.Timer timer = null;
 		long tileCount = 0;
 
 		try {
+
+			timer = changedTilesTime.startTimer();
 
 			long start = System.currentTimeMillis();
 
