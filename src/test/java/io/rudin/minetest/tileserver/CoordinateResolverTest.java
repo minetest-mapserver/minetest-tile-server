@@ -13,13 +13,13 @@ public class CoordinateResolverTest {
 	public void testSimpleTiletoBlock() {
 		MapBlockCoordinateInfo blockInfo = CoordinateResolver.fromTile(1, 2, 9);
 		Assert.assertEquals(16, blockInfo.x);
-		Assert.assertEquals(-32, blockInfo.z);
+		Assert.assertEquals(-33, blockInfo.z);
 		Assert.assertEquals(16, blockInfo.height, 0.1);
 		Assert.assertEquals(16, blockInfo.width, 0.1);
 
 		blockInfo = CoordinateResolver.fromTile(2, 2, 9);
 		Assert.assertEquals(32, blockInfo.x);
-		Assert.assertEquals(-32, blockInfo.z);
+		Assert.assertEquals(-33, blockInfo.z);
 		Assert.assertEquals(16, blockInfo.height, 0.1);
 		Assert.assertEquals(16, blockInfo.width, 0.1);
 	}
@@ -28,13 +28,13 @@ public class CoordinateResolverTest {
 	public void testZoomedTile() {
 		MapBlockCoordinateInfo blockInfo = CoordinateResolver.fromTile(0, 0, 13);
 		Assert.assertEquals(0, blockInfo.x);
-		Assert.assertEquals(0, blockInfo.z);
+		Assert.assertEquals(-1, blockInfo.z);
 		Assert.assertEquals(1, blockInfo.height, 0.1);
 		Assert.assertEquals(1, blockInfo.width, 0.1);
 
 		blockInfo = CoordinateResolver.fromTile(1, 2, 13);
 		Assert.assertEquals(1, blockInfo.x);
-		Assert.assertEquals(2 * -1, blockInfo.z);
+		Assert.assertEquals(-3, blockInfo.z);
 		Assert.assertEquals(1, blockInfo.height, 0.1);
 		Assert.assertEquals(1, blockInfo.width, 0.1);
 	}
@@ -47,21 +47,21 @@ public class CoordinateResolverTest {
 		Assert.assertEquals(1, tileInfo.width, 0.1);
 		Assert.assertEquals(1, tileInfo.height, 0.1);
 		Assert.assertEquals(16, tileInfo.x);
-		Assert.assertEquals(32, tileInfo.y);
+		Assert.assertEquals(33, tileInfo.y);
 		
 		tileInfo = CoordinateResolver.fromCoordinates(32, -32);
 		Assert.assertEquals(13, tileInfo.zoom);
 		Assert.assertEquals(1, tileInfo.width, 0.1);
 		Assert.assertEquals(1, tileInfo.height, 0.1);
 		Assert.assertEquals(32, tileInfo.x);
-		Assert.assertEquals(32, tileInfo.y);
+		Assert.assertEquals(33, tileInfo.y);
 		
 		tileInfo = CoordinateResolver.fromCoordinates(33, -32);
 		Assert.assertEquals(13, tileInfo.zoom);
 		Assert.assertEquals(1, tileInfo.width, 0.1);
 		Assert.assertEquals(1, tileInfo.height, 0.1);
 		Assert.assertEquals(33, tileInfo.x);
-		Assert.assertEquals(32, tileInfo.y);
+		Assert.assertEquals(33, tileInfo.y);
 	}
 	
 	@Test
@@ -71,7 +71,7 @@ public class CoordinateResolverTest {
 		Assert.assertEquals(1, tileInfo.width, 0.1);
 		Assert.assertEquals(1, tileInfo.height, 0.1);
 		Assert.assertEquals(32, tileInfo.x);
-		Assert.assertEquals(32, tileInfo.y);
+		Assert.assertEquals(33, tileInfo.y);
 		
 		tileInfo = tileInfo.toZoom(12); //zoom out
 		Assert.assertEquals(12, tileInfo.zoom);
