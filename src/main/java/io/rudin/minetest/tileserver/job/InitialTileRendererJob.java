@@ -126,7 +126,8 @@ public class InitialTileRendererJob implements Runnable {
                             //Reset count
                             lastTileCount = tileCount;
 
-                            logger.info("Initial rendering status: x-progress({}%) z-progress({}%) tiles({}) data({} MB) posx({}) posz({}) speed({} tiles/s)",
+                            logger.info("Initial rendering status: layer({}) x-progress({}%) z-progress({}%) tiles({}) data({} MB) posx({}) posz({}) speed({} tiles/s)",
+                                    layer.name,
                                     Math.floor(xProgress * 100), Math.floor(zProgress * 100), tileCount, Math.floor(byteCount / 1000) / 1000,
                                     posx, posz, Math.floor(tilesPerSecond)
                             );
