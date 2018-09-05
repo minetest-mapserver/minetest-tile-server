@@ -151,6 +151,8 @@ public class UpdateChangedTilesJob implements Runnable {
 
 			for (Layer layer: layerCfg.layers) {
 
+				logger.debug("update for layer: {}", layer.name);
+
 				Condition yCondition = yQueryBuilder.getCondition(layer);
 
 				Result<BlocksRecord> blocks = ctx
@@ -166,12 +168,14 @@ public class UpdateChangedTilesJob implements Runnable {
 
 				layerBlockChangeGaugeMap.get(layer.id).set(count);
 
-				long diff = start - System.currentTimeMillis();
+				long diff = System.currentTimeMillis() - start;
 
 				boolean renderImmediately = cfg.tileRenderingStrategy() == TileServerConfig.TileRenderingStrategy.ASAP;
 
 				if (diff > 500 && cfg.logQueryPerformance()) {
 					logger.warn("updated-tiles-query took {} ms", diff);
+				} else {
+					logger.debug("updated-tiles-query took {} ms", diff);
 				}
 
 				if (blocks.size() == LIMIT) {
@@ -218,10 +222,14 @@ public class UpdateChangedTilesJob implements Runnable {
 					}
 				}
 
+				logger.debug("Finished invalidating changed tiles");
+
 				//assign new timestamp
 				latestTimestamp = newTimestamp;
 
 				updatedTileKeys.clear();
+
+				logger.debug("Starting rendering of changed tiles");
 
 				//Second run with rendering
 				for (BlocksRecord record : blocks) {
@@ -231,7 +239,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
 
-					for (int i = CoordinateResolver.MAX_ZOOM; i >= CoordinateResolver.MIN_ZOOM; i--) {
+					for (int i = CoordinateResolver.MAX_ZOOM; i >= 4; i--) {
 						TileInfo zoomedTile = tileInfo.toZoom(i);
 						String tileKey = getTileKey(zoomedTile);
 
@@ -239,8 +247,11 @@ public class UpdateChangedTilesJob implements Runnable {
 
 							if (renderImmediately) {
 								//Generate tiles now
+								logger.debug("Rendering tile x={} y={} zoom={}", zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
 								tileRenderer.render(layer, zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
 							}
+
+							logger.debug("Dispatching tile-changed-event for tile: {}/{}", zoomedTile.x, zoomedTile.y);
 
 							EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
 							event.layerId = layer.id;
