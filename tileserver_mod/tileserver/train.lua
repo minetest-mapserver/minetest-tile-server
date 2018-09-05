@@ -20,7 +20,7 @@ local update_formspec = function(meta)
 
 	meta:set_string("formspec", "size[8,3;]" ..
 		-- col 1
-		"field[0,1;4,1;line;Line;" .. name .. "]" ..
+		"field[0,1;4,1;line;Line;" .. line .. "]" ..
 		"button_exit[4,1;4,1;save;Save]" ..
 
 		-- col 2
