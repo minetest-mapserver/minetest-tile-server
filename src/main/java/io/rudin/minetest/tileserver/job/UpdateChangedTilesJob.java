@@ -30,10 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -130,7 +127,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 				long diff = System.currentTimeMillis() - start;
 
-				logger.debug("Newest tile time is {}", latestTimestamp);
+				logger.info("Newest tile time is {} / {}", latestTimestamp, new Date(latestTimestamp));
 
 				if (diff > 1000){
 					logger.warn("Tile time fetch took {} ms", diff);
