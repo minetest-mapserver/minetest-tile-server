@@ -18,7 +18,7 @@ public class CodeGen {
 		jdbc.setDriver("org.postgresql.Driver");
 		jdbc.setPassword("enter");
 		jdbc.setUsername("postgres");
-		jdbc.setUrl("jdbc:postgresql://127.0.0.1:5432/minetest");
+		jdbc.setUrl("jdbc:postgresql://127.0.0.1:5432/postgres");
 		cfg.setJdbc(jdbc);
 	
 		Generator generator = new Generator();

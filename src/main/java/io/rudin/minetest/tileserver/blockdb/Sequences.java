@@ -44,6 +44,11 @@ public class Sequences {
     public static final Sequence<Integer> SHOP_ID_SEQ = new SequenceImpl<Integer>("shop_id_seq", DefaultSchema.DEFAULT_SCHEMA, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
     /**
+     * The sequence <code>trainline_id_seq</code>
+     */
+    public static final Sequence<Integer> TRAINLINE_ID_SEQ = new SequenceImpl<Integer>("trainline_id_seq", DefaultSchema.DEFAULT_SCHEMA, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
+
+    /**
      * The sequence <code>travelnet_id_seq</code>
      */
     public static final Sequence<Integer> TRAVELNET_ID_SEQ = new SequenceImpl<Integer>("travelnet_id_seq", DefaultSchema.DEFAULT_SCHEMA, org.jooq.impl.SQLDataType.INTEGER.nullable(false));

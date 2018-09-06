@@ -80,6 +80,7 @@ public class TileServer {
 		get("/missions", injector.getInstance(MissionsRoute.class), json);
 		get("/poi", injector.getInstance(PoiRoute.class), json);
 		get("/protector/:layerId/:x/:z", injector.getInstance(ProtectorRoute.class), json);
+		get("/trainline", injector.getInstance(TrainlineRoute.class), json);
 
 		//Initialize web server
 		init();
@@ -111,6 +112,9 @@ public class TileServer {
 		if (cfg.parserProtectorEnable()){
 			injector.getInstance(ProtectorMapBlockListener.class).setup();
 		}
+
+		if (cfg.parserTrainEnable())
+			injector.getInstance(TrainBlockListener.class).setup();
 
 		ScheduledExecutorService executor = injector.getInstance(ScheduledExecutorService.class);
 

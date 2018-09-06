@@ -14,7 +14,9 @@ import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
 import io.rudin.minetest.tileserver.blockdb.tables.Poi;
 import io.rudin.minetest.tileserver.blockdb.tables.Protector;
+import io.rudin.minetest.tileserver.blockdb.tables.ServerStats;
 import io.rudin.minetest.tileserver.blockdb.tables.Shop;
+import io.rudin.minetest.tileserver.blockdb.tables.Trainline;
 import io.rudin.minetest.tileserver.blockdb.tables.Travelnet;
 
 import javax.annotation.Generated;
@@ -84,9 +86,19 @@ public class Tables {
     public static final Protector PROTECTOR = io.rudin.minetest.tileserver.blockdb.tables.Protector.PROTECTOR;
 
     /**
+     * The table <code>server_stats</code>.
+     */
+    public static final ServerStats SERVER_STATS = io.rudin.minetest.tileserver.blockdb.tables.ServerStats.SERVER_STATS;
+
+    /**
      * The table <code>shop</code>.
      */
     public static final Shop SHOP = io.rudin.minetest.tileserver.blockdb.tables.Shop.SHOP;
+
+    /**
+     * The table <code>trainline</code>.
+     */
+    public static final Trainline TRAINLINE = io.rudin.minetest.tileserver.blockdb.tables.Trainline.TRAINLINE;
 
     /**
      * The table <code>travelnet</code>.
