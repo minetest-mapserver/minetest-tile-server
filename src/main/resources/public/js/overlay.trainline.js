@@ -51,25 +51,26 @@
 
 
 				var coords = [];
+				var stations = [];
 
 				lines[linename].forEach(function(entry){
 					coords.push([entry.x, entry.z]);
 
 
 					if (entry.station) {
-						var feature = {
+						stations.push({
 							"type": "Feature",
 							"properties": {
 								"name": entry.station,
-								"popupContent": entry.station
+								"popupContent": "<b>Train-station (Line " + entry.line + ")</b><hr>" + 
+									entry.station
 							},
 							"geometry": {
 								"type": "Point",
 								"coordinates": [entry.x, entry.z]
 							}
-						};
+						});
 
-						geoJsonLayer.addData(feature);
 					}
 				});
 
@@ -81,11 +82,16 @@
 					},
 					"properties":{
 					    "name": linename,
-					    "popupContent": linename
+					    "popupContent": "<b>Train-line (" + linename + ")</b>"
 					}
 				}
-
+				//line-points
 				geoJsonLayer.addData(feature);
+
+				//stations
+				stations.forEach(function(stationfeature){
+					geoJsonLayer.addData(stationfeature);
+				});
 
 			});
 
@@ -99,6 +105,6 @@
 	tileserver.heightChangedCallbacks.push(update);
 
 	tileserver.overlays["Trainlines"] = layerGroup;
-	//tileserver.defaultOverlays.push(layerGroup);
+	tileserver.defaultOverlays.push(layerGroup);
 
 })(window.tileserver);
