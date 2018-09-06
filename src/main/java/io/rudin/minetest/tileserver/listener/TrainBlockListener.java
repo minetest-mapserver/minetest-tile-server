@@ -49,9 +49,16 @@ public class TrainBlockListener {
         int posy = (mapBlock.y * 16) + y;
         int posz = (mapBlock.z * 16) + z;
 
+        String station = map.get("station");
+        String line = map.get("line");
+
+        if (line == null)
+            //No trainline without line info
+            return;
+
         TrainlineRecord record = ctx.newRecord(TRAINLINE);
-        record.setStation(map.get("station"));
-        record.setLine(map.get("line"));
+        record.setStation(station == null ? "" : station);
+        record.setLine(line);
         record.setIndex(Integer.parseInt(map.get("index")));
         record.setOwner(map.get("owner"));
         record.setMtime(System.currentTimeMillis());
