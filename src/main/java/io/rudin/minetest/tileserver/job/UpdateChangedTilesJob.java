@@ -239,7 +239,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
 
-					for (int i = CoordinateResolver.MAX_ZOOM; i >= CoordinateResolver.MIN_ZOOM; i--) {
+					for (int i = CoordinateResolver.MAX_ZOOM; i >= CoordinateResolver.MIN_ZOOM+2; i--) {
 						TileInfo zoomedTile = tileInfo.toZoom(i);
 						String tileKey = getTileKey(zoomedTile);
 

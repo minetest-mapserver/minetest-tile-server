@@ -19,7 +19,7 @@ tileserver.start = function(cfg, layerConfig){
     }
 
     var map = L.map('image-map', {
-      minZoom: 1,
+      minZoom: 2,
       maxZoom: 13,
       center: initialCenter,
       zoom: initialZoom,
