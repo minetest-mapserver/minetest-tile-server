@@ -19,7 +19,7 @@
 		.then(function(list){
     		layerGroup.clearLayers();
 
-			geoJsonLayer = L.geoJSON([], {
+			var geoJsonLayer = L.geoJSON([], {
 			    onEachFeature: function(feature, layer){
 			        if (feature.properties && feature.properties.popupContent) {
                         layer.bindPopup(feature.properties.popupContent);
