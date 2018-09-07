@@ -9,7 +9,7 @@
         var cfg = params[0];
         var layers = params[1];
 
-	tileserver.layers = layers;
+	tileserver.layers = layers.layers;
         tileserver.start(cfg, layers);
     });
 

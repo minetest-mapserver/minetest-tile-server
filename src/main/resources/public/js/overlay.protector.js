@@ -62,6 +62,8 @@
 				if (layer.name == ev.name)
 					layerId = layer.id;
 			});
+
+			updateProtectors(map);
 		});
 
 		updateProtectors(map);

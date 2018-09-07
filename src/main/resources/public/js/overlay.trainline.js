@@ -34,6 +34,11 @@
 
 			//Sort by line
 			list.forEach(function(entry){
+
+				if (entry.y < tileserver.currentHeight.from || entry.y > tileserver.currentHeight.to)
+					//ignore block from different height
+					return;
+
 				var line = lines[entry.line];
 				if (!line){
 					line = [];
