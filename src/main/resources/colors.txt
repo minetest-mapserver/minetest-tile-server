@@ -1,5 +1,28 @@
+
+# scifi nodes
+scifi_nodes:slope_white 240 240 240
+scifi_nodes:slope_vent 120 120 120
+scifi_nodes:white2 240 240 240
+
+# other
+building_blocks:slope_smoothglass_half_raised 160 160 160
+building_blocks:slope_smoothglass 160 160 160
+building_blocks:slope_smoothglass_half 160 160 160
+
+# moreblocks
+moreblocks:panel_meselamp_1 244 244 29
+moreblocks:stair_silver_sandstone_brick 209 209 18
+
+# beacon
+beacon:redbeam 255 0 0
+
+# stairs
+stairs:slope_shingles_terracotta 127 34 39
+
+
+
 # baked clay
-bakedclay:white 255 255 255
+bakedclay:white 240 240 240
 bakedclay:black 0 0 0
 bakedclay:red 165 39 39
 bakedclay:yellow 229 222 29
