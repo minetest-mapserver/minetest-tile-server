@@ -148,21 +148,39 @@ public class MapBlockRenderer {
 								int graphicX = x;
 								int graphicY = 15 - z;
 
-								if (isViewBlocking(leftAbove))
-									rgb.addComponent(-5);
-
-								if (isViewBlocking(topAbove))
-									rgb.addComponent(-5);
-
-								if (!isViewBlocking(left))
-									rgb.addComponent(5);
-
-								if (!isViewBlocking(top))
-									rgb.addComponent(5);
-
 								graphics.setColor(rgb.toColor());
 								graphics.fillRect(graphicX * scale, graphicY * scale, scale, scale);
 
+								int borderStripeWidth = 0;
+
+								if (scale > 4)
+									borderStripeWidth = (int)(scale / 4);
+
+								if (borderStripeWidth > 0) {
+
+									if (isViewBlocking(leftAbove)) {
+										graphics.setColor(rgb.toColor().darker());
+										graphics.fillRect(graphicX * scale, (graphicY * scale)+borderStripeWidth, borderStripeWidth, scale-borderStripeWidth);
+
+									} else if (!isViewBlocking(left)) {
+										graphics.setColor(rgb.toColor().brighter());
+										graphics.fillRect(graphicX * scale, (graphicY * scale)+borderStripeWidth, borderStripeWidth, scale-borderStripeWidth);
+
+									}
+
+
+									if (isViewBlocking(topAbove)) {
+										graphics.setColor(rgb.toColor().darker());
+										graphics.fillRect((graphicX * scale)+borderStripeWidth, graphicY * scale, scale-borderStripeWidth, borderStripeWidth);
+
+									} else if (!isViewBlocking(top)) {
+										graphics.setColor(rgb.toColor().brighter());
+										graphics.fillRect((graphicX * scale)+borderStripeWidth, graphicY * scale, scale-borderStripeWidth, borderStripeWidth);
+
+									}
+
+
+								}
 
 								xz_coords[x][z] = true;
 								foundBlocks++;
