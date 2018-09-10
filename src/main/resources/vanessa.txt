@@ -11687,6 +11687,12 @@ moretrees:willow_planks 145 121 51
 moretrees:willow_sapling 27 79 8
 moretrees:willow_sapling_ongen 27 79 8
 moretrees:willow_trunk 62 52 51
+moretrees:poplar_trunk 62 52 51
+moretrees:cedar_trunk 62 52 51
+moretrees:jungletree_trunk 62 52 51
+moretrees:date_palm_leaves 7 36 7
+moretrees:poplar_leaves 7 36 7
+moretrees:cedar_leaves 7 36 7
 mushroom:brown 58 58 58
 mushroom:brown_natural 58 58 58
 mushroom:red 58 58 58
