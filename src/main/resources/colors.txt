@@ -19,9 +19,11 @@ beacon:redbeam 255 0 0
 # stairs
 stairs:slope_shingles_terracotta 127 34 39
 
-
-
 # baked clay
+bakedclay:lazarus 255 192 255
+bakedclay:delphinium 0 255 255
+bakedclay:mannagrass 0 100 0
+bakedclay:thistle 255 0 255
 bakedclay:white 240 240 240
 bakedclay:black 0 0 0
 bakedclay:red 165 39 39
