@@ -74,7 +74,7 @@ public interface TileServerConfig extends Config {
 	boolean parserSmartshopEnable();
 
 	@Key("block.parser.fancyvend.enable")
-	@DefaultValue("false")
+	@DefaultValue("true")
 	boolean parserFancyVendEnable();
 
     @Key("block.parser.protector.enable")

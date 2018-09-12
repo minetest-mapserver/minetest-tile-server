@@ -9,7 +9,6 @@ import com.google.inject.Injector;
 
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
-import io.rudin.minetest.tileserver.blockdb.tables.records.MissionsRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.job.InitialTileRendererJob;
 import io.rudin.minetest.tileserver.job.UpdateChangedTilesJob;
@@ -106,7 +105,7 @@ public class TileServer {
 		}
 
 		if (cfg.parserFancyVendEnable()){
-			injector.getInstance(FancyVendAdminBlockListener.class).setup();
+			injector.getInstance(FancyVendBlockListener.class).setup();
 		}
 
 		if (cfg.parserProtectorEnable()){
