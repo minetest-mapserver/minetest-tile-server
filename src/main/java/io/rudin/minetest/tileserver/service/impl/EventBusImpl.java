@@ -14,7 +14,8 @@ public class EventBusImpl implements EventBus {
 
     @Inject
     public EventBusImpl(ExecutorService executor){
-        eventBus = new AsyncEventBus(executor);
+        //eventBus = new AsyncEventBus(executor);
+        eventBus = new com.google.common.eventbus.EventBus();
     }
 
     private final com.google.common.eventbus.EventBus eventBus;
