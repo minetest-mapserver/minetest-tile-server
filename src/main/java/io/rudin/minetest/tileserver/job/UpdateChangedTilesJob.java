@@ -48,6 +48,9 @@ public class UpdateChangedTilesJob implements Runnable {
 
 	static final Map<Integer, Gauge> layerBlockChangeGaugeMap = new HashMap<>();
 
+	static final Map<Integer, Gauge> layerBlockQueryTimingGaugeMap = new HashMap<>();
+
+
 	@Inject
 	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg,
 								 MapBlockAccessor mapBlockAccessor, BlocksRecordAccessor blocksRecordAccessor,
@@ -66,9 +69,14 @@ public class UpdateChangedTilesJob implements Runnable {
 
 		for (Layer layer: layerCfg.layers){
 			layerBlockChangeGaugeMap.put(layer.id, Gauge.build()
-				.name("tileserver_changed_blocks_layer_" + layer.id)
-				.help("Changed blocks in update job for layer " + layer.name)
-				.register()
+					.name("tileserver_changed_blocks_layer_" + layer.id)
+					.help("Changed blocks in update job for layer " + layer.name)
+					.register()
+			);
+			layerBlockQueryTimingGaugeMap.put(layer.id, Gauge.build()
+					.name("tileserver_changed_blocks_timing_layer_" + layer.id)
+					.help("Changed blocks query timing in update job for layer " + layer.name)
+					.register()
 			);
 		}
 	}
@@ -153,6 +161,8 @@ public class UpdateChangedTilesJob implements Runnable {
 
 				logger.debug("update for layer: {}", layer.name);
 
+				long t0 = System.currentTimeMillis();
+
 				Condition yCondition = yQueryBuilder.getCondition(layer);
 
 				Result<BlocksRecord> blocks = ctx
@@ -163,9 +173,12 @@ public class UpdateChangedTilesJob implements Runnable {
 						.limit(LIMIT)
 						.fetch();
 
+				long queryTime = System.currentTimeMillis() - t0;
+
 				int count = blocks.size();
 				int invalidatedTiles = 0;
 
+				layerBlockQueryTimingGaugeMap.get(layer.id).set(queryTime);
 				layerBlockChangeGaugeMap.get(layer.id).set(count);
 
 				long diff = System.currentTimeMillis() - start;
