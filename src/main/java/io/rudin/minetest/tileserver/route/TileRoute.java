@@ -51,6 +51,16 @@ public class TileRoute implements Route {
 			.help("Active tile route entries.")
 			.register();
 
+	static final Gauge outgoingBytesCached = Gauge.build()
+			.name("tileserver_tile_route_bytes_cached")
+			.help("Active tile route outgoing bytes (cached).")
+			.register();
+
+	static final Gauge outgoingBytesUncached = Gauge.build()
+			.name("tileserver_tile_route_bytes_uncached")
+			.help("Active tile route outgoing bytes (uncached).")
+			.register();
+
 	@Override
 	public Object handle(Request req, Response res) throws Exception {
 		res.header("Content-Type", "image/png");
@@ -59,28 +69,32 @@ public class TileRoute implements Route {
 		int x = Integer.parseInt(req.params(":x"));
 		int layerid = Integer.parseInt(req.params(":layerid"));
 
-		Layer layer = layerMap.get(layerid);
-
-		if (layer == null)
-			throw new IllegalArgumentException("layer not found: " + layerid);
-
-		if (z < 2)
-			throw new IllegalArgumentException("Invalid zoom: " + z);
-
-		//check db cache
-		byte[] tile = cache.get(layerid, x, y, z);
-		if (tile != null) {
-			logger.debug("Serving tile from cache @ {}/{} zoom: {}", x,y,z);
-			return tile;
-		}
-
-		logger.debug("Rendering tile @ {}/{} zoom: {}", x,y,z);
-
 		Histogram.Timer requestTimer = requestLatency.startTimer();
+		activeEntries.inc();
 
 		try {
-			activeEntries.inc();
-			return renderer.render(layer,x, y, z);
+
+			Layer layer = layerMap.get(layerid);
+
+			if (layer == null)
+				throw new IllegalArgumentException("layer not found: " + layerid);
+
+			if (z < 2)
+				throw new IllegalArgumentException("Invalid zoom: " + z);
+
+			//check db cache
+			byte[] tile = cache.get(layerid, x, y, z);
+			if (tile != null) {
+				logger.debug("Serving tile from cache @ {}/{} zoom: {}", x,y,z);
+				outgoingBytesCached.inc(tile.length);
+				return tile;
+			}
+
+			logger.debug("Rendering tile @ {}/{} zoom: {}", x,y,z);
+
+			tile = renderer.render(layer,x, y, z);
+			outgoingBytesUncached.inc(tile.length);
+			return tile;
 
 		} finally {
 			requestTimer.observeDuration();
