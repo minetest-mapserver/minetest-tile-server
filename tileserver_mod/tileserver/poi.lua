@@ -11,9 +11,11 @@ local update_formspec = function(meta)
 
 	local name = meta:get_string("name")
 	local category = meta:get_string("category")
+	local url = meta:get_string("url") or ""
+
 	meta:set_string("infotext", "POI: " .. name .. ", " .. category .. " (" .. state .. ")")
 
-	meta:set_string("formspec", "size[8,3;]" ..
+	meta:set_string("formspec", "size[8,5;]" ..
 		-- col 1
 		"field[0,1;4,1;name;Name;" .. name .. "]" ..
 		"button_exit[4,1;4,1;save;Save]" ..
@@ -21,6 +23,9 @@ local update_formspec = function(meta)
 		-- col 2
 		"field[0,2.5;4,1;category;Category;" .. category .. "]" ..
 		"button_exit[4,2;4,1;toggle;Toggle]" ..
+
+		-- col 3
+		"field[0,3.5;8,1;url;URL;" .. url .. "]" ..
 		"")
 
 end
@@ -56,6 +61,7 @@ minetest.register_node("tileserver:poi", {
 
 		meta:set_string("name", "<unconfigured>")
 		meta:set_string("category", "main")
+		meta:set_string("url", "")
 		meta:set_int("active", 0)
 
 		update_formspec(meta)
@@ -68,11 +74,9 @@ minetest.register_node("tileserver:poi", {
 		if playername == meta:get_string("owner") then
 			-- owner
 			if fields.save then
-
-				local name = fields.name
 				meta:set_string("name", fields.name)
-
-
+				meta:set_string("url", fields.url)
+				meta:set_string("category", fields.category)
 			end
 
 			if fields.toggle then
