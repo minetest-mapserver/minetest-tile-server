@@ -101,8 +101,6 @@ public class UpdateChangedTilesJob implements Runnable {
 
 	private boolean running = false;
 
-	private Long latestTimestamp = null;
-
 	private String getTileKey(TileInfo tile){
 		return "Tile:" + tile.x + "/" + tile.y + "/" + tile.zoom;
 	}
@@ -110,6 +108,7 @@ public class UpdateChangedTilesJob implements Runnable {
 	static final Histogram changedTilesTime = Histogram.build()
 			.name("tileserver_update_changed_tiles_time_seconds").help("Tile update job time in seconds.").register();
 
+	private final Map<Integer, Long> timestampMap = new HashMap<>();
 
 	@Override
 	public void run() {
@@ -119,8 +118,9 @@ public class UpdateChangedTilesJob implements Runnable {
 			return;
 		}
 
-		if (latestTimestamp == null) {
+		if (timestampMap.isEmpty()) {
 
+			long latestTimestamp = 0L;
 
 			if (cfg.tilerendererEnableInitialRendering()){
 				logger.info("Initial rendering detected, ignoring updated blocks since now");
@@ -142,6 +142,10 @@ public class UpdateChangedTilesJob implements Runnable {
 				}
 			}
 
+			for (Layer layer: layerCfg.layers){
+				timestampMap.put(layer.id, latestTimestamp);
+			}
+
 		}
 
 		Histogram.Timer timer = null;
@@ -155,9 +159,10 @@ public class UpdateChangedTilesJob implements Runnable {
 
 			running = true;
 			final int LIMIT = cfg.tilerendererUpdateMaxBlocks();
-			long newTimestamp = latestTimestamp;
 
 			for (Layer layer: layerCfg.layers) {
+
+				long latestTimestamp = timestampMap.get(layer.id);
 
 				logger.debug("update for layer: {}", layer.name);
 
@@ -212,9 +217,9 @@ public class UpdateChangedTilesJob implements Runnable {
 					Integer x = record.getPosx();
 					Integer z = record.getPosz();
 
-					if (record.getMtime() > newTimestamp) {
+					if (record.getMtime() > latestTimestamp) {
 						//Update timestamp
-						newTimestamp = record.getMtime();
+						latestTimestamp = record.getMtime();
 					}
 
 					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
@@ -238,7 +243,7 @@ public class UpdateChangedTilesJob implements Runnable {
 				logger.debug("Finished invalidating changed tiles");
 
 				//assign new timestamp
-				latestTimestamp = newTimestamp;
+				timestampMap.put(layer.id, latestTimestamp);
 
 				updatedTileKeys.clear();
 
