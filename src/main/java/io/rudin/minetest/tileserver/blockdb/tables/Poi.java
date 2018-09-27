@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Poi extends TableImpl<PoiRecord> {
 
-    private static final long serialVersionUID = -1911319382;
+    private static final long serialVersionUID = -265875303;
 
     /**
      * The reference instance of <code>poi</code>
@@ -112,6 +112,11 @@ public class Poi extends TableImpl<PoiRecord> {
      * The column <code>poi.mtime</code>.
      */
     public final TableField<PoiRecord, Long> MTIME = createField("mtime", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+    /**
+     * The column <code>poi.url</code>.
+     */
+    public final TableField<PoiRecord, String> URL = createField("url", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * Create a <code>poi</code> table reference

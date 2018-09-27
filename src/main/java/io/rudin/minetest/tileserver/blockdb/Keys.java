@@ -13,7 +13,6 @@ import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
 import io.rudin.minetest.tileserver.blockdb.tables.Poi;
 import io.rudin.minetest.tileserver.blockdb.tables.Protector;
-import io.rudin.minetest.tileserver.blockdb.tables.ServerStats;
 import io.rudin.minetest.tileserver.blockdb.tables.Shop;
 import io.rudin.minetest.tileserver.blockdb.tables.Trainline;
 import io.rudin.minetest.tileserver.blockdb.tables.Travelnet;
@@ -26,7 +25,6 @@ import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerMetadataRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PlayerRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PoiRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.ProtectorRecord;
-import io.rudin.minetest.tileserver.blockdb.tables.records.ServerStatsRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.ShopRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.TrainlineRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.TravelnetRecord;
@@ -74,7 +72,6 @@ public class Keys {
     public static final UniqueKey<PlayerInventoriesRecord> PLAYER_INVENTORIES_PKEY = UniqueKeys0.PLAYER_INVENTORIES_PKEY;
     public static final UniqueKey<PlayerInventoryItemsRecord> PLAYER_INVENTORY_ITEMS_PKEY = UniqueKeys0.PLAYER_INVENTORY_ITEMS_PKEY;
     public static final UniqueKey<PlayerMetadataRecord> PLAYER_METADATA_PKEY = UniqueKeys0.PLAYER_METADATA_PKEY;
-    public static final UniqueKey<ServerStatsRecord> SERVER_STATS_PKEY = UniqueKeys0.SERVER_STATS_PKEY;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -104,7 +101,6 @@ public class Keys {
         public static final UniqueKey<PlayerInventoriesRecord> PLAYER_INVENTORIES_PKEY = Internal.createUniqueKey(PlayerInventories.PLAYER_INVENTORIES, "player_inventories_pkey", PlayerInventories.PLAYER_INVENTORIES.PLAYER, PlayerInventories.PLAYER_INVENTORIES.INV_ID);
         public static final UniqueKey<PlayerInventoryItemsRecord> PLAYER_INVENTORY_ITEMS_PKEY = Internal.createUniqueKey(PlayerInventoryItems.PLAYER_INVENTORY_ITEMS, "player_inventory_items_pkey", PlayerInventoryItems.PLAYER_INVENTORY_ITEMS.PLAYER, PlayerInventoryItems.PLAYER_INVENTORY_ITEMS.INV_ID, PlayerInventoryItems.PLAYER_INVENTORY_ITEMS.SLOT_ID);
         public static final UniqueKey<PlayerMetadataRecord> PLAYER_METADATA_PKEY = Internal.createUniqueKey(PlayerMetadata.PLAYER_METADATA, "player_metadata_pkey", PlayerMetadata.PLAYER_METADATA.PLAYER, PlayerMetadata.PLAYER_METADATA.ATTR);
-        public static final UniqueKey<ServerStatsRecord> SERVER_STATS_PKEY = Internal.createUniqueKey(ServerStats.SERVER_STATS, "server_stats_pkey", ServerStats.SERVER_STATS.KEY);
     }
 
     private static class ForeignKeys0 {

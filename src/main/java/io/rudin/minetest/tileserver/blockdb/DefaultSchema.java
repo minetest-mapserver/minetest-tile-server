@@ -14,7 +14,6 @@ import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
 import io.rudin.minetest.tileserver.blockdb.tables.Poi;
 import io.rudin.minetest.tileserver.blockdb.tables.Protector;
-import io.rudin.minetest.tileserver.blockdb.tables.ServerStats;
 import io.rudin.minetest.tileserver.blockdb.tables.Shop;
 import io.rudin.minetest.tileserver.blockdb.tables.Trainline;
 import io.rudin.minetest.tileserver.blockdb.tables.Travelnet;
@@ -44,7 +43,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = 1952839563;
+    private static final long serialVersionUID = -426306518;
 
     /**
      * The reference instance of <code></code>
@@ -100,11 +99,6 @@ public class DefaultSchema extends SchemaImpl {
      * The table <code>protector</code>.
      */
     public final Protector PROTECTOR = io.rudin.minetest.tileserver.blockdb.tables.Protector.PROTECTOR;
-
-    /**
-     * The table <code>server_stats</code>.
-     */
-    public final ServerStats SERVER_STATS = io.rudin.minetest.tileserver.blockdb.tables.ServerStats.SERVER_STATS;
 
     /**
      * The table <code>shop</code>.
@@ -173,7 +167,6 @@ public class DefaultSchema extends SchemaImpl {
             PlayerMetadata.PLAYER_METADATA,
             Poi.POI,
             Protector.PROTECTOR,
-            ServerStats.SERVER_STATS,
             Shop.SHOP,
             Trainline.TRAINLINE,
             Travelnet.TRAVELNET);

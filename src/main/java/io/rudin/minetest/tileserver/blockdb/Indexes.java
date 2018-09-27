@@ -13,7 +13,6 @@ import io.rudin.minetest.tileserver.blockdb.tables.PlayerInventoryItems;
 import io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata;
 import io.rudin.minetest.tileserver.blockdb.tables.Poi;
 import io.rudin.minetest.tileserver.blockdb.tables.Protector;
-import io.rudin.minetest.tileserver.blockdb.tables.ServerStats;
 import io.rudin.minetest.tileserver.blockdb.tables.Shop;
 import io.rudin.minetest.tileserver.blockdb.tables.Trainline;
 import io.rudin.minetest.tileserver.blockdb.tables.Travelnet;
@@ -53,7 +52,6 @@ public class Indexes {
     public static final Index PLAYER_METADATA_PKEY = Indexes0.PLAYER_METADATA_PKEY;
     public static final Index POI_MAPBLOCK = Indexes0.POI_MAPBLOCK;
     public static final Index PROTECTOR_MAPBLOCK = Indexes0.PROTECTOR_MAPBLOCK;
-    public static final Index SERVER_STATS_PKEY = Indexes0.SERVER_STATS_PKEY;
     public static final Index SHOP_MAPBLOCK = Indexes0.SHOP_MAPBLOCK;
     public static final Index TRAINLINE_MAPBLOCK = Indexes0.TRAINLINE_MAPBLOCK;
     public static final Index TRAVELNET_MAPBLOCK = Indexes0.TRAVELNET_MAPBLOCK;
@@ -74,7 +72,6 @@ public class Indexes {
         public static Index PLAYER_METADATA_PKEY = Internal.createIndex("player_metadata_pkey", PlayerMetadata.PLAYER_METADATA, new OrderField[] { PlayerMetadata.PLAYER_METADATA.PLAYER, PlayerMetadata.PLAYER_METADATA.ATTR }, true);
         public static Index POI_MAPBLOCK = Internal.createIndex("poi_mapblock", Poi.POI, new OrderField[] { Poi.POI.POSX, Poi.POI.POSY, Poi.POI.POSZ }, false);
         public static Index PROTECTOR_MAPBLOCK = Internal.createIndex("protector_mapblock", Protector.PROTECTOR, new OrderField[] { Protector.PROTECTOR.POSX, Protector.PROTECTOR.POSY, Protector.PROTECTOR.POSZ }, false);
-        public static Index SERVER_STATS_PKEY = Internal.createIndex("server_stats_pkey", ServerStats.SERVER_STATS, new OrderField[] { ServerStats.SERVER_STATS.KEY }, true);
         public static Index SHOP_MAPBLOCK = Internal.createIndex("shop_mapblock", Shop.SHOP, new OrderField[] { Shop.SHOP.POSX, Shop.SHOP.POSY, Shop.SHOP.POSZ, Shop.SHOP.TYPE }, false);
         public static Index TRAINLINE_MAPBLOCK = Internal.createIndex("trainline_mapblock", Trainline.TRAINLINE, new OrderField[] { Trainline.TRAINLINE.POSX, Trainline.TRAINLINE.POSY, Trainline.TRAINLINE.POSZ }, false);
         public static Index TRAVELNET_MAPBLOCK = Internal.createIndex("travelnet_mapblock", Travelnet.TRAVELNET, new OrderField[] { Travelnet.TRAVELNET.POSX, Travelnet.TRAVELNET.POSY, Travelnet.TRAVELNET.POSZ }, false);

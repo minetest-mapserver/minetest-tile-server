@@ -22,7 +22,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Poi implements Serializable {
 
-    private static final long serialVersionUID = 1615396414;
+    private static final long serialVersionUID = -1487992891;
 
     private Integer id;
     private String  name;
@@ -36,6 +36,7 @@ public class Poi implements Serializable {
     private Integer posy;
     private Integer posz;
     private Long    mtime;
+    private String  url;
 
     public Poi() {}
 
@@ -52,6 +53,7 @@ public class Poi implements Serializable {
         this.posy = value.posy;
         this.posz = value.posz;
         this.mtime = value.mtime;
+        this.url = value.url;
     }
 
     public Poi(
@@ -66,7 +68,8 @@ public class Poi implements Serializable {
         Integer posx,
         Integer posy,
         Integer posz,
-        Long    mtime
+        Long    mtime,
+        String  url
     ) {
         this.id = id;
         this.name = name;
@@ -80,6 +83,7 @@ public class Poi implements Serializable {
         this.posy = posy;
         this.posz = posz;
         this.mtime = mtime;
+        this.url = url;
     }
 
     public Integer getId() {
@@ -178,6 +182,14 @@ public class Poi implements Serializable {
         this.mtime = mtime;
     }
 
+    public String getUrl() {
+        return this.url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Poi (");
@@ -194,6 +206,7 @@ public class Poi implements Serializable {
         sb.append(", ").append(posy);
         sb.append(", ").append(posz);
         sb.append(", ").append(mtime);
+        sb.append(", ").append(url);
 
         sb.append(")");
         return sb.toString();

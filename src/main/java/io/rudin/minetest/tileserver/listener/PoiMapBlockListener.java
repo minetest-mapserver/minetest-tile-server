@@ -48,6 +48,7 @@ public class PoiMapBlockListener {
         poiRecord.setCategory(map.get("category"));
         poiRecord.setName(map.get("name"));
         poiRecord.setOwner(map.get("owner"));
+        poiRecord.setUrl(map.get("url"));
         poiRecord.setActive(map.get("active").equals("1"));
         poiRecord.setMtime(System.currentTimeMillis());
 
