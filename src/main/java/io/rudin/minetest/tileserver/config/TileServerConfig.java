@@ -98,7 +98,7 @@ public interface TileServerConfig extends Config {
 	 */
 
 	@Key("tile.rendering.strategy")
-	@DefaultValue("ON_DEMAND")
+	@DefaultValue("ASAP")
 	TileRenderingStrategy tileRenderingStrategy();
 
 	enum TileRenderingStrategy {
