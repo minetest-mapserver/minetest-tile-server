@@ -62,14 +62,6 @@ minetest.db.password=1234
 Port to expose http server on
 * Default: **8080**
 
-### tiles.maxy
-Max y value for blocks to render (in Mapblocks)
-* Default: **10** (Equals 160 blocks)
-
-### tiles.miny
-Min y value for blocks to render (in Mapblocks)
-* Default: **-1** (Equals -16 blocks)
-
 ### tilerenderer.updateinterval
 Update interval to check for new tiles (in seconds)
 * Default: **20**
