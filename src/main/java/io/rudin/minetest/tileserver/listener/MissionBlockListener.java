@@ -45,9 +45,15 @@ public class MissionBlockListener {
         int posy = (mapBlock.y * 16) + y;
         int posz = (mapBlock.z * 16) + z;
 
+	String name = map.get("name");
+	String desc = map.get("description");
+
+	if (name == null || desc == null)
+		return;
+
         MissionsRecord record = ctx.newRecord(MISSIONS);
-        record.setName(map.get("name"));
-        record.setDescription(map.get("description"));
+        record.setName(name);
+        record.setDescription(desc);
         record.setTime(Integer.parseInt(map.get("time")));
         record.setOwner(map.get("owner"));
         record.setMtime(System.currentTimeMillis());
