@@ -149,16 +149,16 @@ public class MapBlockRenderer {
 								int graphicY = 15 - z;
 
 								if (isViewBlocking(leftAbove))
-									rgb.addComponent(-5);
+									rgb.addComponent(-10);
 
 								if (isViewBlocking(topAbove))
-									rgb.addComponent(-5);
+									rgb.addComponent(-10);
 
 								if (!isViewBlocking(left))
-									rgb.addComponent(5);
+									rgb.addComponent(10);
 
 								if (!isViewBlocking(top))
-									rgb.addComponent(5);
+									rgb.addComponent(10);
 
 								graphics.setColor(rgb.toColor());
 								graphics.fillRect(graphicX * scale, graphicY * scale, scale, scale);
