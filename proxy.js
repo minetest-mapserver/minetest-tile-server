@@ -12,7 +12,7 @@ var proxy = httpProxy.createProxy({
 
 var app = connect()
 .use("/", function(req, res, next){
-	if (req.url.substring(0,3) == "/js" || req.url == "/" || req.url.substring(0,5) == "/pics"){
+	if (req.url.substring(0,3) == "/js" || req.url == "/" || req.url.substring(0,5) == "/pics" || req.url == "/search.html" || req.url == "/index.html" || req.url.substring(0,4) == "/css"){
 		console.log("Local: " + req.url);
 		next();
 		return;
