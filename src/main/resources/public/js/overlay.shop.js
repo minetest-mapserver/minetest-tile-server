@@ -56,7 +56,10 @@
 
 	function update(){
 		m.request({ url: "shop" })
-		.then(function(_list){ list = _list; });
+		.then(function(_list){
+			list = _list;
+			redraw();
+		});
 	}
 
 	tileserver.mapLoadedCallbacks.push(function(map){
