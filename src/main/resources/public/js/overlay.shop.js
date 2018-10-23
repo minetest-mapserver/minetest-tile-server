@@ -11,13 +11,23 @@
 		popupAnchor:  [0, -16]
 	});
 
+	var ShopEmptyIcon = L.icon({
+		iconUrl: 'pics/shop_empty.png',
+
+		iconSize:     [32, 32],
+		iconAnchor:   [16, 16],
+		popupAnchor:  [0, -16]
+	});
+
 	function updateShop(shop) {
 
 		if (shop.y < tileserver.currentHeight.from || shop.y > tileserver.currentHeight.to)
 			//ignore block from different height
 			return;
 
-		var marker = L.marker([shop.z, shop.x], {icon: ShopIcon});
+		var icon = shop.outStock > 0 ? ShopIcon : ShopEmptyIcon;
+
+		var marker = L.marker([shop.z, shop.x], {icon: icon});
 
 		var popup = "<h4>" + shop.type + "</h4><hr>" +
 			"<b>Owner: </b> " + shop.owner + "<br>" +
