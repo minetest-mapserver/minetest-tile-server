@@ -10,10 +10,10 @@
 		var latlng = map.getCenter();
 		var zoom = map.getZoom();
 
-        if (zoom < 12){
-    		layerGroup.clearLayers();
-            return; //too much info
-        }
+		if (zoom < 12){
+	    		layerGroup.clearLayers();
+			return; //too much info
+		}
 
 		m.request("protector/" + layerId + "/" + parseInt(latlng.lng) + "/" + parseInt(latlng.lat))
 		.then(function(list){
