@@ -93,7 +93,7 @@ public class MapBlockParser {
 		inflater = new Inflater();
 		inflater.setInput(data, dataOffset, data.length - dataOffset);
 
-		int expectedMetadataSize = data.length * 50;
+		int expectedMetadataSize = data.length * 75;
 
 		if (expectedMetadataSize > 1024*1024){
 			logger.warn("Allocating {} bytes for mapblock metadata @ {}/{}/{}",
