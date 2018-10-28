@@ -101,7 +101,7 @@ public class MapBlockParser {
 			);
 		}
 
-		block.metadata = new byte[data.length*50];
+		block.metadata = new byte[expectedMetadataSize];
 
 		try {
 			//Dummy inflation to get size
