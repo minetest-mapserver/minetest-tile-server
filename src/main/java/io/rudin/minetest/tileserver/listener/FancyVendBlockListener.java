@@ -7,7 +7,9 @@ import io.rudin.minetest.tileserver.parser.Inventory;
 import io.rudin.minetest.tileserver.parser.Item;
 import io.rudin.minetest.tileserver.parser.Metadata;
 import io.rudin.minetest.tileserver.service.EventBus;
+import io.rudin.minetest.tileserver.util.LuaParser;
 import org.jooq.DSLContext;
+import org.luaj.vm2.LuaTable;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -78,14 +80,17 @@ main={size=90}
         Inventory give = inv.get("given_item");
         Inventory main = inv.get("main");
 
+        String settings = map.get("settings");
+        LuaTable settingsTable = LuaParser.parseMap(settings);
+
         if (pay.items.isEmpty() || give.items.isEmpty())
             return;
 
         String in_item = pay.items.get(0).name;
-        int in_count = Math.max(1, pay.items.get(0).count);
+        int in_count = Math.max(1, settingsTable.get("input_item_qty").toint());
 
         String out_item = give.items.get(0).name;
-        int out_count = Math.max(1, give.items.get(0).count);
+        int out_count = Math.max(1, settingsTable.get("output_item_qty").toint());
 
         if (in_item == null || out_item == null)
             //Nothing to sell yet
