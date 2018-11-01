@@ -32,6 +32,7 @@
 
 	function redraw(map){
 		travelnetLayer.clearLayers();
+		map = map || tileserver.map;
 
 		if (map && map.getZoom && map.getZoom() < 10)
 			//too much clutter
