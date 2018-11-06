@@ -75,7 +75,11 @@ public class TileRenderer {
 
 		//Check binary cache
 		if (cache.has(layer.id, tileX, tileY, zoom)) {
-			return cache.get(layer.id, tileX, tileY, zoom);
+			byte[] tile =  cache.get(layer.id, tileX, tileY, zoom);
+
+			if (tile == null || tile.length == 0){
+				logger.error("Got a null/zero tile @ {}/{}/{}", tileX, tileY, zoom);
+			}
 		}
 
 		MapBlockCoordinateInfo mapblockInfo = CoordinateResolver.fromTile(tileX, tileY, zoom);
@@ -204,10 +208,12 @@ public class TileRenderer {
 				ByteArrayOutputStream output = new ByteArrayOutputStream(12000);
 				ImageIO.write(tile, "png", output);
 
+				//binary cache
 				byte[] data = output.toByteArray();
-
 				cache.put(layer.id, tileX, tileY, zoom, data);
 
+				if (tile == null)
+					logger.error("Got a null-tile @ {}/{}/{}", tileX, tileY, data);
 
 				return tile;
 
@@ -255,6 +261,8 @@ public class TileRenderer {
 
 				cache.put(layer.id, tileX, tileY, zoom, data);
 
+				if (tile == null)
+					logger.error("Got a null-tile @ {}/{}/{} (data={})", tileX, tileY, zoom, data.length);
 
 				return tile;
 
@@ -303,8 +311,6 @@ public class TileRenderer {
 			long timingRender = 0;
 
 			if (!countList.isEmpty()) {
-
-
 				blockRenderer.render(layer, mapblockX, mapblockZ, graphics, 16);
 
 				now = System.currentTimeMillis();
@@ -328,6 +334,8 @@ public class TileRenderer {
 
 			cache.put(layer.id, tileX, tileY, zoom, data);
 
+			if (image == null)
+				logger.error("Got a null-tile @ {}/{}/{} (layer={},data={})", tileX, tileY, zoom, layer.id, data.length);
 
 			return image;
 
