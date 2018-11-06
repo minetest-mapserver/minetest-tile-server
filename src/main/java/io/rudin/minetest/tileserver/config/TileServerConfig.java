@@ -181,7 +181,11 @@ public interface TileServerConfig extends Config {
 	 */
 
 	@Key("debug.enable")
-	@DefaultValue("true")
+	@DefaultValue("false")
 	boolean enableDebug();
+
+	@Key("debug.mapblock.dumpfailed")
+	@DefaultValue("false")
+	boolean dumpFailedMapblocks();
 
 }

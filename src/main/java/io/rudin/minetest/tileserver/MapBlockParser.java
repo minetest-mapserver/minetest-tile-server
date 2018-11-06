@@ -54,6 +54,7 @@ public class MapBlockParser {
 
 
 		if (block.version != 28) {
+			logger.error("block version not supported: {}", block.version);
 			throw new IllegalArgumentException("block version not supported: " + block.version);
 		}
 

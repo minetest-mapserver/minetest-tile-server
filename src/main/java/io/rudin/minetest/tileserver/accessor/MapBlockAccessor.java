@@ -8,9 +8,12 @@ import io.rudin.minetest.tileserver.MapBlockParser;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.service.EventBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +23,10 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class MapBlockAccessor extends CacheLoader<Coordinate, Optional<MapBlock>> {
 
+    private static final Logger logger = LoggerFactory.getLogger(MapBlockAccessor.class);
+
     @Inject
-    public MapBlockAccessor(BlocksRecordAccessor recordAccessor, EventBus eventBus){
+    public MapBlockAccessor(BlocksRecordAccessor recordAccessor, EventBus eventBus, TileServerConfig cfg){
         this.recordAccessor = recordAccessor;
         this.eventBus = eventBus;
 
@@ -30,7 +35,11 @@ public class MapBlockAccessor extends CacheLoader<Coordinate, Optional<MapBlock>
                 .maximumSize(500)
                 .expireAfterAccess(10, TimeUnit.MINUTES)
                 .build(this);
+
+        this.cfg = cfg;
     }
+
+    private final TileServerConfig cfg;
 
     private final EventBus eventBus;
 
@@ -81,13 +90,43 @@ public class MapBlockAccessor extends CacheLoader<Coordinate, Optional<MapBlock>
 
         if (optionalRecord.isPresent()) {
 
-            MapBlock mapBlock = MapBlockParser.parse(optionalRecord.get());
+            BlocksRecord record = optionalRecord.get();
 
-            EventBus.MapBlockParsedEvent event = new EventBus.MapBlockParsedEvent();
-            event.mapblock = mapBlock;
-            eventBus.post(event);
+            try {
+                MapBlock mapBlock = MapBlockParser.parse(record);
 
-            return Optional.of(mapBlock);
+                EventBus.MapBlockParsedEvent event = new EventBus.MapBlockParsedEvent();
+                event.mapblock = mapBlock;
+                eventBus.post(event);
+
+                return Optional.of(mapBlock);
+
+            } catch (Exception e){
+                logger.error("load", e);
+
+                if (cfg.dumpFailedMapblocks()){
+                    //dump mapblock and stacktrace
+
+                    File dumpDir = new File("mapblocks");
+                    if (!dumpDir.isDirectory())
+                        dumpDir.mkdir();
+
+                    String nameBase = record.getPosx() + "_" + record.getPosy() + "_" + record.getPosz();
+                    File dumpFile = new File(dumpDir, nameBase + ".mapblock");
+                    File errorFile = new File(dumpDir, nameBase + ".error");
+
+                    try (OutputStream output = new FileOutputStream(dumpFile)){
+                        output.write(record.getData());
+                    }
+
+                    try (OutputStream output = new FileOutputStream(errorFile)){
+                        e.printStackTrace(new PrintWriter(errorFile));
+                    }
+                }
+
+                throw e;
+
+            }
 
         } else {
             return Optional.empty();
