@@ -4,6 +4,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import ch.qos.logback.classic.Level;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -35,6 +36,14 @@ public class TileServer {
 
 		TileServerConfig cfg = ConfigFactory.create(TileServerConfig.class);
 
+		if (cfg.enableDebug()){
+			TileServer.logger.warn("Enabling debug/logging mode");
+
+			Logger logger = LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+			ch.qos.logback.classic.Logger loggerImpl = (ch.qos.logback.classic.Logger)logger;
+
+			loggerImpl.setLevel(Level.DEBUG);
+		}
 
 		Injector injector = Guice.createInjector(
 				new ConfigModule(cfg),
@@ -51,7 +60,7 @@ public class TileServer {
 
 		} else {
 			//Static files specified, DEV mode
-			logger.warn("Using external static file location: '{}'", cfg.staticFilesLocation());
+			TileServer.logger.warn("Using external static file location: '{}'", cfg.staticFilesLocation());
 			externalStaticFileLocation(cfg.staticFilesLocation());
 
 		}
@@ -60,7 +69,7 @@ public class TileServer {
 
 		HTTPServer promServer = null;
 		if (cfg.prometheusEnable()) {
-			logger.info("Starting prometheus metrics server at port {}", cfg.prometheusPort());
+			TileServer.logger.info("Starting prometheus metrics server at port {}", cfg.prometheusPort());
 			promServer = new HTTPServer(cfg.prometheusPort());
 			DefaultExports.initialize();
 		}

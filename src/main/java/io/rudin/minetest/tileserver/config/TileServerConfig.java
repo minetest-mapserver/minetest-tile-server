@@ -176,4 +176,12 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("org.postgresql.Driver")
 	String tileDatabaseDriver();
 
+	/*
+	Debug stuff
+	 */
+
+	@Key("debug.enable")
+	@DefaultValue("true")
+	boolean enableDebug();
+
 }
