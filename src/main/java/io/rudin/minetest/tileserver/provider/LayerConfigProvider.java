@@ -1,6 +1,7 @@
 package io.rudin.minetest.tileserver.provider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.LayerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,10 @@ public class LayerConfigProvider implements Provider<LayerConfig> {
 
         ObjectMapper mapper = new ObjectMapper();
         this.layers = mapper.readValue(layersInput, LayerConfig.class);
+
+        for (Layer layer: layers.layers){
+            logger.info("Configured layer: id={} name={} from={} to={}", layer.id, layer.name, layer.from, layer.to);
+        }
 
         layersInput.close();
     }

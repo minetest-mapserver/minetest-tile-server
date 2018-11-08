@@ -1,13 +1,1 @@
-target
-.settings
-.project
-.classpath
-.extract
-*.log
-*.mv.db
-logs
-node_modules
-heimdallr-data
-.idea
-*.iml
 tiles

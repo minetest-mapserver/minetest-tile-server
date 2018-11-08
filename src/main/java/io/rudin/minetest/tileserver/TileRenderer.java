@@ -161,7 +161,7 @@ public class TileRenderer {
 		if (cache.has(layer.id, tileX, tileY, zoom)) {
 			byte[] data = cache.get(layer.id, tileX, tileY, zoom);
 
-			if (data != null)
+			if (data != null && data.length > 0)
 				//In case the cache disappears
 				return ImageIO.read(new ByteArrayInputStream(data));
 		}
