@@ -1,6 +1,7 @@
 package io.rudin.minetest.tileserver.route;
 
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Trainline;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import org.jooq.DSLContext;
 import spark.Request;
 import spark.Response;
@@ -15,7 +16,7 @@ import static io.rudin.minetest.tileserver.blockdb.tables.Trainline.TRAINLINE;
 public class TrainlineRoute implements Route {
 
 	@Inject
-	public TrainlineRoute(DSLContext ctx) {
+	public TrainlineRoute(@MapDB DSLContext ctx) {
 		this.ctx = ctx;
 	}
 	

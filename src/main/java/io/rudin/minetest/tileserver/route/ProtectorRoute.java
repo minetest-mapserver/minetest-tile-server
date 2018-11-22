@@ -3,6 +3,7 @@ package io.rudin.minetest.tileserver.route;
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Protector;
 import io.rudin.minetest.tileserver.config.LayerConfig;
 import io.rudin.minetest.tileserver.config.Layer;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.util.CoordinateResolver;
 import org.jooq.DSLContext;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ public class ProtectorRoute implements Route {
 	private static final Logger logger = LoggerFactory.getLogger(ProtectorRoute.class);
 
 	@Inject
-	public ProtectorRoute(DSLContext ctx, LayerConfig layerCfg) {
+	public ProtectorRoute(@MapDB DSLContext ctx, LayerConfig layerCfg) {
 		this.ctx = ctx;
 
 		for (Layer layer: layerCfg.layers)

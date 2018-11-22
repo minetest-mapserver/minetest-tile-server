@@ -1,6 +1,7 @@
 package io.rudin.minetest.tileserver.route;
 
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Shop;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import org.jooq.DSLContext;
 import spark.Request;
 import spark.Response;
@@ -15,7 +16,7 @@ import static io.rudin.minetest.tileserver.blockdb.tables.Shop.SHOP;
 public class ShopRoute implements Route {
 
 	@Inject
-	public ShopRoute(DSLContext ctx) {
+	public ShopRoute(@MapDB DSLContext ctx) {
 		this.ctx = ctx;
 	}
 	

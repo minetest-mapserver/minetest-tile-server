@@ -2,6 +2,7 @@ package io.rudin.minetest.tileserver.route;
 
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Missions;
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Travelnet;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import org.jooq.DSLContext;
 import spark.Request;
 import spark.Response;
@@ -16,7 +17,7 @@ import static io.rudin.minetest.tileserver.blockdb.tables.Missions.MISSIONS;
 public class MissionsRoute implements Route {
 
 	@Inject
-	public MissionsRoute(DSLContext ctx) {
+	public MissionsRoute(@MapDB DSLContext ctx) {
 		this.ctx = ctx;
 	}
 	

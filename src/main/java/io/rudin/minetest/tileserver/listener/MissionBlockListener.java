@@ -5,6 +5,7 @@ import io.rudin.minetest.tileserver.MapBlock;
 import io.rudin.minetest.tileserver.blockdb.tables.records.MissionsRecord;
 import io.rudin.minetest.tileserver.blockdb.tables.records.TravelnetRecord;
 import io.rudin.minetest.tileserver.parser.Metadata;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.DSLContext;
 
@@ -21,7 +22,7 @@ public class MissionBlockListener {
     private static final String BLOCK_NAME = "missions:mission";
 
     @Inject
-    public MissionBlockListener(EventBus eventBus, DSLContext ctx){
+    public MissionBlockListener(EventBus eventBus, @MapDB DSLContext ctx){
         this.eventBus = eventBus;
         this.ctx = ctx;
     }

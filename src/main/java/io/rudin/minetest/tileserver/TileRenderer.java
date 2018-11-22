@@ -22,6 +22,7 @@ import io.prometheus.client.Histogram;
 import io.rudin.minetest.tileserver.accessor.Coordinate;
 import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.query.YQueryBuilder;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -42,7 +43,7 @@ public class TileRenderer {
 	private static final Logger logger = LoggerFactory.getLogger(TileRenderer.class);
 	
 	@Inject
-	public TileRenderer(DSLContext ctx, TileCache cache, MapBlockRenderer blockRenderer, TileServerConfig cfg, YQueryBuilder yQueryBuilder) {
+	public TileRenderer(@MapDB DSLContext ctx, TileCache cache, MapBlockRenderer blockRenderer, TileServerConfig cfg, YQueryBuilder yQueryBuilder) {
 		this.ctx = ctx;
 		this.cache = cache;
 		this.blockRenderer = blockRenderer;

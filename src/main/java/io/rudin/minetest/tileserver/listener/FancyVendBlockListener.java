@@ -6,6 +6,7 @@ import io.rudin.minetest.tileserver.blockdb.tables.records.ShopRecord;
 import io.rudin.minetest.tileserver.parser.Inventory;
 import io.rudin.minetest.tileserver.parser.Item;
 import io.rudin.minetest.tileserver.parser.Metadata;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.service.EventBus;
 import io.rudin.minetest.tileserver.util.LuaParser;
 import org.jooq.DSLContext;
@@ -29,7 +30,7 @@ public class FancyVendBlockListener {
     private static final String TYPE = "Fancyvend";
 
     @Inject
-    public FancyVendBlockListener(EventBus eventBus, DSLContext ctx){
+    public FancyVendBlockListener(EventBus eventBus, @MapDB DSLContext ctx){
         this.eventBus = eventBus;
         this.ctx = ctx;
     }

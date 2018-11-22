@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import io.rudin.minetest.tileserver.MapBlock;
 import io.rudin.minetest.tileserver.blockdb.tables.records.ProtectorRecord;
 import io.rudin.minetest.tileserver.parser.Metadata;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.DSLContext;
 
@@ -21,7 +22,7 @@ public class ProtectorMapBlockListener {
     private static final String BLOCK_NAME2 = "protector:protect2";
 
     @Inject
-    public ProtectorMapBlockListener(EventBus eventBus, DSLContext ctx){
+    public ProtectorMapBlockListener(EventBus eventBus, @MapDB DSLContext ctx){
         this.eventBus = eventBus;
         this.ctx = ctx;
     }

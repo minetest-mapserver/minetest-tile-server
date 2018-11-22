@@ -4,6 +4,7 @@ import io.rudin.minetest.tileserver.accessor.PlayerInfoAccessor;
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Player;
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.PlayerMetadata;
 import io.rudin.minetest.tileserver.entity.PlayerInfo;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.route.TileRoute;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.DSLContext;
@@ -28,7 +29,7 @@ public class UpdatePlayerJob implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(UpdatePlayerJob.class);
 
     @Inject
-    public UpdatePlayerJob(DSLContext ctx, EventBus eventBus, PlayerInfoAccessor playerInfoAccessor){
+    public UpdatePlayerJob(@MapDB DSLContext ctx, EventBus eventBus, PlayerInfoAccessor playerInfoAccessor){
         this.ctx = ctx;
         this.eventBus = eventBus;
         this.playerInfoAccessor = playerInfoAccessor;

@@ -2,6 +2,7 @@ package io.rudin.minetest.tileserver.query;
 
 import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.LayerConfig;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -15,10 +16,7 @@ import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 public class YQueryBuilder {
 
     @Inject
-    public YQueryBuilder(DSLContext ctx, LayerConfig cfg){
-        this.cfg = cfg;
-        this.ctx = ctx;
-
+    public YQueryBuilder(LayerConfig cfg){
         Condition condition = DSL.condition(true);
 
         for (Layer layer: cfg.layers){
@@ -27,10 +25,6 @@ public class YQueryBuilder {
 
         this.allLayers = condition;
     }
-
-    private final DSLContext ctx;
-
-    private final LayerConfig cfg;
 
     private final Condition allLayers;
 

@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import io.rudin.minetest.tileserver.MapBlock;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PoiRecord;
 import io.rudin.minetest.tileserver.parser.Metadata;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.DSLContext;
 
@@ -20,7 +21,7 @@ public class PoiMapBlockListener {
     private static final String POIBLOCK_NAME = "tileserver:poi";
 
     @Inject
-    public PoiMapBlockListener(EventBus eventBus, DSLContext ctx){
+    public PoiMapBlockListener(EventBus eventBus, @MapDB DSLContext ctx){
         this.eventBus = eventBus;
         this.ctx = ctx;
     }

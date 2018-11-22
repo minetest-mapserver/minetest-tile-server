@@ -5,6 +5,7 @@ import io.rudin.minetest.tileserver.TileRenderer;
 import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.LayerConfig;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.query.YQueryBuilder;
 import io.rudin.minetest.tileserver.util.CoordinateResolver;
 import org.jooq.Condition;
@@ -27,7 +28,7 @@ public class InitialTileRendererJob implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(InitialTileRendererJob.class);
 
     @Inject
-    public InitialTileRendererJob(DSLContext ctx, TileServerConfig cfg, TileRenderer renderer, YQueryBuilder yQueryBuilder, LayerConfig layerCfg){
+    public InitialTileRendererJob(@MapDB DSLContext ctx, TileServerConfig cfg, TileRenderer renderer, YQueryBuilder yQueryBuilder, LayerConfig layerCfg){
         this.ctx = ctx;
         this.renderer = renderer;
         this.yQueryBuilder = yQueryBuilder;

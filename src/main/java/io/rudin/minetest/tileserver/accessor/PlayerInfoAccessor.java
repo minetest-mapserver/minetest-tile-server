@@ -3,6 +3,7 @@ package io.rudin.minetest.tileserver.accessor;
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Player;
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.PlayerMetadata;
 import io.rudin.minetest.tileserver.entity.PlayerInfo;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.DSLContext;
 
@@ -19,7 +20,7 @@ import static io.rudin.minetest.tileserver.blockdb.tables.PlayerMetadata.PLAYER_
 public class PlayerInfoAccessor {
 
     @Inject
-    public PlayerInfoAccessor(DSLContext ctx){
+    public PlayerInfoAccessor(@MapDB DSLContext ctx){
         this.ctx = ctx;
     }
 

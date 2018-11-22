@@ -3,16 +3,17 @@ package io.rudin.minetest.tileserver.provider;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.sql.DataSource;
 
 import com.zaxxer.hikari.HikariConfig;
-
+import com.zaxxer.hikari.HikariDataSource;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 
 @Singleton
-public class HikariConfigProvider implements Provider<HikariConfig> {
+public class MapDBDatasourceProvider implements Provider<DataSource> {
 
 	@Inject
-	public HikariConfigProvider(TileServerConfig cfg) {
+	public MapDBDatasourceProvider(TileServerConfig cfg) {
 		this.cfg = cfg;
 	}
 	
@@ -20,14 +21,15 @@ public class HikariConfigProvider implements Provider<HikariConfig> {
 	
 	@Override
 	@Singleton
-	public HikariConfig get() {
-		
+	public DataSource get() {
+
 		HikariConfig hikariConfig = new HikariConfig();
 		hikariConfig.setUsername(cfg.minetestDatabaseUsername());
 		hikariConfig.setPassword(cfg.minetestDatabasePassword());
 		hikariConfig.setJdbcUrl(cfg.minetestDatabaseUrl());
 		hikariConfig.setDriverClassName(cfg.minetestDatabaseDriver());
-		return hikariConfig;
+
+		return new HikariDataSource(hikariConfig);
 	}
 
 }

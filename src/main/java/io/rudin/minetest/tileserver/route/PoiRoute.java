@@ -1,6 +1,7 @@
 package io.rudin.minetest.tileserver.route;
 
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Poi;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import org.jooq.DSLContext;
 import spark.Request;
 import spark.Response;
@@ -17,7 +18,7 @@ import static io.rudin.minetest.tileserver.blockdb.tables.Poi.POI;
 public class PoiRoute implements Route {
 
 	@Inject
-	public PoiRoute(DSLContext ctx) {
+	public PoiRoute(@MapDB DSLContext ctx) {
 		this.ctx = ctx;
 	}
 	

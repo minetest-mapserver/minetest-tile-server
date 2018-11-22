@@ -1,6 +1,7 @@
 package io.rudin.minetest.tileserver.route;
 
 import io.rudin.minetest.tileserver.blockdb.tables.pojos.Travelnet;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import org.jooq.DSLContext;
 import spark.Request;
 import spark.Response;
@@ -15,7 +16,7 @@ import static io.rudin.minetest.tileserver.blockdb.tables.Travelnet.TRAVELNET;
 public class TravelnetRoute implements Route {
 
 	@Inject
-	public TravelnetRoute(DSLContext ctx) {
+	public TravelnetRoute(@MapDB DSLContext ctx) {
 		this.ctx = ctx;
 	}
 	

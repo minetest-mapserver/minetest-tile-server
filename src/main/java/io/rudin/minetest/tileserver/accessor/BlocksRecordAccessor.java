@@ -5,6 +5,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import org.jooq.DSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<Block
     private static final Logger logger = LoggerFactory.getLogger(BlocksRecordAccessor.class);
 
     @Inject
-    public BlocksRecordAccessor(DSLContext ctx, TileServerConfig cfg){
+    public BlocksRecordAccessor(@MapDB DSLContext ctx, TileServerConfig cfg){
         this.ctx = ctx;
         this.cfg = cfg;
         this.cache = CacheBuilder.newBuilder()

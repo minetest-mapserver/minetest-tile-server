@@ -17,6 +17,7 @@ import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.LayerConfig;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
+import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.qualifier.TileDB;
 import io.rudin.minetest.tileserver.query.YQueryBuilder;
 import io.rudin.minetest.tileserver.service.EventBus;
@@ -52,7 +53,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 
 	@Inject
-	public UpdateChangedTilesJob(DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg,
+	public UpdateChangedTilesJob(@MapDB DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg,
 								 MapBlockAccessor mapBlockAccessor, BlocksRecordAccessor blocksRecordAccessor,
 								 TileRenderer tileRenderer, YQueryBuilder yQueryBuilder, LayerConfig layerCfg) {
 		this.ctx = ctx;
