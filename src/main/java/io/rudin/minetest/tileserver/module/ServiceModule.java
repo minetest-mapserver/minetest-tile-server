@@ -11,12 +11,10 @@ import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.provider.ColorTableProvider;
 import io.rudin.minetest.tileserver.provider.ExecutorProvider;
 import io.rudin.minetest.tileserver.provider.LayerConfigProvider;
+import io.rudin.minetest.tileserver.service.BlocksRecordService;
 import io.rudin.minetest.tileserver.service.EventBus;
 import io.rudin.minetest.tileserver.service.TileCache;
-import io.rudin.minetest.tileserver.service.impl.DatabaseTileCache;
-import io.rudin.minetest.tileserver.service.impl.EHTileCache;
-import io.rudin.minetest.tileserver.service.impl.EventBusImpl;
-import io.rudin.minetest.tileserver.service.impl.FileTileCache;
+import io.rudin.minetest.tileserver.service.impl.*;
 import org.jooq.util.jaxb.Database;
 
 public class ServiceModule extends AbstractModule {
@@ -45,5 +43,6 @@ public class ServiceModule extends AbstractModule {
 		bind(ExecutorService.class).toProvider(ExecutorProvider.class);
 		bind(ScheduledExecutorService.class).toProvider(ExecutorProvider.class);
 		bind(LayerConfig.class).toProvider(LayerConfigProvider.class);
+		bind(BlocksRecordService.class).to(BlocksRecordDatabaseService.class);
 	}
 }

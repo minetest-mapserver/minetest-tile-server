@@ -1,7 +1,6 @@
 package io.rudin.minetest.tileserver.job;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
-import static io.rudin.minetest.tileserver.tiledb.tables.Tiles.TILES;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -10,7 +9,6 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.Histogram;
 import io.rudin.minetest.tileserver.TileRenderer;
-import io.rudin.minetest.tileserver.accessor.BlocksRecordAccessor;
 import io.rudin.minetest.tileserver.accessor.Coordinate;
 import io.rudin.minetest.tileserver.accessor.MapBlockAccessor;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
@@ -18,21 +16,18 @@ import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.LayerConfig;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.qualifier.MapDB;
-import io.rudin.minetest.tileserver.qualifier.TileDB;
 import io.rudin.minetest.tileserver.query.YQueryBuilder;
+import io.rudin.minetest.tileserver.service.BlocksRecordService;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.jooq.*;
 
 import io.rudin.minetest.tileserver.service.TileCache;
 import io.rudin.minetest.tileserver.util.CoordinateResolver;
 import io.rudin.minetest.tileserver.util.CoordinateResolver.TileInfo;
-import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Timestamp;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Singleton
 public class UpdateChangedTilesJob implements Runnable {
@@ -54,7 +49,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 	@Inject
 	public UpdateChangedTilesJob(@MapDB DSLContext ctx, TileCache tileCache, EventBus eventBus, TileServerConfig cfg,
-								 MapBlockAccessor mapBlockAccessor, BlocksRecordAccessor blocksRecordAccessor,
+								 MapBlockAccessor mapBlockAccessor, BlocksRecordService blocksRecordService,
 								 TileRenderer tileRenderer, YQueryBuilder yQueryBuilder, LayerConfig layerCfg) {
 		this.ctx = ctx;
 		this.tileCache = tileCache;
@@ -66,7 +61,7 @@ public class UpdateChangedTilesJob implements Runnable {
 		this.cfg = cfg;
 
 		this.mapBlockAccessor = mapBlockAccessor;
-		this.blocksRecordAccessor = blocksRecordAccessor;
+		this.blocksRecordService = blocksRecordService;
 
 		for (Layer layer: layerCfg.layers){
 			layerBlockChangeGaugeMap.put(layer.id, Gauge.build()
@@ -90,7 +85,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 	private final MapBlockAccessor mapBlockAccessor;
 
-	private final BlocksRecordAccessor blocksRecordAccessor;
+	private final BlocksRecordService blocksRecordService;
 
 	private final TileServerConfig cfg;
 
@@ -212,7 +207,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 				for (BlocksRecord record : blocks) {
 
-					blocksRecordAccessor.update(record);
+					blocksRecordService.update(record);
 					mapBlockAccessor.invalidate(new Coordinate(record));
 
 					Integer x = record.getPosx();

@@ -1,12 +1,13 @@
-package io.rudin.minetest.tileserver.accessor;
+package io.rudin.minetest.tileserver.service.impl;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import io.rudin.minetest.tileserver.MapBlock;
+import io.rudin.minetest.tileserver.accessor.Coordinate;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.qualifier.MapDB;
+import io.rudin.minetest.tileserver.service.BlocksRecordService;
 import org.jooq.DSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -25,12 +25,15 @@ import java.util.concurrent.TimeUnit;
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
 @Singleton
-public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<BlocksRecord>> {
+public class BlocksRecordDatabaseService
+        extends CacheLoader<Coordinate, Optional<BlocksRecord>>
+        implements BlocksRecordService {
 
-    private static final Logger logger = LoggerFactory.getLogger(BlocksRecordAccessor.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(BlocksRecordDatabaseService.class);
 
     @Inject
-    public BlocksRecordAccessor(@MapDB DSLContext ctx, TileServerConfig cfg){
+    public BlocksRecordDatabaseService(@MapDB DSLContext ctx, TileServerConfig cfg){
         this.ctx = ctx;
         this.cfg = cfg;
         this.cache = CacheBuilder.newBuilder()
@@ -45,6 +48,8 @@ public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<Block
 
     private final DSLContext ctx;
 
+
+    @Override
     public Optional<BlocksRecord> get(Coordinate coords){
         try {
             return cache.get(coords);
@@ -53,6 +58,7 @@ public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<Block
         }
     }
 
+    @Override
     public List<BlocksRecord> getTopDownYStride(int x, int z, int minY, int maxY) {
 
         long start = System.currentTimeMillis();
@@ -102,7 +108,7 @@ public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<Block
 
     }
 
-
+    @Override
     public void update(BlocksRecord block){
         Coordinate coordinate = new Coordinate(block);
         cache.put(coordinate, Optional.of(block));
@@ -135,4 +141,5 @@ public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<Block
 
         return record;
     }
+
 }

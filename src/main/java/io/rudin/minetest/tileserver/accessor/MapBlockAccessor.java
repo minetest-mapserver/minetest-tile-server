@@ -7,6 +7,7 @@ import io.rudin.minetest.tileserver.MapBlock;
 import io.rudin.minetest.tileserver.MapBlockParser;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
+import io.rudin.minetest.tileserver.service.BlocksRecordService;
 import io.rudin.minetest.tileserver.service.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +27,8 @@ public class MapBlockAccessor extends CacheLoader<Coordinate, Optional<MapBlock>
     private static final Logger logger = LoggerFactory.getLogger(MapBlockAccessor.class);
 
     @Inject
-    public MapBlockAccessor(BlocksRecordAccessor recordAccessor, EventBus eventBus, TileServerConfig cfg){
-        this.recordAccessor = recordAccessor;
+    public MapBlockAccessor(BlocksRecordService blocksRecordService, EventBus eventBus, TileServerConfig cfg){
+        this.blocksRecordService = blocksRecordService;
         this.eventBus = eventBus;
 
         //TODO: disk based cache, ehcache
@@ -45,7 +46,7 @@ public class MapBlockAccessor extends CacheLoader<Coordinate, Optional<MapBlock>
 
     private final LoadingCache<Coordinate, Optional<MapBlock>> cache;
 
-    private final BlocksRecordAccessor recordAccessor;
+    private final BlocksRecordService blocksRecordService;
 
     public Optional<MapBlock> get(Coordinate coords){
         try {
@@ -64,7 +65,7 @@ public class MapBlockAccessor extends CacheLoader<Coordinate, Optional<MapBlock>
         }
 
         //do prefetch
-        List<BlocksRecord> blocks = recordAccessor.getTopDownYStride(x, z, minY, maxY);
+        List<BlocksRecord> blocks = blocksRecordService.getTopDownYStride(x, z, minY, maxY);
         for (BlocksRecord record: blocks){
             MapBlock mapBlock = MapBlockParser.parse(record);
 
@@ -86,7 +87,7 @@ public class MapBlockAccessor extends CacheLoader<Coordinate, Optional<MapBlock>
 
     @Override
     public Optional<MapBlock> load(Coordinate coordinate) throws Exception {
-        Optional<BlocksRecord> optionalRecord = recordAccessor.get(coordinate);
+        Optional<BlocksRecord> optionalRecord = blocksRecordService.get(coordinate);
 
         if (optionalRecord.isPresent()) {
 
