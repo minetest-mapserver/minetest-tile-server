@@ -3,6 +3,7 @@ package io.rudin.minetest.tileserver.accessor;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import io.rudin.minetest.tileserver.MapBlock;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.qualifier.MapDB;
@@ -12,7 +13,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -74,9 +79,34 @@ public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<Block
         return list;
     }
 
+    private File getLocalMapBlockFile(Coordinate coordinate){
+        File mapblockDir = new File("mapblocks");
+        if (!mapblockDir.isDirectory())
+            mapblockDir.mkdir();
+
+        return new File(mapblockDir, coordinate.x + "." + coordinate.y + "." + coordinate.z);
+    }
+
+    private void saveMapBlockLocally(Coordinate coordinate, BlocksRecord block){
+        if (!cfg.saveMapBlocks() || block == null)
+            return;
+
+        File file = getLocalMapBlockFile(coordinate);
+        try (OutputStream output = new FileOutputStream(file)){
+            output.write(block.getData());
+
+        } catch (Exception e){
+            //debug option, nobody cares...
+            e.printStackTrace();
+        }
+
+    }
+
 
     public void update(BlocksRecord block){
-        cache.put(new Coordinate(block), Optional.of(block));
+        Coordinate coordinate = new Coordinate(block);
+        cache.put(coordinate, Optional.of(block));
+        saveMapBlockLocally(coordinate, block);
     }
 
     @Override
@@ -98,6 +128,11 @@ public class BlocksRecordAccessor extends CacheLoader<Coordinate, Optional<Block
         if (diff > 500 && cfg.logQueryPerformance()){
             logger.warn("load took {} ms", diff);
         }
+
+        if (record.isPresent()){
+            saveMapBlockLocally(coordinate, record.get());
+        }
+
         return record;
     }
 }

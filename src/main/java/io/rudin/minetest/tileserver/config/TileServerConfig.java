@@ -188,4 +188,12 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("false")
 	boolean dumpFailedMapblocks();
 
+	/**
+	 * Saves mapblocks as local file if enabled
+	 * @return
+	 */
+	@Key("debug.mapblock.save")
+	@DefaultValue("false")
+	boolean saveMapBlocks();
+
 }
