@@ -3,3 +3,6 @@ target
 mapblocks
 .idea
 *.iml
+*.log
+node_modules
+logs
