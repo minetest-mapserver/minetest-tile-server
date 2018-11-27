@@ -85,7 +85,7 @@ public class BlocksRecordDatabaseService
         return list;
     }
 
-    private File getLocalMapBlockFile(Coordinate coordinate){
+    public static File getLocalMapBlockFile(Coordinate coordinate){
         File mapblockDir = new File("mapblocks");
         if (!mapblockDir.isDirectory())
             mapblockDir.mkdir();
