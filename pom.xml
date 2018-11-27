@@ -52,8 +52,6 @@
 			<version>1.0.10</version>
 		</dependency>
 
-		<!--DB Drivers -->
-
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -61,20 +59,10 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.xerial</groupId>
-			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.25.2</version>
-		</dependency>
-
-		<!-- Connection pool -->
-
-		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
 			<version>${hikaricp.version}</version>
 		</dependency>
-
-		<!-- jOOQ -->
 
 		<dependency>
 			<groupId>org.jooq</groupId>
