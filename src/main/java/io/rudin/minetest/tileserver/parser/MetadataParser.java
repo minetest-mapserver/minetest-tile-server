@@ -1,7 +1,6 @@
 package io.rudin.minetest.tileserver.parser;
 
-import io.rudin.minetest.tileserver.MapBlockParser;
-import org.jooq.Meta;
+import io.rudin.minetest.tileserver.util.MapBlockParser;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

@@ -1,6 +1,6 @@
 package io.rudin.minetest.tileserver.accessor;
 
-import io.rudin.minetest.tileserver.MapBlock;
+import io.rudin.minetest.tileserver.util.MapBlock;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 
 import java.util.Objects;

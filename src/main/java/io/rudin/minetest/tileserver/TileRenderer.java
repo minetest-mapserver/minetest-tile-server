@@ -312,7 +312,7 @@ public class TileRenderer {
 			long timingRender = 0;
 
 			if (!countList.isEmpty()) {
-				blockRenderer.render(layer, mapblockX, mapblockZ, graphics, 16);
+				blockRenderer.render(layer.from, layer.to, mapblockX, mapblockZ, graphics, 16);
 
 				now = System.currentTimeMillis();
 				timingRender = now - start;

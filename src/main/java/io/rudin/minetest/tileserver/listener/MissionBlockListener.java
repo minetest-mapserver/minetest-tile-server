@@ -1,9 +1,8 @@
 package io.rudin.minetest.tileserver.listener;
 
 import com.google.common.eventbus.Subscribe;
-import io.rudin.minetest.tileserver.MapBlock;
+import io.rudin.minetest.tileserver.util.MapBlock;
 import io.rudin.minetest.tileserver.blockdb.tables.records.MissionsRecord;
-import io.rudin.minetest.tileserver.blockdb.tables.records.TravelnetRecord;
 import io.rudin.minetest.tileserver.parser.Metadata;
 import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.service.EventBus;

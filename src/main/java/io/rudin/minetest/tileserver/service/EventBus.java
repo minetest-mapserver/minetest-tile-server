@@ -1,11 +1,7 @@
 package io.rudin.minetest.tileserver.service;
 
-import io.rudin.minetest.tileserver.MapBlock;
-import io.rudin.minetest.tileserver.blockdb.tables.pojos.Player;
+import io.rudin.minetest.tileserver.util.MapBlock;
 import io.rudin.minetest.tileserver.entity.PlayerInfo;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public interface EventBus {
 

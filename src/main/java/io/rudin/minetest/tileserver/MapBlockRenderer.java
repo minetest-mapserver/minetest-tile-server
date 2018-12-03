@@ -1,9 +1,6 @@
 package io.rudin.minetest.tileserver;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.zip.DataFormatException;
@@ -17,6 +14,7 @@ import io.rudin.minetest.tileserver.accessor.MapBlockAccessor;
 import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.query.YQueryBuilder;
+import io.rudin.minetest.tileserver.util.MapBlock;
 import io.rudin.minetest.tileserver.util.UnknownBlockCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,11 +47,11 @@ public class MapBlockRenderer {
 
 	private final ColorTable colorTable;
 
-	public void render(Layer layer, int x, int z, Graphics graphics) throws IllegalArgumentException, DataFormatException, ExecutionException {
-		render(layer, x, z, graphics, 1);
+	public void render(int fromY, int toY, int x, int z, Graphics graphics) throws IllegalArgumentException, DataFormatException, ExecutionException {
+		render(fromY, toY, x, z, graphics, 1);
 	}
 
-	public void render(Layer layer, int mapBlockX, int mapBlockZ, Graphics graphics, int scale) throws IllegalArgumentException, DataFormatException, ExecutionException {
+	public void render(int fromY, int toY, int mapBlockX, int mapBlockZ, Graphics graphics, int scale) throws IllegalArgumentException, DataFormatException, ExecutionException {
 
 		logger.debug("Rendering block: x={} z={}", mapBlockX, mapBlockZ);
 
@@ -65,9 +63,6 @@ public class MapBlockRenderer {
 			final int expectedBlocks = 16 * 16;
 
 			boolean[][] xz_coords = new boolean[16][16];
-
-			int fromY = YQueryBuilder.coordinateToMapBlock(layer.from);
-			int toY = YQueryBuilder.coordinateToMapBlock(layer.to);
 
 			mapBlockAccessor.prefetchTopDownYStride(mapBlockX, mapBlockZ, fromY, toY);
 

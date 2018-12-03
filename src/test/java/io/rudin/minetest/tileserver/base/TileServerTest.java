@@ -41,6 +41,7 @@ public class TileServerTest {
 
         DataSource dataSource = injector.getInstance(Key.get(DataSource.class, MapDB.class));
         try (Connection connection = dataSource.getConnection()){
+            connection.createStatement().execute("drop all objects");
             connection.createStatement().execute("runscript from 'classpath:/minetest-db.sql'");
         }
 

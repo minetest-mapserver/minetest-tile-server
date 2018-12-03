@@ -1,8 +1,8 @@
-package io.rudin.minetest.tileserver;
+package io.rudin.minetest.tileserver.util;
 
 import io.rudin.minetest.tileserver.parser.Metadata;
 import io.rudin.minetest.tileserver.parser.MetadataParser;
-import org.slf4j.Logger;
+import io.rudin.minetest.tileserver.util.MapBlockParser;
 
 import java.util.HashMap;
 import java.util.Map;

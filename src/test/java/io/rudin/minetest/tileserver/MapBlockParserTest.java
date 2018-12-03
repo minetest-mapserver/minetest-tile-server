@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.DataFormatException;
 
+import io.rudin.minetest.tileserver.util.MapBlock;
+import io.rudin.minetest.tileserver.util.MapBlockParser;
 import org.junit.Before;
 import org.junit.Test;
 

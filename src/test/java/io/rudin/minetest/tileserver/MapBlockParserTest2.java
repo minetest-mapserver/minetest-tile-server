@@ -1,11 +1,12 @@
 package io.rudin.minetest.tileserver;
 
 import io.rudin.minetest.tileserver.parser.MetadataParser;
+import io.rudin.minetest.tileserver.util.MapBlock;
+import io.rudin.minetest.tileserver.util.MapBlockParser;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.*;
-import java.util.zip.DataFormatException;
 
 public class MapBlockParserTest2 {
 

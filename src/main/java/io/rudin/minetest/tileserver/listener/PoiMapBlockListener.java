@@ -1,7 +1,7 @@
 package io.rudin.minetest.tileserver.listener;
 
 import com.google.common.eventbus.Subscribe;
-import io.rudin.minetest.tileserver.MapBlock;
+import io.rudin.minetest.tileserver.util.MapBlock;
 import io.rudin.minetest.tileserver.blockdb.tables.records.PoiRecord;
 import io.rudin.minetest.tileserver.parser.Metadata;
 import io.rudin.minetest.tileserver.qualifier.MapDB;

@@ -1,10 +1,9 @@
-package io.rudin.minetest.tileserver;
+package io.rudin.minetest.tileserver.util;
 
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileOutputStream;
 import java.util.Map;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;

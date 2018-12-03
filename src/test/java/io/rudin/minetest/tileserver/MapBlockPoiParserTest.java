@@ -1,5 +1,7 @@
 package io.rudin.minetest.tileserver;
 
+import io.rudin.minetest.tileserver.util.MapBlock;
+import io.rudin.minetest.tileserver.util.MapBlockParser;
 import org.junit.Before;
 import org.junit.Test;
 
