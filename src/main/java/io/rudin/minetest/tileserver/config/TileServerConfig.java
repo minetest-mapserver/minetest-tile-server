@@ -94,22 +94,6 @@ public interface TileServerConfig extends Config {
 	String staticFilesLocation();
 
 	/*
-	Tile rendering strategy
-	 */
-
-	@Key("tile.rendering.strategy")
-	@DefaultValue("ASAP")
-	TileRenderingStrategy tileRenderingStrategy();
-
-	enum TileRenderingStrategy {
-		//When tiles are viewed in browser
-		ON_DEMAND,
-
-		//When tiles change
-		ASAP
-	}
-
-	/*
 	tile cache stuff
 	 */
 

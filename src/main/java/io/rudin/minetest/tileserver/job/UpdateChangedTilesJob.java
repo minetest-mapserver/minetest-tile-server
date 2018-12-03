@@ -184,8 +184,6 @@ public class UpdateChangedTilesJob implements Runnable {
 
 				long diff = System.currentTimeMillis() - start;
 
-				boolean renderImmediately = cfg.tileRenderingStrategy() == TileServerConfig.TileRenderingStrategy.ASAP;
-
 				if (diff > 500 && cfg.logQueryPerformance()) {
 					logger.warn("updated-tiles-query took {} ms", diff);
 				} else {
@@ -194,58 +192,22 @@ public class UpdateChangedTilesJob implements Runnable {
 
 				if (blocks.size() == LIMIT) {
 					logger.warn("Got max-blocks ({}) from update-queue", LIMIT);
-
-					if (renderImmediately) {
-						logger.warn("Disabling immediate rendering strategy for current run!");
-						renderImmediately = false;
-					}
 				}
 
 				logger.debug("Got {} updated blocks", blocks.size());
 
-				List<String> updatedTileKeys = new ArrayList<>();
-
 				for (BlocksRecord record : blocks) {
-
 					blocksRecordService.update(record);
 					mapBlockAccessor.invalidate(new Coordinate(record));
-
-					Integer x = record.getPosx();
-					Integer z = record.getPosz();
-
-					if (record.getMtime() > latestTimestamp) {
-						//Update timestamp
-						latestTimestamp = record.getMtime();
-					}
-
-					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
-
-					//remove all tiles in every zoom
-					for (int i = CoordinateResolver.MAX_ZOOM; i >= CoordinateResolver.MIN_ZOOM; i--) {
-						TileInfo zoomedTile = tileInfo.toZoom(i);
-						String tileKey = getTileKey(zoomedTile);
-
-						if (!updatedTileKeys.contains(tileKey)) {
-							invalidatedTiles++;
-							tileCache.remove(layer.id, zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
-							tileCount++;
-
-							updatedTileKeys.add(tileKey);
-						}
-
-					}
 				}
-
-				logger.debug("Finished invalidating changed tiles");
 
 				//assign new timestamp
 				timestampMap.put(layer.id, latestTimestamp);
 
-				updatedTileKeys.clear();
 
 				logger.debug("Starting rendering of changed tiles");
 
-				//Second run with rendering
+				//run with rendering of highest zoom level without cache
 				for (BlocksRecord record : blocks) {
 
 					Integer x = record.getPosx();
@@ -253,17 +215,44 @@ public class UpdateChangedTilesJob implements Runnable {
 
 					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
 
-					for (int i = CoordinateResolver.MAX_ZOOM; i >= CoordinateResolver.MIN_ZOOM+2; i--) {
+					TileInfo zoomedTile = tileInfo.toZoom(CoordinateResolver.MAX_ZOOM);
+					String tileKey = getTileKey(zoomedTile);
+
+					logger.debug("Rendering tile x={} y={} zoom={}", zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
+					tileRenderer.render(layer, zoomedTile.x, zoomedTile.y, zoomedTile.zoom, false); //render without cache
+
+					logger.debug("Dispatching tile-changed-event for tile: {}/{}", zoomedTile.x, zoomedTile.y);
+
+					EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
+					event.layerId = layer.id;
+					event.x = zoomedTile.x;
+					event.y = zoomedTile.y;
+					event.zoom = zoomedTile.zoom;
+					event.mapblockX = x;
+					event.mapblockZ = z;
+					eventBus.post(event);
+
+				}
+
+				List<String> updatedTileKeys = new ArrayList<>();
+
+				//run with rendering of other zoom levels, but cached
+				for (BlocksRecord record : blocks) {
+
+					Integer x = record.getPosx();
+					Integer z = record.getPosz();
+
+					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
+
+					for (int i = CoordinateResolver.MAX_ZOOM-1; i >= CoordinateResolver.MIN_ZOOM+2; i--) {
 						TileInfo zoomedTile = tileInfo.toZoom(i);
 						String tileKey = getTileKey(zoomedTile);
 
 						if (!updatedTileKeys.contains(tileKey)) {
 
-							if (renderImmediately) {
-								//Generate tiles now
-								logger.debug("Rendering tile x={} y={} zoom={}", zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
-								tileRenderer.render(layer, zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
-							}
+							//Generate tiles now
+							logger.debug("Rendering tile x={} y={} zoom={}", zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
+							tileRenderer.render(layer, zoomedTile.x, zoomedTile.y, zoomedTile.zoom, false); //render without cache
 
 							logger.debug("Dispatching tile-changed-event for tile: {}/{}", zoomedTile.x, zoomedTile.y);
 

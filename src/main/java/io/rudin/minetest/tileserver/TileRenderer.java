@@ -67,9 +67,13 @@ public class TileRenderer {
 	private final int DEFAULT_BLOCK_ZOOM = 13;
 
 	public byte[] render(Layer layer, int tileX, int tileY, int zoom) throws IllegalArgumentException, DataFormatException, IOException, ExecutionException {
+		return render(layer, tileX, tileY, zoom, true);
+	}
+
+	public byte[] render(Layer layer, int tileX, int tileY, int zoom, boolean usecache) throws IllegalArgumentException, DataFormatException, IOException, ExecutionException {
 
 		//Check binary cache
-		if (cache.has(layer.id, tileX, tileY, zoom)) {
+		if (usecache && cache.has(layer.id, tileX, tileY, zoom)) {
 			byte[] tile =  cache.get(layer.id, tileX, tileY, zoom);
 
 			if (tile == null || tile.length == 0){
@@ -128,7 +132,7 @@ public class TileRenderer {
 		}
 
 
-		BufferedImage image = renderImage(layer, tileX, tileY, zoom);
+		BufferedImage image = renderImage(layer, tileX, tileY, zoom, usecache);
 
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		ImageIO.write(image, "png", output);
@@ -151,9 +155,13 @@ public class TileRenderer {
 	 * @throws ExecutionException
 	 */
 	public BufferedImage renderImage(Layer layer, int tileX, int tileY, int zoom) throws IllegalArgumentException, DataFormatException, IOException, ExecutionException {
+		return renderImage(layer, tileX, tileY, zoom, true);
+	}
+
+	public BufferedImage renderImage(Layer layer, int tileX, int tileY, int zoom, boolean usecache) throws IllegalArgumentException, DataFormatException, IOException, ExecutionException {
 
 		//Check if binary cached, use cached version for rendering
-		if (cache.has(layer.id, tileX, tileY, zoom)) {
+		if (usecache && cache.has(layer.id, tileX, tileY, zoom)) {
 			byte[] data = cache.get(layer.id, tileX, tileY, zoom);
 
 			if (data != null && data.length > 0)
