@@ -1,4 +1,4 @@
-package io.rudin.minetest.tileserver;
+package io.rudin.minetest.tileserver.service.impl;
 
 import java.awt.*;
 import java.util.Optional;
@@ -9,11 +9,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.prometheus.client.Histogram;
+import io.rudin.minetest.tileserver.ColorTable;
 import io.rudin.minetest.tileserver.accessor.Coordinate;
 import io.rudin.minetest.tileserver.accessor.MapBlockAccessor;
-import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
-import io.rudin.minetest.tileserver.query.YQueryBuilder;
+import io.rudin.minetest.tileserver.service.MapBlockRenderService;
 import io.rudin.minetest.tileserver.util.MapBlock;
 import io.rudin.minetest.tileserver.util.UnknownBlockCollector;
 import org.slf4j.Logger;
@@ -21,14 +21,14 @@ import org.slf4j.LoggerFactory;
 
 
 @Singleton
-public class MapBlockRenderer {
+public class DefaultMapBlockRenderService implements MapBlockRenderService {
 
-	private static final Logger logger = LoggerFactory.getLogger(MapBlockRenderer.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultMapBlockRenderService.class);
 
 	private static final int BLOCK_SIZE = 16;
 	
 	@Inject
-	public MapBlockRenderer(ColorTable colorTable, MapBlockAccessor mapBlockAccessor, TileServerConfig cfg, UnknownBlockCollector unknownBlockCollector) {
+	public DefaultMapBlockRenderService(ColorTable colorTable, MapBlockAccessor mapBlockAccessor, TileServerConfig cfg, UnknownBlockCollector unknownBlockCollector) {
 		this.colorTable = colorTable;
 		this.mapBlockAccessor = mapBlockAccessor;
 		this.unknownBlockCollector = unknownBlockCollector;
@@ -46,10 +46,6 @@ public class MapBlockRenderer {
 	private final MapBlockAccessor mapBlockAccessor;
 
 	private final ColorTable colorTable;
-
-	public void render(int fromY, int toY, int x, int z, Graphics graphics) throws IllegalArgumentException, DataFormatException, ExecutionException {
-		render(fromY, toY, x, z, graphics, 1);
-	}
 
 	public void render(int fromY, int toY, int mapBlockX, int mapBlockZ, Graphics graphics, int scale) throws IllegalArgumentException, DataFormatException, ExecutionException {
 

@@ -13,9 +13,9 @@ import io.rudin.minetest.tileserver.provider.ExecutorProvider;
 import io.rudin.minetest.tileserver.provider.LayerConfigProvider;
 import io.rudin.minetest.tileserver.service.BlocksRecordService;
 import io.rudin.minetest.tileserver.service.EventBus;
+import io.rudin.minetest.tileserver.service.MapBlockRenderService;
 import io.rudin.minetest.tileserver.service.TileCache;
 import io.rudin.minetest.tileserver.service.impl.*;
-import org.jooq.util.jaxb.Database;
 
 public class ServiceModule extends AbstractModule {
 
@@ -44,5 +44,6 @@ public class ServiceModule extends AbstractModule {
 		bind(ScheduledExecutorService.class).toProvider(ExecutorProvider.class);
 		bind(LayerConfig.class).toProvider(LayerConfigProvider.class);
 		bind(BlocksRecordService.class).to(BlocksRecordDatabaseService.class);
+		bind(MapBlockRenderService.class).to(DefaultMapBlockRenderService.class);
 	}
 }

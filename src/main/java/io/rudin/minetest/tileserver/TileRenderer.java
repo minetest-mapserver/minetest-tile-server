@@ -7,27 +7,21 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.zip.DataFormatException;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.google.common.util.concurrent.Striped;
 import io.prometheus.client.Histogram;
-import io.rudin.minetest.tileserver.accessor.Coordinate;
 import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.query.YQueryBuilder;
-import org.jooq.Condition;
+import io.rudin.minetest.tileserver.service.MapBlockRenderService;
 import org.jooq.DSLContext;
 import org.jooq.Result;
-import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +37,7 @@ public class TileRenderer {
 	private static final Logger logger = LoggerFactory.getLogger(TileRenderer.class);
 	
 	@Inject
-	public TileRenderer(@MapDB DSLContext ctx, TileCache cache, MapBlockRenderer blockRenderer, TileServerConfig cfg, YQueryBuilder yQueryBuilder) {
+	public TileRenderer(@MapDB DSLContext ctx, TileCache cache, MapBlockRenderService blockRenderer, TileServerConfig cfg, YQueryBuilder yQueryBuilder) {
 		this.ctx = ctx;
 		this.cache = cache;
 		this.blockRenderer = blockRenderer;
@@ -61,7 +55,7 @@ public class TileRenderer {
 
 	private final DSLContext ctx;
 
-	private final MapBlockRenderer blockRenderer;
+	private final MapBlockRenderService blockRenderer;
 
 	static final Histogram renderTime = Histogram.build()
 			.name("tileserver_render_time_seconds").help("Render time in seconds.").register();
