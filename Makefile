@@ -5,7 +5,7 @@ MAVEN_TAG=maven:3.6-jdk-11
 
 build:
 	rm -rf target/docker
-	docker run -it --rm $(VOLUMES) -e M3_HOME=/root/.m2 $(MAVEN_TAG) mvn install
+	docker run -it --rm $(VOLUMES) $(MAVEN_TAG) mvn install
 	docker build . -t $(TAG)
 
 push:
