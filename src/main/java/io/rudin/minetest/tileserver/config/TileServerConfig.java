@@ -165,6 +165,10 @@ public interface TileServerConfig extends Config {
 	@DefaultValue("org.postgresql.Driver")
 	String tileDatabaseDriver();
 
+	@Key("minetest.db.dialect")
+	@DefaultValue("POSTGRES")
+	SQLDialect tileDatabaseDialect();
+
 	/*
 	Debug stuff
 	 */

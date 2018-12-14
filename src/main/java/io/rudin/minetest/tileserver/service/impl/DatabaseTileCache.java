@@ -10,6 +10,7 @@ import io.rudin.minetest.tileserver.qualifier.TileDB;
 import io.rudin.minetest.tileserver.service.TileCache;
 import io.rudin.minetest.tileserver.tiledb.tables.records.TilesRecord;
 import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,10 +110,15 @@ public class DatabaseTileCache implements TileCache {
 
     @Override
     public long getLatestTimestamp() {
-        return ctx
+        Long mtime = ctx
                 .select(DSL.max(TILES.MTIME))
                 .from(TILES)
                 .fetchOne(DSL.max(TILES.MTIME));
+
+        if (mtime == null)
+            return 0L;
+        else
+            return mtime;
     }
 
     @Override
@@ -121,17 +127,25 @@ public class DatabaseTileCache implements TileCache {
     }
 
     private void insertOrupdate(TilesRecord record){
-        ctx
-                .insertInto(TILES, record.fields())
-                .values(record.intoArray())
-                .onDuplicateKeyUpdate()
-                .set(TILES.X, record.getX())
-                .set(TILES.Y, record.getY())
-                .set(TILES.Z, record.getZ())
-                .set(TILES.LAYERID, record.getLayerid())
-                .set(TILES.MTIME, record.getMtime())
-                .set(TILES.TILE, record.getTile())
-                .execute();
+        if (ctx.dialect() == SQLDialect.POSTGRES){
+            //upsert
+            ctx
+                    .insertInto(TILES, record.fields())
+                    .values(record.intoArray())
+                    .onDuplicateKeyUpdate()
+                    .set(TILES.X, record.getX())
+                    .set(TILES.Y, record.getY())
+                    .set(TILES.Z, record.getZ())
+                    .set(TILES.LAYERID, record.getLayerid())
+                    .set(TILES.MTIME, record.getMtime())
+                    .set(TILES.TILE, record.getTile())
+                    .execute();
+
+        } else {
+            //fallback
+            record.store();
+        }
+
     }
 
 }

@@ -13,6 +13,7 @@ import io.rudin.minetest.tileserver.module.DBModule;
 import io.rudin.minetest.tileserver.module.ServiceModule;
 import io.rudin.minetest.tileserver.module.TestServiceModule;
 import io.rudin.minetest.tileserver.qualifier.MapDB;
+import io.rudin.minetest.tileserver.qualifier.TileDB;
 import io.rudin.minetest.tileserver.util.StreamUtil;
 import org.aeonbits.owner.ConfigFactory;
 import org.jooq.DSLContext;
@@ -38,24 +39,40 @@ public class TileServerTest {
     @Before
     public void init() throws SQLException, IOException {
         Map<String, String> properties = new HashMap<>();
-        properties.put("minetest.db.url", "jdbc:h2:mem:tileserver;DB_CLOSE_DELAY=-1");
+
+        properties.put("minetest.db.url", "jdbc:h2:mem:blocks;DB_CLOSE_DELAY=-1");
         properties.put("minetest.db.username", "sa");
         properties.put("minetest.db.password", "");
         properties.put("minetest.db.driver", "org.h2.Driver");
         properties.put("minetest.db.dialect", "H2");
+
+        properties.put("tile.db.url", "jdbc:h2:mem:tiles;DB_CLOSE_DELAY=-1");
+        properties.put("tile.db.username", "sa");
+        properties.put("tile.db.password", "");
+        properties.put("tile.db.driver", "org.h2.Driver");
+        properties.put("tile.db.dialect", "H2");
+
+        properties.put("tile.cache.impl", "DATABASE");
 
         TileServerConfig cfg = ConfigFactory.create(TileServerConfig.class, properties);
 
         injector = Guice.createInjector(
                 new ConfigModule(cfg),
                 new DBModule(cfg),
-                new TestServiceModule()
+                new ServiceModule(cfg)
         );
 
         DataSource dataSource = injector.getInstance(Key.get(DataSource.class, MapDB.class));
         try (Connection connection = dataSource.getConnection()){
             connection.createStatement().execute("drop all objects");
             connection.createStatement().execute("runscript from 'classpath:/minetest-db.sql'");
+
+        }
+
+        DataSource tileDataSource = injector.getInstance(Key.get(DataSource.class, TileDB.class));
+        try (Connection connection = tileDataSource.getConnection()){
+            connection.createStatement().execute("drop all objects");
+            connection.createStatement().execute("runscript from 'classpath:/minetest-tiledb.sql'");
 
         }
 

@@ -1,6 +1,7 @@
 package io.rudin.minetest.tileserver.provider;
 
 import com.zaxxer.hikari.HikariDataSource;
+import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.qualifier.TileDB;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -15,15 +16,18 @@ import javax.sql.DataSource;
 public class TileDBDSLContextProvider implements Provider<DSLContext> {
 
 	@Inject
-	public TileDBDSLContextProvider(@TileDB DataSource ds) {
+	public TileDBDSLContextProvider(@TileDB DataSource ds, TileServerConfig cfg) {
 		this.ds = ds;
+		this.cfg = cfg;
 	}
-	
+
+	private final TileServerConfig cfg;
+
 	private final DataSource ds;
 	
 	@Override
 	public DSLContext get() {
-		return DSL.using(ds, SQLDialect.POSTGRES);
+		return DSL.using(ds, cfg.tileDatabaseDialect());
 	}
 
 }
