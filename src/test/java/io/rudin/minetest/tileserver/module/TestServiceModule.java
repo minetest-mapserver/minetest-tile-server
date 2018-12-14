@@ -7,10 +7,7 @@ import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.provider.ColorTableProvider;
 import io.rudin.minetest.tileserver.provider.ExecutorProvider;
 import io.rudin.minetest.tileserver.provider.LayerConfigProvider;
-import io.rudin.minetest.tileserver.service.BlocksRecordLocalService;
-import io.rudin.minetest.tileserver.service.BlocksRecordService;
-import io.rudin.minetest.tileserver.service.EventBus;
-import io.rudin.minetest.tileserver.service.TileCache;
+import io.rudin.minetest.tileserver.service.*;
 import io.rudin.minetest.tileserver.service.impl.*;
 
 import java.util.concurrent.ExecutorService;
@@ -28,7 +25,8 @@ public class TestServiceModule  extends AbstractModule {
         bind(ExecutorService.class).toProvider(ExecutorProvider.class);
         bind(ScheduledExecutorService.class).toProvider(ExecutorProvider.class);
         bind(LayerConfig.class).toProvider(LayerConfigProvider.class);
+        bind(MapBlockRenderService.class).to(DefaultMapBlockRenderService.class);
 
-        bind(BlocksRecordService.class).to(BlocksRecordLocalService.class);
+        bind(BlocksRecordService.class).to(BlocksRecordDatabaseService.class);
     }
 }

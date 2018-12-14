@@ -15,22 +15,21 @@ public class TileDBDatasourceProvider implements Provider<DataSource> {
 
 	@Inject
 	public TileDBDatasourceProvider(TileServerConfig cfg) {
-		this.cfg = cfg;
-	}
-	
-	private final TileServerConfig cfg;
-	
-	@Override
-	@Singleton
-	public DataSource get() {
-
 		HikariConfig hikariConfig = new HikariConfig();
 		hikariConfig.setUsername(cfg.tileDatabaseUsername());
 		hikariConfig.setPassword(cfg.tileDatabasePassword());
 		hikariConfig.setJdbcUrl(cfg.tileDatabaseUrl());
 		hikariConfig.setDriverClassName(cfg.tileDatabaseDriver());
 
-		return new HikariDataSource(hikariConfig);
+		this.ds = new HikariDataSource(hikariConfig);
+	}
+	
+	private final HikariDataSource ds;
+	
+	@Override
+	@Singleton
+	public DataSource get() {
+		return ds;
 	}
 
 }

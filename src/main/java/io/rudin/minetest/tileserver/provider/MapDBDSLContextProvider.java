@@ -28,7 +28,7 @@ public class MapDBDSLContextProvider implements Provider<DSLContext> {
 	
 	@Override
 	public DSLContext get() {
-		return DSL.using(ds, SQLDialect.POSTGRES);
+		return DSL.using(ds, cfg.minetestDatabaseDialect());
 	}
 
 }

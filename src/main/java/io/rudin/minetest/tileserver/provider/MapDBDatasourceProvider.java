@@ -14,22 +14,21 @@ public class MapDBDatasourceProvider implements Provider<DataSource> {
 
 	@Inject
 	public MapDBDatasourceProvider(TileServerConfig cfg) {
-		this.cfg = cfg;
-	}
-	
-	private final TileServerConfig cfg;
-	
-	@Override
-	@Singleton
-	public DataSource get() {
-
 		HikariConfig hikariConfig = new HikariConfig();
 		hikariConfig.setUsername(cfg.minetestDatabaseUsername());
 		hikariConfig.setPassword(cfg.minetestDatabasePassword());
 		hikariConfig.setJdbcUrl(cfg.minetestDatabaseUrl());
 		hikariConfig.setDriverClassName(cfg.minetestDatabaseDriver());
 
-		return new HikariDataSource(hikariConfig);
+		ds = new HikariDataSource(hikariConfig);
+	}
+	
+	private final HikariDataSource ds;
+	
+	@Override
+	@Singleton
+	public DataSource get() {
+		return ds;
 	}
 
 }

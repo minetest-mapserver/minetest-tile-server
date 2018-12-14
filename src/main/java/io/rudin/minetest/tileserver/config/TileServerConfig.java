@@ -2,6 +2,7 @@ package io.rudin.minetest.tileserver.config;
 
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.Sources;
+import org.jooq.SQLDialect;
 
 @Sources({
 	"file:./tileserver.properties"
@@ -139,6 +140,10 @@ public interface TileServerConfig extends Config {
 	@Key("minetest.db.driver")
 	@DefaultValue("org.postgresql.Driver")
 	String minetestDatabaseDriver();
+
+	@Key("minetest.db.dialect")
+	@DefaultValue("POSTGRES")
+	SQLDialect minetestDatabaseDialect();
 
 	/*
 	 Tile cache DB
