@@ -94,7 +94,7 @@ public class TileRenderer {
 			int x2 = mapblockInfo.x + (int)mapblockInfo.width;
 			
 			int z1 = mapblockInfo.z;
-			int z2 = mapblockInfo.z + ((int)mapblockInfo.height * -1);
+			int z2 = (mapblockInfo.z *-1) + ((int)mapblockInfo.height);
 
 			long start = System.currentTimeMillis();
 
@@ -117,7 +117,7 @@ public class TileRenderer {
 			}
 		
 			if (firstResult.isEmpty()) {
-				logger.debug("Fail-fast, got zero mapblock count for x={}-{} z={}-{}", x1,x2, z1,z2);
+				logger.debug("Fail-fast, got zero mapblock count for x=({})-({}) z=({})-({})", x1,x2, z1,z2);
 
 				byte[] data = WhiteTile.getPNG();
 
@@ -260,7 +260,7 @@ public class TileRenderer {
 
 				long diff = System.currentTimeMillis() - start;
 
-				logger.debug("Timings of cross-stitched tile X={} Y={} Zoom={}: render={} ms", tileX, tileY, zoom, diff);
+				logger.trace("Timings of cross-stitched tile X={} Y={} Zoom={}: render={} ms", tileX, tileY, zoom, diff);
 
 				cache.put(layer.id, tileX, tileY, zoom, data);
 
@@ -314,6 +314,7 @@ public class TileRenderer {
 			long timingRender = 0;
 
 			if (!countList.isEmpty()) {
+				logger.debug("Rendering tile for mapblock: X={}, Z={}", mapblockX, mapblockZ);
 				blockRenderer.render(layer.from, layer.to, mapblockX, mapblockZ, graphics, 16);
 
 				now = System.currentTimeMillis();
@@ -330,7 +331,7 @@ public class TileRenderer {
 			long timingBufferOutput = now - start;
 
 
-			logger.debug("Timings of tile X={} Y={} Zoom={}: setup={} ms, zeroCheck={} ms, render={} ms, output={} ms",
+			logger.trace("Timings of tile X={} Y={} Zoom={}: setup={} ms, zeroCheck={} ms, render={} ms, output={} ms",
 					tileX, tileY, zoom,
 					timingImageSetup, timingZeroCountCheck, timingRender, timingBufferOutput
 			);

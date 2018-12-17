@@ -175,12 +175,17 @@ Zoom: 8
 	public void testTileZoomIterate() {
 		TileInfo tileInfo = CoordinateResolver.fromCoordinates(32, -32);
 		
-		for (int i=CoordinateResolver.MIN_ZOOM; i<=CoordinateResolver.MAX_ZOOM; i++) {
+		for (int i=CoordinateResolver.MAX_ZOOM; i>=CoordinateResolver.MIN_ZOOM; i--) {
 			TileInfo zoomedTile = tileInfo.toZoom(i);
-			
-			System.out.println("Zoom: " + i + " x=" + zoomedTile.x + " y=" + zoomedTile.y + " width=" + zoomedTile.width);
+
+			MapBlockCoordinateInfo coordinateInfo = CoordinateResolver.fromTile(zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
+
+			System.out.println("Zoom: " + i);
+			System.out.println("+Tile: " + zoomedTile);
+			System.out.println("+MapBlock: " + coordinateInfo);
 		}
 		
 	}
+
 
 }

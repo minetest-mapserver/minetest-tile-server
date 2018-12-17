@@ -8,7 +8,10 @@ public class CoordinateResolver {
 	public static final int MAX_ZOOM = 13;
 	public static final int MIN_ZOOM = 1;
 	public static final int ONE_TO_ONE_ZOOM = 13; // 1 tile == 1 mapblock
-	
+
+	/**
+	 * Tile information
+	 */
 	public static class TileInfo {
 		public int x, y;
 		public int zoom;
@@ -31,8 +34,25 @@ public class CoordinateResolver {
 			
 			return info;
 		}
+
+		@Override
+		public String toString() {
+			return "TileInfo{" +
+					"x=" + x +
+					", y=" + y +
+					", zoom=" + zoom +
+					", width=" + width +
+					", height=" + height +
+					'}';
+		}
 	}
 
+	/**
+	 * Get tile coordinates from mapblock coords
+	 * @param x
+	 * @param z
+	 * @return
+	 */
 	public static TileInfo fromCoordinates(int x, int z) {
 		TileInfo info = new TileInfo();
 
@@ -48,6 +68,8 @@ public class CoordinateResolver {
 
 	public static class MapBlockCoordinateInfo {
 		public int x, z;
+
+		@Deprecated //area
 		public double width, height; //in map-blocks
 
 		@Override
@@ -60,22 +82,35 @@ public class CoordinateResolver {
 					'}';
 		}
 	}
-	
-	/*
-	 * ...
-	 * 7 == 0.25
-	 * 8 == 0.5
-	 * 9 == 1 (16x16 mapblocks)
-	 * 10 == 2 (8x8 mapblocks)
-	 * 11 == 4 (4x4 mapblocks)
-	 * 12 == 8 (2x2 mapblocks)
-	 * 13 == 16 (1 mapblock)
-	 * ...
+
+	/**
+	 * An area defined by two mapblock "points"
 	 */
-	public static double getZoomFactor(int zoom) {
-		return Math.pow(2, zoom - 9);
+	public static class MapBlockArea {
+		public MapBlockCoordinateInfo pos1, pos2;
 	}
-	
+
+
+	public static MapBlockArea getMapBlockArea(int x, int y, int zoom){
+		MapBlockArea area = new MapBlockArea();
+
+		MapBlockCoordinateInfo pos1 = new MapBlockCoordinateInfo();
+		MapBlockCoordinateInfo pos2 = new MapBlockCoordinateInfo();
+
+		double factor  = Math.pow(2, ONE_TO_ONE_ZOOM - zoom);
+
+		pos1.x = (int)(x * factor);
+		pos1.z = (int)((y-1) * factor * -1);
+
+		//TODO
+
+		area.pos1 = pos1;
+		area.pos2 = pos2;
+
+		return area;
+	}
+
+	@Deprecated
 	public static MapBlockCoordinateInfo fromTile(int x, int y, int zoom) {
 		MapBlockCoordinateInfo info = new MapBlockCoordinateInfo();
 		
@@ -96,7 +131,7 @@ public class CoordinateResolver {
 		
 		// tile with 1:1 map resolution
 		info.x = (int)(x * factor);
-		info.z = (int)(y * factor * -1) - 1; //offset hack
+		info.z = (int)((y-1) * factor * -1);
 		info.height = factor;
 		info.width = factor;
 

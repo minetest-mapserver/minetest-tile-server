@@ -106,12 +106,46 @@ public class UpdateChangedTilesJob implements Runnable {
 
 	private final Map<Integer, Long> timestampMap = new HashMap<>();
 
+
+
 	@Override
 	public void run() {
+		//Run without parsing summary
+		updateChangedTiles();
+	}
+
+
+	/**
+	 * Execution summory of changed tiles
+	 */
+	public static class ChangedTilesResult {
+		public Map<Integer, Integer> renderedTilesPerLayer = new HashMap<>();
+		public Map<Integer, Integer> skippedTilesPerLayer = new HashMap<>();
+		public Map<Integer, Integer> changedBlocksPerLayer = new HashMap<>();
+		public double executionTime;
+
+		@Override
+		public String toString() {
+			return "ChangedTilesResult{" +
+					"renderedTilesPerLayer=" + renderedTilesPerLayer +
+					", skippedTilesPerLayer=" + skippedTilesPerLayer +
+					", changedBlocksPerLayer=" + changedBlocksPerLayer +
+					", executionTime=" + executionTime +
+					'}';
+		}
+	}
+
+	/**
+	 * Updates the changed tiles and returns a summary of all actions
+	 * @return
+	 */
+	public ChangedTilesResult updateChangedTiles(){
+
+		ChangedTilesResult result = new ChangedTilesResult();
 
 		if (running) {
 			//skip multiple invocations
-			return;
+			return result;
 		}
 
 		if (timestampMap.isEmpty()) {
@@ -179,6 +213,10 @@ public class UpdateChangedTilesJob implements Runnable {
 				int count = blocks.size();
 				int invalidatedTiles = 0;
 
+				//internal summary
+				result.changedBlocksPerLayer.put(layer.id, count);
+
+				//prometheus
 				layerBlockQueryTimingGaugeMap.get(layer.id).set(queryTime);
 				layerBlockChangeGaugeMap.get(layer.id).set(count);
 
@@ -207,32 +245,8 @@ public class UpdateChangedTilesJob implements Runnable {
 
 				logger.debug("Starting rendering of changed tiles");
 
-				//run with rendering of highest zoom level without cache
-				for (BlocksRecord record : blocks) {
-
-					Integer x = record.getPosx();
-					Integer z = record.getPosz();
-
-					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
-
-					TileInfo zoomedTile = tileInfo.toZoom(CoordinateResolver.MAX_ZOOM);
-					String tileKey = getTileKey(zoomedTile);
-
-					logger.debug("Rendering tile x={} y={} zoom={}", zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
-					tileRenderer.render(layer, zoomedTile.x, zoomedTile.y, zoomedTile.zoom, false); //render without cache
-
-					logger.debug("Dispatching tile-changed-event for tile: {}/{}", zoomedTile.x, zoomedTile.y);
-
-					EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
-					event.layerId = layer.id;
-					event.x = zoomedTile.x;
-					event.y = zoomedTile.y;
-					event.zoom = zoomedTile.zoom;
-					event.mapblockX = x;
-					event.mapblockZ = z;
-					eventBus.post(event);
-
-				}
+				int changedTileCount = 0;
+				int skippedTileCount = 0;
 
 				List<String> updatedTileKeys = new ArrayList<>();
 
@@ -244,7 +258,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
 
-					for (int i = CoordinateResolver.MAX_ZOOM-1; i >= CoordinateResolver.MIN_ZOOM+2; i--) {
+					for (int i = CoordinateResolver.MAX_ZOOM; i >= CoordinateResolver.MIN_ZOOM+2; i--) {
 						TileInfo zoomedTile = tileInfo.toZoom(i);
 						String tileKey = getTileKey(zoomedTile);
 
@@ -252,7 +266,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 							//Generate tiles now
 							logger.debug("Rendering tile x={} y={} zoom={}", zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
-							tileRenderer.render(layer, zoomedTile.x, zoomedTile.y, zoomedTile.zoom, false); //render without cache
+							tileRenderer.render(layer, zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
 
 							logger.debug("Dispatching tile-changed-event for tile: {}/{}", zoomedTile.x, zoomedTile.y);
 
@@ -265,12 +279,20 @@ public class UpdateChangedTilesJob implements Runnable {
 							event.mapblockZ = z;
 							eventBus.post(event);
 
+							changedTileCount++;
 							updatedTileKeys.add(tileKey);
+
+						} else {
+							skippedTileCount++;
+
 						}
 
 					}
 
 				}
+
+				result.renderedTilesPerLayer.put(layer.id, changedTileCount);
+				result.skippedTilesPerLayer.put(layer.id, skippedTileCount);
 
 				final String msg = "Tile update job took {} ms for {} blocks in layer: '{}' (invalidated {} tiles)";
 				final Object[] params = new Object[]{
@@ -293,9 +315,10 @@ public class UpdateChangedTilesJob implements Runnable {
 			changedTiles.set(tileCount);
 
 			running = false;
-			timer.observeDuration();
+			result.executionTime = timer.observeDuration();
 		}
 
+		return result;
 	}
 
 }

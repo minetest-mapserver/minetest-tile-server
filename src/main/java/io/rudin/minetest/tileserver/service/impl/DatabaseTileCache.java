@@ -143,7 +143,25 @@ public class DatabaseTileCache implements TileCache {
 
         } else {
             //fallback
-            record.store();
+            TilesRecord existingRecord = ctx.selectFrom(TILES)
+                    .where(TILES.X.eq(record.getX()))
+                    .and(TILES.Y.eq(record.getY()))
+                    .and(TILES.Z.eq(record.getZ()))
+                    .and(TILES.LAYERID.eq(record.getLayerid()))
+                    .fetchOne();
+
+            if (existingRecord != null){
+                //update
+                existingRecord.setTile(record.getTile());
+                existingRecord.setMtime(record.getMtime());
+                existingRecord.update();
+
+            } else {
+                //insert
+                record.insert();
+
+            }
+
         }
 
     }
