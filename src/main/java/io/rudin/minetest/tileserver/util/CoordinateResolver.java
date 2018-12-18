@@ -102,7 +102,7 @@ public class CoordinateResolver {
 		pos1.x = (int)(x * factor);
 		pos1.z = (int)((y-1) * factor * -1);
 
-		//TODO
+		//TODOs
 
 		area.pos1 = pos1;
 		area.pos2 = pos2;
