@@ -1,4 +1,9 @@
 
+const host = process.argv[2]; // host, for example: https://pandorabox.io/map
+//TODO: argument parser, more options: port, debug,e etc
+
+console.log("Creating proxy-connection for backend @ " + host);
+
 var httpProxy = require('http-proxy'),
     http = require("http"),
     serveStatic = require('serve-static'),
@@ -6,7 +11,7 @@ var httpProxy = require('http-proxy'),
 
 
 var proxy = httpProxy.createProxy({
-	target: "https://pandorabox.io/map",
+	target: host,
 	secure: false
 });
 
