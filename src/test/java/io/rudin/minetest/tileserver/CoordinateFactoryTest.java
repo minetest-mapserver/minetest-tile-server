@@ -12,19 +12,19 @@ public class CoordinateFactoryTest {
         MapBlockCoordinate mapBlock = new MapBlockCoordinate(0,0);
         TileCoordinate tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(mapBlock);
         Assert.assertEquals(0, tileCoordinate.x);
-        Assert.assertEquals(0, tileCoordinate.y);
+        Assert.assertEquals(1, tileCoordinate.y);
         Assert.assertEquals(13, tileCoordinate.zoom);
 
         mapBlock = new MapBlockCoordinate(1,1);
         tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(mapBlock);
         Assert.assertEquals(1, tileCoordinate.x);
-        Assert.assertEquals(-1, tileCoordinate.y);
+        Assert.assertEquals(0, tileCoordinate.y);
         Assert.assertEquals(13, tileCoordinate.zoom);
 
         mapBlock = new MapBlockCoordinate(-1,-1);
         tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(mapBlock);
         Assert.assertEquals(-1, tileCoordinate.x);
-        Assert.assertEquals(1, tileCoordinate.y);
+        Assert.assertEquals(2, tileCoordinate.y);
         Assert.assertEquals(13, tileCoordinate.zoom);
 
     }
@@ -34,45 +34,45 @@ public class CoordinateFactoryTest {
 
         Range<MapBlockCoordinate> range = CoordinateFactory.getMapBlocksInTile(new TileCoordinate(0, 0, 13));
         Assert.assertEquals(0, range.pos1.x);
-        Assert.assertEquals(0, range.pos1.z);
+        Assert.assertEquals(-1, range.pos1.z);
         Assert.assertEquals(0, range.pos2.x);
-        Assert.assertEquals(0, range.pos2.z);
+        Assert.assertEquals(-1, range.pos2.z);
 
         range = CoordinateFactory.getMapBlocksInTile(new TileCoordinate(-1, -1, 13));
         Assert.assertEquals(-1, range.pos1.x);
-        Assert.assertEquals(1, range.pos1.z);
+        Assert.assertEquals(0, range.pos1.z);
         Assert.assertEquals(-1, range.pos2.x);
-        Assert.assertEquals(1, range.pos2.z);
+        Assert.assertEquals(0, range.pos2.z);
 
         range = CoordinateFactory.getMapBlocksInTile(new TileCoordinate(0, 0, 12));
         Assert.assertEquals(0, range.pos1.x);
-        Assert.assertEquals(0, range.pos1.z);
+        Assert.assertEquals(-1, range.pos1.z);
         Assert.assertEquals(1, range.pos2.x);
-        Assert.assertEquals(-1, range.pos2.z);
+        Assert.assertEquals(-2, range.pos2.z);
 
         range = CoordinateFactory.getMapBlocksInTile(new TileCoordinate(1, 1, 12));
         Assert.assertEquals(2, range.pos1.x);
-        Assert.assertEquals(-2, range.pos1.z);
+        Assert.assertEquals(-3, range.pos1.z);
         Assert.assertEquals(3, range.pos2.x);
-        Assert.assertEquals(-3, range.pos2.z);
+        Assert.assertEquals(-4, range.pos2.z);
 
         range = CoordinateFactory.getMapBlocksInTile(new TileCoordinate(2, 2, 12));
         Assert.assertEquals(4, range.pos1.x);
-        Assert.assertEquals(-4, range.pos1.z);
+        Assert.assertEquals(-5, range.pos1.z);
         Assert.assertEquals(5, range.pos2.x);
-        Assert.assertEquals(-5, range.pos2.z);
+        Assert.assertEquals(-6, range.pos2.z);
 
         range = CoordinateFactory.getMapBlocksInTile(new TileCoordinate(0, 0, 11));
         Assert.assertEquals(0, range.pos1.x);
-        Assert.assertEquals(0, range.pos1.z);
+        Assert.assertEquals(-1, range.pos1.z);
         Assert.assertEquals(3, range.pos2.x);
-        Assert.assertEquals(-3, range.pos2.z);
+        Assert.assertEquals(-4, range.pos2.z);
 
         range = CoordinateFactory.getMapBlocksInTile(new TileCoordinate(1, 1, 11));
         Assert.assertEquals(4, range.pos1.x);
-        Assert.assertEquals(-4, range.pos1.z);
+        Assert.assertEquals(-5, range.pos1.z);
         Assert.assertEquals(7, range.pos2.x);
-        Assert.assertEquals(-7, range.pos2.z);
+        Assert.assertEquals(-8, range.pos2.z);
 
     }
 

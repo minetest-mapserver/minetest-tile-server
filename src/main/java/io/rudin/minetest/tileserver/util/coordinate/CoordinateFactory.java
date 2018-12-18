@@ -13,8 +13,8 @@ public class CoordinateFactory {
      * @return
      */
     public static TileCoordinate getTileCoordinateFromMapBlock(MapBlockCoordinate mapBlock){
-        //Inverted z-axis
-        return new TileCoordinate(mapBlock.x, mapBlock.z * -1, MAX_ZOOM);
+        //Inverted and offsetet z-axis
+        return new TileCoordinate(mapBlock.x, (mapBlock.z * -1) + 1, MAX_ZOOM);
     }
 
     /**
@@ -27,10 +27,10 @@ public class CoordinateFactory {
         int scale = (int) Math.pow(2, scaleDiff); //1,4,8,16,32...4096
 
         int mapBlockX1 = tile.x * scale;
-        int mapBlockZ1 = tile.y * scale * -1;
+        int mapBlockZ1 = (tile.y * scale * -1) - 1;
 
         int mapBlockX2 = mapBlockX1 + scale-1;
-        int mapBlockZ2 = mapBlockZ1 + ((scale-1) * -1);
+        int mapBlockZ2 = (mapBlockZ1 + ((scale-1) * -1));
 
         return new Range<>(
                 new MapBlockCoordinate(mapBlockX1, mapBlockZ1),
