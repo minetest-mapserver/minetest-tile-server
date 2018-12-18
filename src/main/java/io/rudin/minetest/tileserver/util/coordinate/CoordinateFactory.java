@@ -38,6 +38,22 @@ public class CoordinateFactory {
         );
     }
 
+    public static TileCoordinate getZoomedOutTile(TileCoordinate tile){
+        if (tile.zoom <= 1)
+            throw new IllegalArgumentException("invalid zoom: " + tile.zoom);
+
+        return new TileCoordinate(
+                (int)Math.floor(tile.x / 2.0),
+                (int)Math.floor(tile.y / 2.0),
+                tile.zoom - 1
+        );
+    }
+
+    /**
+     * Returns the zoomed in tile-quadrants
+     * @param tile
+     * @return
+     */
     public static TileQuadrants getZoomedQuadrantsFromTile(TileCoordinate tile){
         if (tile.zoom >= MAX_ZOOM || tile.zoom < 1)
             throw new IllegalArgumentException("invalid zoom: " + tile.zoom);

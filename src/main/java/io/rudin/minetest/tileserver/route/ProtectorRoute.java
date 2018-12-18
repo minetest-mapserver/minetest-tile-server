@@ -4,7 +4,6 @@ import io.rudin.minetest.tileserver.blockdb.tables.pojos.Protector;
 import io.rudin.minetest.tileserver.config.LayerConfig;
 import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.qualifier.MapDB;
-import io.rudin.minetest.tileserver.util.CoordinateResolver;
 import org.jooq.DSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

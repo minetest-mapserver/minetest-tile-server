@@ -19,11 +19,12 @@ import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.query.YQueryBuilder;
 import io.rudin.minetest.tileserver.service.BlocksRecordService;
 import io.rudin.minetest.tileserver.service.EventBus;
+import io.rudin.minetest.tileserver.util.coordinate.CoordinateFactory;
+import io.rudin.minetest.tileserver.util.coordinate.MapBlockCoordinate;
+import io.rudin.minetest.tileserver.util.coordinate.TileCoordinate;
 import org.jooq.*;
 
 import io.rudin.minetest.tileserver.service.TileCache;
-import io.rudin.minetest.tileserver.util.CoordinateResolver;
-import io.rudin.minetest.tileserver.util.CoordinateResolver.TileInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +98,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 	private boolean running = false;
 
-	private String getTileKey(TileInfo tile){
+	private String getTileKey(TileCoordinate tile){
 		return "Tile:" + tile.x + "/" + tile.y + "/" + tile.zoom;
 	}
 
@@ -256,25 +257,25 @@ public class UpdateChangedTilesJob implements Runnable {
 					Integer x = record.getPosx();
 					Integer z = record.getPosz();
 
-					TileInfo tileInfo = CoordinateResolver.fromCoordinates(x, z);
+					TileCoordinate tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(new MapBlockCoordinate(x, z));
 
-					for (int i = CoordinateResolver.MAX_ZOOM; i >= CoordinateResolver.MIN_ZOOM+2; i--) {
-						TileInfo zoomedTile = tileInfo.toZoom(i);
-						String tileKey = getTileKey(zoomedTile);
+					for (int i = CoordinateFactory.MAX_ZOOM; i >= 3; i--) {
+
+						String tileKey = getTileKey(tileCoordinate);
 
 						if (!updatedTileKeys.contains(tileKey)) {
 
 							//Generate tiles now
-							logger.debug("Rendering tile x={} y={} zoom={}", zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
-							tileRenderer.render(layer, zoomedTile.x, zoomedTile.y, zoomedTile.zoom);
+							logger.debug("Rendering tile x={} y={} zoom={}", tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
+							tileRenderer.render(layer, tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
 
-							logger.debug("Dispatching tile-changed-event for tile: {}/{}", zoomedTile.x, zoomedTile.y);
+							logger.debug("Dispatching tile-changed-event for tile: {}/{}", tileCoordinate.x, tileCoordinate.y);
 
 							EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
 							event.layerId = layer.id;
-							event.x = zoomedTile.x;
-							event.y = zoomedTile.y;
-							event.zoom = zoomedTile.zoom;
+							event.x = tileCoordinate.x;
+							event.y = tileCoordinate.y;
+							event.zoom = tileCoordinate.zoom;
 							event.mapblockX = x;
 							event.mapblockZ = z;
 							eventBus.post(event);
@@ -286,6 +287,9 @@ public class UpdateChangedTilesJob implements Runnable {
 							skippedTileCount++;
 
 						}
+
+						//zom out
+						tileCoordinate = CoordinateFactory.getZoomedOutTile(tileCoordinate);
 
 					}
 

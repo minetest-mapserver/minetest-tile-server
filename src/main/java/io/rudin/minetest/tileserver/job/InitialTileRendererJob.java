@@ -1,13 +1,14 @@
 package io.rudin.minetest.tileserver.job;
 
-import com.google.common.util.concurrent.Striped;
 import io.rudin.minetest.tileserver.TileRenderer;
 import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.LayerConfig;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.query.YQueryBuilder;
-import io.rudin.minetest.tileserver.util.CoordinateResolver;
+import io.rudin.minetest.tileserver.util.coordinate.CoordinateFactory;
+import io.rudin.minetest.tileserver.util.coordinate.MapBlockCoordinate;
+import io.rudin.minetest.tileserver.util.coordinate.TileCoordinate;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
@@ -17,8 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import java.util.concurrent.locks.ReadWriteLock;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
@@ -96,10 +95,10 @@ public class InitialTileRendererJob implements Runnable {
 
                         double zProgress = (posz - minZ) / (double) zCount;
 
-                        CoordinateResolver.TileInfo tileInfo = CoordinateResolver.fromCoordinates(posx, posz);
+                        TileCoordinate tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(new MapBlockCoordinate(posx, posz));
 
                         try {
-                            byte[] data = renderer.render(layer, tileInfo.x, tileInfo.y, CoordinateResolver.ONE_TO_ONE_ZOOM);
+                            byte[] data = renderer.render(layer, tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
                             byteCount += data.length;
                             tileCount++;
 

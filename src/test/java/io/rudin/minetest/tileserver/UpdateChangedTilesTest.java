@@ -1,14 +1,13 @@
 package io.rudin.minetest.tileserver;
 
-import io.rudin.minetest.tileserver.accessor.Coordinate;
 import io.rudin.minetest.tileserver.base.TileServerTest;
-import io.rudin.minetest.tileserver.blockdb.tables.Blocks;
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.job.UpdateChangedTilesJob;
 import io.rudin.minetest.tileserver.qualifier.MapDB;
-import io.rudin.minetest.tileserver.service.BlocksRecordService;
 import io.rudin.minetest.tileserver.service.TileCache;
-import io.rudin.minetest.tileserver.util.CoordinateResolver;
+import io.rudin.minetest.tileserver.util.coordinate.CoordinateFactory;
+import io.rudin.minetest.tileserver.util.coordinate.MapBlockCoordinate;
+import io.rudin.minetest.tileserver.util.coordinate.TileCoordinate;
 import org.jooq.DSLContext;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.List;
 
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
@@ -33,26 +31,26 @@ public class UpdateChangedTilesTest extends TileServerTest {
     @Test
     public void test() throws IOException {
 
-        final int mapblockX = 0;
-        final int mapblockZ = 0;
-
-        CoordinateResolver.TileInfo coordinates = CoordinateResolver.fromCoordinates(mapblockX, mapblockZ);
-
-        logger.debug("Mapblock X={} Z={} / Tile X={} Y={} Zoom={} Width={} Height={}",
-                mapblockX, mapblockZ,
-                coordinates.x, coordinates.y, coordinates.zoom, coordinates.width, coordinates.height);
 
 
-        byte[] tile = tileCache.get(0, coordinates.x, coordinates.y, 13);
+        MapBlockCoordinate mapBlockCoordinate = new MapBlockCoordinate(0, 0);
+        TileCoordinate tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(mapBlockCoordinate);
+
+        logger.debug("Mapblock X={} Z={} / Tile X={} Y={} Zoom={}",
+                mapBlockCoordinate.x, mapBlockCoordinate.z,
+                tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
+
+
+        byte[] tile = tileCache.get(0, tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
         Assert.assertNull(tile);
 
         logger.debug("First result: {}", changedTilesJob.updateChangedTiles());
 
-        tile = tileCache.get(0, coordinates.x, coordinates.y, 13);
+        tile = tileCache.get(0, tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
         Assert.assertNotNull(tile);
 
         BlocksRecord block = ctx.selectFrom(BLOCKS)
-                .where(BLOCKS.POSX.eq(mapblockX).and(BLOCKS.POSY.eq(0).and(BLOCKS.POSZ.eq(mapblockZ))))
+                .where(BLOCKS.POSX.eq(mapBlockCoordinate.x).and(BLOCKS.POSY.eq(0).and(BLOCKS.POSZ.eq(mapBlockCoordinate.z))))
                 .fetchOne();
 
         block.setMtime(System.currentTimeMillis());
@@ -60,7 +58,7 @@ public class UpdateChangedTilesTest extends TileServerTest {
 
         logger.debug("Second result: {}", changedTilesJob.updateChangedTiles());
 
-        tile = tileCache.get(0, coordinates.x, coordinates.y, 13);
+        tile = tileCache.get(0, tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
         Assert.assertNotNull(tile);
 
 

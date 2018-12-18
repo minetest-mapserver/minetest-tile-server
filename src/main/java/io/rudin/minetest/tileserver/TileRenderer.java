@@ -20,6 +20,7 @@ import io.rudin.minetest.tileserver.config.TileServerConfig;
 import io.rudin.minetest.tileserver.qualifier.MapDB;
 import io.rudin.minetest.tileserver.query.YQueryBuilder;
 import io.rudin.minetest.tileserver.service.MapBlockRenderService;
+import io.rudin.minetest.tileserver.util.coordinate.*;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.slf4j.Logger;
@@ -27,15 +28,15 @@ import org.slf4j.LoggerFactory;
 
 import io.rudin.minetest.tileserver.blockdb.tables.records.BlocksRecord;
 import io.rudin.minetest.tileserver.service.TileCache;
-import io.rudin.minetest.tileserver.util.CoordinateResolver;
-import io.rudin.minetest.tileserver.util.CoordinateResolver.MapBlockCoordinateInfo;
 import io.rudin.minetest.tileserver.util.WhiteTile;
 
 @Singleton
 public class TileRenderer {
 
 	private static final Logger logger = LoggerFactory.getLogger(TileRenderer.class);
-	
+
+	public static final int TILE_PIXEL_SIZE = 256;
+
 	@Inject
 	public TileRenderer(@MapDB DSLContext ctx, TileCache cache, MapBlockRenderService blockRenderer, TileServerConfig cfg, YQueryBuilder yQueryBuilder) {
 		this.ctx = ctx;
@@ -61,7 +62,7 @@ public class TileRenderer {
 			.name("tileserver_render_time_seconds").help("Render time in seconds.").register();
 
 	public BufferedImage createTile() {
-		return new BufferedImage(CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE, BufferedImage.TYPE_INT_RGB);
+		return new BufferedImage(TILE_PIXEL_SIZE, TILE_PIXEL_SIZE, BufferedImage.TYPE_INT_RGB);
 	}
 
 	private final int DEFAULT_BLOCK_ZOOM = 13;
@@ -81,30 +82,35 @@ public class TileRenderer {
 			}
 		}
 
-		MapBlockCoordinateInfo mapblockInfo = CoordinateResolver.fromTile(tileX, tileY, zoom);
+		Range<MapBlockCoordinate> mapBlocksRange = CoordinateFactory.getMapBlocksInTile(new TileCoordinate(tileX, tileY, zoom));
 
-		if (mapblockInfo.x > 2048 || mapblockInfo.x < -2048 || mapblockInfo.z > 2048 || mapblockInfo.z < -2048)
+		int max = Math.max(
+				Math.max(mapBlocksRange.pos1.x, mapBlocksRange.pos1.z),
+				Math.max(mapBlocksRange.pos2.x, mapBlocksRange.pos2.x)
+		);
+
+		int min = Math.min(
+				Math.min(mapBlocksRange.pos1.x, mapBlocksRange.pos1.z),
+				Math.min(mapBlocksRange.pos2.x, mapBlocksRange.pos2.x)
+		);
+
+		if (max > 2048 || min < -2048)
 			//Out of range...
 			return WhiteTile.getPNG();
+
 		
 		if (zoom < DEFAULT_BLOCK_ZOOM) {
 			//TODO: fail-fast for regions without map-blocks -> white
-
-			int x1 = mapblockInfo.x;
-			int x2 = mapblockInfo.x + (int)mapblockInfo.width;
-			
-			int z1 = mapblockInfo.z;
-			int z2 = (mapblockInfo.z *-1) + ((int)mapblockInfo.height);
 
 			long start = System.currentTimeMillis();
 
 			Result<BlocksRecord> firstResult = ctx
 					.selectFrom(BLOCKS)
 					.where(
-							BLOCKS.POSX.ge(Math.min(x1, x2))
-							.and(BLOCKS.POSX.le(Math.max(x1, x2)))
-							.and(BLOCKS.POSZ.ge(Math.min(z1, z2)))
-							.and(BLOCKS.POSZ.le(Math.max(z1, z2)))
+							BLOCKS.POSX.ge(Math.min(mapBlocksRange.pos1.x, mapBlocksRange.pos2.x))
+							.and(BLOCKS.POSX.le(Math.max(mapBlocksRange.pos1.x, mapBlocksRange.pos2.x)))
+							.and(BLOCKS.POSZ.ge(Math.min(mapBlocksRange.pos1.z, mapBlocksRange.pos2.z)))
+							.and(BLOCKS.POSZ.le(Math.max(mapBlocksRange.pos1.z, mapBlocksRange.pos2.z)))
 							.and(yQueryBuilder.getCondition(layer))
 					)
 					.limit(1)
@@ -117,7 +123,9 @@ public class TileRenderer {
 			}
 		
 			if (firstResult.isEmpty()) {
-				logger.debug("Fail-fast, got zero mapblock count for x=({})-({}) z=({})-({})", x1,x2, z1,z2);
+				logger.debug("Fail-fast, got zero mapblock count for x=({})-({}) z=({})-({})",
+						mapBlocksRange.pos1.x, mapBlocksRange.pos2.x,
+						mapBlocksRange.pos1.z, mapBlocksRange.pos2.z);
 
 				byte[] data = WhiteTile.getPNG();
 
@@ -173,69 +181,26 @@ public class TileRenderer {
 
 		try {
 
-			final int HALF_TILE_PIXEL_SIZE = CoordinateResolver.TILE_PIXEL_SIZE / 2;
+			final int HALF_TILE_PIXEL_SIZE = TILE_PIXEL_SIZE / 2;
 
 
-			if (zoom > DEFAULT_BLOCK_ZOOM) {
-				//TODO: needed anymore?
-				//Zoom in
-
-				int nextZoom = zoom - 1;
-				int offsetNextZoomX = Math.abs(tileX % 2);
-				int offsetNextZoomY = Math.abs(tileY % 2);
-
-				int nextZoomX = (tileX - offsetNextZoomX) / 2;
-				int nextZoomY = (tileY - offsetNextZoomY) / 2;
-
-				BufferedImage tile = createTile();
-				Graphics2D graphics = tile.createGraphics();
-
-				//Get all quadrants
-				BufferedImage image = renderImage(layer, nextZoomX, nextZoomY, nextZoom);
-
-				BufferedImage quadrant = image.getSubimage(
-						HALF_TILE_PIXEL_SIZE * offsetNextZoomX,
-						HALF_TILE_PIXEL_SIZE * offsetNextZoomY,
-						HALF_TILE_PIXEL_SIZE,
-						HALF_TILE_PIXEL_SIZE
-				);
-
-				Image scaledInstance = quadrant.getScaledInstance(
-						CoordinateResolver.TILE_PIXEL_SIZE,
-						CoordinateResolver.TILE_PIXEL_SIZE,
-						Image.SCALE_FAST
-				);
-
-				graphics.drawImage(scaledInstance, 0, 0, CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE, null);
-
-				ByteArrayOutputStream output = new ByteArrayOutputStream(12000);
-				ImageIO.write(tile, "png", output);
-
-				//binary cache
-				byte[] data = output.toByteArray();
-				cache.put(layer.id, tileX, tileY, zoom, data);
-
-				if (tile == null)
-					logger.error("Got a null-tile @ {}/{}/{}", tileX, tileY, data);
-
-				return tile;
-
-
-			} else if (zoom < DEFAULT_BLOCK_ZOOM) {
+			if (zoom < DEFAULT_BLOCK_ZOOM) {
 				//Zoom out
 
 
 				BufferedImage tile = createTile();
 				//Pack 4 tiles from higher zoom into 1 tile
 
+				TileQuadrants quadrants = CoordinateFactory.getZoomedQuadrantsFromTile(new TileCoordinate(tileX, tileY, zoom));
+
 				int nextZoom = zoom + 1;
 				int nextZoomX = tileX * 2;
 				int nextZoomY = tileY * 2;
 
-				BufferedImage upperLeft = renderImage(layer, nextZoomX, nextZoomY, nextZoom);
-				BufferedImage upperRightImage = renderImage(layer, nextZoomX + 1, nextZoomY, nextZoom);
-				BufferedImage lowerLeftImage = renderImage(layer, nextZoomX, nextZoomY + 1, nextZoom);
-				BufferedImage lowerRightImage = renderImage(layer, nextZoomX + 1, nextZoomY + 1, nextZoom);
+				BufferedImage upperLeft = renderImage(layer, quadrants.upperLeft.x, quadrants.upperLeft.y, quadrants.upperLeft.zoom);
+				BufferedImage upperRightImage = renderImage(layer, quadrants.upperRight.x, quadrants.upperRight.y, quadrants.upperRight.zoom);
+				BufferedImage lowerLeftImage = renderImage(layer, quadrants.lowerLeft.x, quadrants.lowerLeft.y, quadrants.lowerLeft.zoom);
+				BufferedImage lowerRightImage = renderImage(layer, quadrants.lowerRight.x, quadrants.lowerRight.y, quadrants.lowerRight.zoom);
 
 				long start = System.currentTimeMillis();
 
@@ -274,18 +239,18 @@ public class TileRenderer {
 			//Default zoom (13 == 1 mapblock with 16px wide blocks)
 			long start = System.currentTimeMillis();
 
-			MapBlockCoordinateInfo coordinateInfo = CoordinateResolver.fromTile(tileX, tileY, zoom);
+			Range<MapBlockCoordinate> coordinateRange = CoordinateFactory.getMapBlocksInTile(new TileCoordinate(tileX, tileY, zoom));
 
 			//16x16 mapblocks on a tile
 			BufferedImage image = createTile();
 			Graphics2D graphics = image.createGraphics();
 
 			graphics.setColor(Color.WHITE);
-			graphics.fillRect(0, 0, CoordinateResolver.TILE_PIXEL_SIZE, CoordinateResolver.TILE_PIXEL_SIZE);
+			graphics.fillRect(0, 0, TILE_PIXEL_SIZE, TILE_PIXEL_SIZE);
 
 
-			int mapblockX = coordinateInfo.x;
-			int mapblockZ = coordinateInfo.z;
+			int mapblockX = coordinateRange.pos1.x;
+			int mapblockZ = coordinateRange.pos1.z;
 
 			long now = System.currentTimeMillis();
 			long timingImageSetup = now - start;
