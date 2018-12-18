@@ -24,7 +24,7 @@
     <logger name="org.jooq" level="WARN"/>
     <logger name="io.rudin.minetest.tileserver.job.UpdateChangedTilesJob" level="INFO"/>
     <logger name="io.rudin.minetest.tileserver.service.impl.DefaultMapBlockRenderService" level="INFO"/>
-    <logger name="io.rudin.minetest.tileserver.TileRenderer" level="DEBUG"/>
+    <logger name="io.rudin.minetest.tileserver.TileRenderer" level="INFO"/>
 
     <root level="info">
         <appender-ref ref="logfile" />
