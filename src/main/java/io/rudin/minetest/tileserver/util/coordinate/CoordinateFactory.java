@@ -14,7 +14,7 @@ public class CoordinateFactory {
      */
     public static TileCoordinate getTileCoordinateFromMapBlock(MapBlockCoordinate mapBlock){
         //Inverted and offsetet z-axis
-        return new TileCoordinate(mapBlock.x, (mapBlock.z * -1) + 1, MAX_ZOOM);
+        return new TileCoordinate(mapBlock.x, (mapBlock.z + 1) * -1, MAX_ZOOM);
     }
 
     /**

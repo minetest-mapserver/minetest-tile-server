@@ -12,19 +12,19 @@ public class CoordinateFactoryTest {
         MapBlockCoordinate mapBlock = new MapBlockCoordinate(0,0);
         TileCoordinate tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(mapBlock);
         Assert.assertEquals(0, tileCoordinate.x);
-        Assert.assertEquals(1, tileCoordinate.y);
+        Assert.assertEquals(-1, tileCoordinate.y);
         Assert.assertEquals(13, tileCoordinate.zoom);
 
         mapBlock = new MapBlockCoordinate(1,1);
         tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(mapBlock);
         Assert.assertEquals(1, tileCoordinate.x);
-        Assert.assertEquals(0, tileCoordinate.y);
+        Assert.assertEquals(-2, tileCoordinate.y);
         Assert.assertEquals(13, tileCoordinate.zoom);
 
         mapBlock = new MapBlockCoordinate(-1,-1);
         tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(mapBlock);
         Assert.assertEquals(-1, tileCoordinate.x);
-        Assert.assertEquals(2, tileCoordinate.y);
+        Assert.assertEquals(0, tileCoordinate.y);
         Assert.assertEquals(13, tileCoordinate.zoom);
 
     }

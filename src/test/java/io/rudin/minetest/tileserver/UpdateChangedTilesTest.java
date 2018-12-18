@@ -44,7 +44,7 @@ public class UpdateChangedTilesTest extends TileServerTest {
         byte[] tile = tileCache.get(0, tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
         Assert.assertNull(tile);
 
-        logger.debug("First result: {}", changedTilesJob.updateChangedTiles());
+        logger.debug("First result (init): {}", changedTilesJob.updateChangedTiles());
 
         tile = tileCache.get(0, tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
         Assert.assertNotNull(tile);
@@ -56,7 +56,12 @@ public class UpdateChangedTilesTest extends TileServerTest {
         block.setMtime(System.currentTimeMillis());
         block.update();
 
-        logger.debug("Second result: {}", changedTilesJob.updateChangedTiles());
+        logger.debug("Second result (changed): {}", changedTilesJob.updateChangedTiles());
+
+        tile = tileCache.get(0, tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
+        Assert.assertNotNull(tile);
+
+        logger.debug("Third result (unchanged): {}", changedTilesJob.updateChangedTiles());
 
         tile = tileCache.get(0, tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
         Assert.assertNotNull(tile);

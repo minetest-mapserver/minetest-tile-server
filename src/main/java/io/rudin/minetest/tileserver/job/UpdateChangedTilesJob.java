@@ -93,7 +93,7 @@ public class UpdateChangedTilesJob implements Runnable {
 	private final EventBus eventBus;
 
 	private final DSLContext ctx;
-	
+
 	private final TileCache tileCache;
 
 	private boolean running = false;
@@ -235,9 +235,28 @@ public class UpdateChangedTilesJob implements Runnable {
 
 				logger.debug("Got {} updated blocks", blocks.size());
 
+				//invalidation run
 				for (BlocksRecord record : blocks) {
 					blocksRecordService.update(record);
 					mapBlockAccessor.invalidate(new Coordinate(record));
+
+					if (record.getMtime() > latestTimestamp)
+						latestTimestamp = record.getMtime();
+
+					Integer x = record.getPosx();
+					Integer z = record.getPosz();
+
+					TileCoordinate tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(new MapBlockCoordinate(x, z));
+
+					for (int i = CoordinateFactory.MAX_ZOOM; i > 0; i--) {
+						tileCache.remove(layer.id, tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
+						invalidatedTiles++;
+
+						//Zoom out
+						if (i > 1) {
+							tileCoordinate = CoordinateFactory.getZoomedOutTile(tileCoordinate);
+						}
+					}
 				}
 
 				//assign new timestamp
@@ -251,7 +270,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 				List<String> updatedTileKeys = new ArrayList<>();
 
-				//run with rendering of other zoom levels, but cached
+				//tile re-rendering
 				for (BlocksRecord record : blocks) {
 
 					Integer x = record.getPosx();
@@ -259,7 +278,7 @@ public class UpdateChangedTilesJob implements Runnable {
 
 					TileCoordinate tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(new MapBlockCoordinate(x, z));
 
-					for (int i = CoordinateFactory.MAX_ZOOM; i >= 3; i--) {
+					for (int i = CoordinateFactory.MAX_ZOOM; i > 0; i--) {
 
 						String tileKey = getTileKey(tileCoordinate);
 
@@ -269,7 +288,7 @@ public class UpdateChangedTilesJob implements Runnable {
 							logger.debug("Rendering tile x={} y={} zoom={}", tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
 							tileRenderer.render(layer, tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
 
-							logger.debug("Dispatching tile-changed-event for tile: {}/{}", tileCoordinate.x, tileCoordinate.y);
+							logger.debug("Dispatching tile-changed-event for tile: {}/{} zoom:{}", tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);
 
 							EventBus.TileChangedEvent event = new EventBus.TileChangedEvent();
 							event.layerId = layer.id;
@@ -289,7 +308,9 @@ public class UpdateChangedTilesJob implements Runnable {
 						}
 
 						//zom out
-						tileCoordinate = CoordinateFactory.getZoomedOutTile(tileCoordinate);
+						if (i > 1) {
+							tileCoordinate = CoordinateFactory.getZoomedOutTile(tileCoordinate);
+						}
 
 					}
 
