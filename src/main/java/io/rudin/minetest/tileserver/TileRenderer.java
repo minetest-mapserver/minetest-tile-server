@@ -129,9 +129,7 @@ public class TileRenderer {
 		return renderImage(layer, tileX, tileY, zoom, true);
 	}
 
-	public synchronized BufferedImage renderImage(Layer layer, int tileX, int tileY, int zoom, boolean usecache) throws IllegalArgumentException, DataFormatException, IOException, ExecutionException {
-
-
+	public BufferedImage renderImage(Layer layer, int tileX, int tileY, int zoom, boolean usecache) throws IllegalArgumentException, DataFormatException, IOException, ExecutionException {
 
 		//Check if binary cached, use cached version for rendering
 		if (usecache && cache.has(layer.id, tileX, tileY, zoom)) {
@@ -141,22 +139,6 @@ public class TileRenderer {
 				//In case the cache disappears
 				return ImageIO.read(new ByteArrayInputStream(data));
 		}
-
-
-
-		//Second cache check in critical section
-		//Check if binary cached, use cached version for rendering
-		if (usecache && cache.has(layer.id, tileX, tileY, zoom)) {
-			byte[] data = cache.get(layer.id, tileX, tileY, zoom);
-
-			if (data != null && data.length > 0)
-				//In case the cache disappears
-				return ImageIO.read(new ByteArrayInputStream(data));
-		}
-
-
-
-
 
 		BufferedImage tile = createTile();
 
