@@ -252,7 +252,8 @@ public class TileRenderer {
 
 				logger.trace("Timings of cross-stitched tile X={} Y={} Zoom={}: render={} ms", tileX, tileY, zoom, diff);
 
-				cache.put(layer.id, tileX, tileY, zoom, data);
+				if (zoom <= cfg.tileCacheMaxZoom())
+					cache.put(layer.id, tileX, tileY, zoom, data);
 
 				if (tile == null)
 					logger.error("Got a null-tile @ {}/{}/{} (data={})", tileX, tileY, zoom, data.length);
@@ -323,7 +324,8 @@ public class TileRenderer {
 					timingImageSetup, timingZeroCountCheck, timingRender, timingBufferOutput
 			);
 
-			cache.put(layer.id, tileX, tileY, zoom, data);
+			if (zoom <= cfg.tileCacheMaxZoom())
+				cache.put(layer.id, tileX, tileY, zoom, data);
 
 			if (tile == null)
 				logger.error("Got a null-tile @ {}/{}/{} (layer={},data={})", tileX, tileY, zoom, layer.id, data.length);

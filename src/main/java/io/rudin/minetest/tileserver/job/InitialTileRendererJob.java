@@ -104,6 +104,7 @@ public class InitialTileRendererJob implements Runnable {
                         double zProgress = (posz - minZ) / (double) zCount;
 
                         TileCoordinate tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(new MapBlockCoordinate(posx, posz));
+                        tileCoordinate = CoordinateFactory.getZoomedOutTile(tileCoordinate); //zoom out to 12 (max=13)
 
                         try {
                             byte[] data = renderer.render(layer, tileCoordinate.x, tileCoordinate.y, tileCoordinate.zoom);

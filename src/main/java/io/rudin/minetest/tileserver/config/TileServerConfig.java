@@ -98,6 +98,11 @@ public interface TileServerConfig extends Config {
 	tile cache stuff
 	 */
 
+	//max cached zoom, 12=default, 13=very file/storage-heavy
+	@Key("tile.cache.maxzoom")
+	@DefaultValue("12")
+	int tileCacheMaxZoom();
+
 	@Key("tile.cache.impl")
 	@DefaultValue("FILE")
 	CacheType tileCacheType();

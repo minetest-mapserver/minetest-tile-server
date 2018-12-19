@@ -79,7 +79,7 @@ public class TileRoute implements Route {
 			if (layer == null)
 				throw new IllegalArgumentException("layer not found: " + layerid);
 
-			if (z < 2)
+			if (z < 2 || z > 12)
 				throw new IllegalArgumentException("Invalid zoom: " + z);
 
 			//check db cache
