@@ -74,8 +74,6 @@ public class TileServerTest {
         //does not work: create function plsql not available in h2
         //injector.getInstance(DBMigration.class).migrate();
 
-        uploadMapBlocksToDatabase();
-
         logger.info("Environment set up, injecting members");
 
         injector.injectMembers(this);
@@ -83,9 +81,9 @@ public class TileServerTest {
 
     private Injector injector;
 
-    private void uploadMapBlocksToDatabase() throws IOException {
+    protected void uploadMapBlocksToDatabase(String mapblocksDir) throws IOException {
         DSLContext ctx = injector.getInstance(Key.get(DSLContext.class, MapDB.class));
-        File mapBlockDir = new File("testdata/mapblocks");
+        File mapBlockDir = new File(mapblocksDir);
         for (File file: mapBlockDir.listFiles()){
 
             if (file.getName().startsWith("."))

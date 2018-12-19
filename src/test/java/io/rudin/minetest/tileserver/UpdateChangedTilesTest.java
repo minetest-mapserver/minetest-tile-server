@@ -31,7 +31,7 @@ public class UpdateChangedTilesTest extends TileServerTest {
     @Test
     public void test() throws IOException {
 
-
+        uploadMapBlocksToDatabase("testdata/mapblocks");
 
         MapBlockCoordinate mapBlockCoordinate = new MapBlockCoordinate(0, 0);
         TileCoordinate tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(mapBlockCoordinate);
