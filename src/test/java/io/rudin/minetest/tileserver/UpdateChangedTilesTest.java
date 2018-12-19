@@ -35,6 +35,7 @@ public class UpdateChangedTilesTest extends TileServerTest {
 
         MapBlockCoordinate mapBlockCoordinate = new MapBlockCoordinate(0, 0);
         TileCoordinate tileCoordinate = CoordinateFactory.getTileCoordinateFromMapBlock(mapBlockCoordinate);
+        tileCoordinate = CoordinateFactory.getZoomedOutTile(tileCoordinate);
 
         logger.debug("Mapblock X={} Z={} / Tile X={} Y={} Zoom={}",
                 mapBlockCoordinate.x, mapBlockCoordinate.z,
