@@ -1,6 +1,7 @@
 package io.rudin.minetest.tileserver.job;
 
 import io.rudin.minetest.tileserver.TileRenderer;
+import io.rudin.minetest.tileserver.TileServer;
 import io.rudin.minetest.tileserver.config.Layer;
 import io.rudin.minetest.tileserver.config.LayerConfig;
 import io.rudin.minetest.tileserver.config.TileServerConfig;
@@ -19,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import java.util.concurrent.ScheduledExecutorService;
+
 import static io.rudin.minetest.tileserver.blockdb.tables.Blocks.BLOCKS;
 
 @Singleton
@@ -27,12 +30,17 @@ public class InitialTileRendererJob implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(InitialTileRendererJob.class);
 
     @Inject
-    public InitialTileRendererJob(@MapDB DSLContext ctx, TileServerConfig cfg, TileRenderer renderer, YQueryBuilder yQueryBuilder, LayerConfig layerCfg){
+    public InitialTileRendererJob(@MapDB DSLContext ctx, TileServerConfig cfg, TileRenderer renderer,
+                                  YQueryBuilder yQueryBuilder, LayerConfig layerCfg,
+                                  ScheduledExecutorService executor){
         this.ctx = ctx;
         this.renderer = renderer;
         this.yQueryBuilder = yQueryBuilder;
         this.layerCfg = layerCfg;
+        this.executor = executor;
     }
+
+    private final ScheduledExecutorService executor;
 
     private final YQueryBuilder yQueryBuilder;
 
@@ -150,5 +158,7 @@ public class InitialTileRendererJob implements Runnable {
             logger.error("run", e);
         }
 
+        TileServer.startUpdateJobs();
+        TileServer.startWebserver();
     }
 }

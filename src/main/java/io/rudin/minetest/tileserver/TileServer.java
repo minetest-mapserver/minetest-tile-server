@@ -31,10 +31,14 @@ import static spark.Spark.*;
 public class TileServer {
 
 	private static final Logger logger = LoggerFactory.getLogger(TileServer.class);
+
+	private static TileServerConfig cfg;
+
+	private static Injector injector;
 	
 	public static void main(String[] args) throws Exception {
 
-		TileServerConfig cfg = ConfigFactory.create(TileServerConfig.class);
+		cfg = ConfigFactory.create(TileServerConfig.class);
 
 		if (cfg.enableDebug()){
 			TileServer.logger.warn("Enabling debug/logging mode");
@@ -45,7 +49,7 @@ public class TileServer {
 			loggerImpl.setLevel(Level.DEBUG);
 		}
 
-		Injector injector = Guice.createInjector(
+		injector = Guice.createInjector(
 				new ConfigModule(cfg),
 				new DBModule(cfg),
 				new ServiceModule(cfg)
@@ -90,8 +94,6 @@ public class TileServer {
 		get("/protector/:layerId/:x/:z", injector.getInstance(ProtectorRoute.class), json);
 		get("/trainline", injector.getInstance(TrainlineRoute.class), json);
 
-		//Initialize web server
-		init();
 
 		//Initialize ws updater
 		injector.getInstance(WebSocketUpdater.class).init();
@@ -126,16 +128,17 @@ public class TileServer {
 
 		ScheduledExecutorService executor = injector.getInstance(ScheduledExecutorService.class);
 
-		executor.scheduleAtFixedRate(injector.getInstance(UpdateChangedTilesJob.class), 0, cfg.tilerendererUpdateInterval(), TimeUnit.SECONDS);
-		executor.scheduleAtFixedRate(injector.getInstance(UpdatePlayerJob.class), 0, cfg.playerUpdateInterval(), TimeUnit.SECONDS);
 
 		if (cfg.tilerendererEnableInitialRendering()){
 			//Start initial rendering
 			executor.submit(injector.getInstance(InitialTileRendererJob.class));
+		} else {
+			startUpdateJobs();
+			startWebserver();
 		}
 
+		//TODO: do this properly, join or something
 		AtomicBoolean running = new AtomicBoolean(true);
-
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			stop();
 			running.set(false);
@@ -147,6 +150,21 @@ public class TileServer {
 
 		if (cfg.prometheusEnable())
 			promServer.stop();
+	}
+
+	public static void startWebserver(){
+		//Initialize web server
+		logger.info("Starting webserver");
+		init();
+	}
+
+	public static void startUpdateJobs(){
+		logger.info("Starting update jobs");
+		ScheduledExecutorService executor = injector.getInstance(ScheduledExecutorService.class);
+
+		//Start normal tasks
+		executor.scheduleAtFixedRate(injector.getInstance(UpdateChangedTilesJob.class), 0, cfg.tilerendererUpdateInterval(), TimeUnit.SECONDS);
+		executor.scheduleAtFixedRate(injector.getInstance(UpdatePlayerJob.class), 0, cfg.playerUpdateInterval(), TimeUnit.SECONDS);
 	}
 	
 }
