@@ -14,6 +14,12 @@ public interface TileServerConfig extends Config {
 	int httPort();
 
 	/*
+	colors from external source
+	 */
+	@Key("colors.file")
+	String externalColorsFile();
+
+	/*
 	Tile renderer stuff
 	 */
 

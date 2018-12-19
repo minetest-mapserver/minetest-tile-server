@@ -99,6 +99,10 @@ Enable parsing of POI blocks, provided with the mod in this repository
 Enable parsing of Travelnet boxes
 * Default: **true**
 
+### colors.file
+Supply an external colors file supplementary to the builtin tables
+Should be a valid filename or empty (no external colors)
+* Default: **none***
 
 # How it works
 
