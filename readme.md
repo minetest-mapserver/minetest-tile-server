@@ -102,7 +102,7 @@ Enable parsing of Travelnet boxes
 ### colors.file
 Supply an external colors file supplementary to the builtin tables
 Should be a valid filename or empty (no external colors)
-* Default: **none***
+* Default: **none**
 
 # How it works
 
