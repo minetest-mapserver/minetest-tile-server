@@ -52,7 +52,7 @@ public class MapBlockParser {
 		block.version = data[0];
 
 
-		if (block.version != 28) {
+		if (block.version < 25 || block.version > 28) {
 			logger.error("block version not supported: {}", block.version);
 			throw new IllegalArgumentException("block version not supported: " + block.version);
 		}
@@ -68,7 +68,7 @@ public class MapBlockParser {
 		//data[4] = content_width (2)
 
 		//data[5] = params_width (2)
-		int dataOffset = 6;
+		int dataOffset = block.version >= 27 ? 6 : 4;
 
 		Inflater inflater = new Inflater();
 		inflater.setInput(data, dataOffset, data.length - dataOffset);
